@@ -13,7 +13,7 @@ message("Using GIT_REPO_VERSION=${GIT_REPO_VERSION}")
 
 # project
 
-project(roq-gate-io-futures VERSION ${GIT_REPO_VERSION})
+project(roq-gateio-futures VERSION ${GIT_REPO_VERSION})
 
 # conda
 
@@ -70,7 +70,7 @@ include_directories(
 
 # sub-projects
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/roq/gate_io_futures")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/roq/gateio_futures")
 
 # test
 
@@ -95,7 +95,7 @@ endif(BUILD_BENCHMARK)
 
 # install
 
-install(FILES "share/config.toml" DESTINATION "${CMAKE_INSTALL_DATADIR}/roq-gate-io-futures")
+install(FILES "share/config.toml" DESTINATION "${CMAKE_INSTALL_DATADIR}/roq-gateio-futures")
 
 install(FILES "${CMAKE_SOURCE_DIR}/CHANGELOG.md"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/doc/${PROJECT_NAME}")

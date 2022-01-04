@@ -1,5 +1,5 @@
 package:
-  name: roq-gate-io-futures
+  name: roq-gateio-futures
   version: {{ GIT_DESCRIBE_TAG }}
 
 source:
@@ -9,7 +9,7 @@ build:
   skip: True  # [win]
   number: {{ GIT_DESCRIBE_NUMBER }}
   run_exports:
-    - {{ pin_subpackage('roq-gate-io-futures', max_pin='x.x') }}
+    - {{ pin_subpackage('roq-gateio-futures', max_pin='x.x') }}
 
 requirements:
   build:

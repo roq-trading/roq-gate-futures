@@ -4,9 +4,9 @@ MAINTAINER Hans Erik Thrane <info@roq-trading.com>
 
 COPY pkgs/ /pkgs/
 
-RUN conda install --quiet --yes --override-channels --channel file:///pkgs --channel defaults roq-gate-io-futures
+RUN conda install --quiet --yes --override-channels --channel file:///pkgs --channel defaults roq-gateio-futures
 RUN rm -rf /pkgs
 
-ENTRYPOINT [ "/opt/conda/bin/roq-gate-io-futures" ]
+ENTRYPOINT [ "/opt/conda/bin/roq-gateio-futures" ]
 
 CMD [ "--help" ]
