@@ -1,0 +1,9 @@
+{
+"name": "RestState",
+"type": "enum",
+"values": [
+	{ "name": "currencies" },
+	{ "name": "currency_pairs" },
+	{ "name": "done" }
+]
+}

@@ -1,0 +1,9 @@
+{
+"name": "BookTicker",
+"type": "comp",
+"values": [
+	{ "name": "topic", "type": "Topic" },
+	{ "name": "params", "type": "Params" },
+	{ "name": "data", "type": "BookTickerData" }
+]
+}

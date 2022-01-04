@@ -1,0 +1,8 @@
+currencies_item.h
+currencies_item.cpp
+currencies.h
+currencies.cpp
+currency_pairs_item.h
+currency_pairs_item.cpp
+currency_pairs.h
+currency_pairs.cpp
