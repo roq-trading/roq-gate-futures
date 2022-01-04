@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/tools/hasher.h"
+#include "roq/gate_io_futures/tools/hasher.h"
 
 #include <fmt/format.h>
 
@@ -13,7 +13,7 @@
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 namespace tools {
 
 namespace {
@@ -92,5 +92,5 @@ std::string Hasher::create_headers_v2(
 }
 
 }  // namespace tools
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

@@ -3,6 +3,7 @@ set(TARGET_NAME "${PROJECT_NAME}")
 add_subdirectory(flags)
 
 set(SOURCES
+    api.cpp
     application.cpp
     config.cpp
     drop_copy.cpp
@@ -26,7 +27,7 @@ roq_autogen(
   OUTPUT
   AUTOGEN_HEADERS
   NAMESPACE
-  "roq/gate_io"
+  "roq/gate_io_futures"
   OUTPUT_TYPE
   "state"
   FILE_TYPE
@@ -40,7 +41,7 @@ roq_autogen(
   OUTPUT
   AUTOGEN_SOURCES
   NAMESPACE
-  "roq/gate_io"
+  "roq/gate_io_futures"
   OUTPUT_TYPE
   "state"
   FILE_TYPE

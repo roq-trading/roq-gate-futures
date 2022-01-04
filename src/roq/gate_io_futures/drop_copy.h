@@ -16,14 +16,14 @@
 #include "roq/download.h"
 #include "roq/server.h"
 
-#include "roq/gate_io/drop_copy_state.h"
-#include "roq/gate_io/security.h"
-#include "roq/gate_io/shared.h"
+#include "roq/gate_io_futures/drop_copy_state.h"
+#include "roq/gate_io_futures/security.h"
+#include "roq/gate_io_futures/shared.h"
 
-#include "roq/gate_io/json/parser.h"
+#include "roq/gate_io_futures/json/parser.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class DropCopy final : public core::web::ClientSocket::Handler, json::Parser::Handler {
  public:
@@ -110,5 +110,5 @@ class DropCopy final : public core::web::ClientSocket::Handler, json::Parser::Ha
   std::chrono::nanoseconds next_ping_ = {};
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

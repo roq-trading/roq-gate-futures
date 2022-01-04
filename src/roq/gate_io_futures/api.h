@@ -2,12 +2,16 @@
 
 #pragma once
 
-#include "roq/gate_io_futures/flags/flags.h"
+#include <string_view>
 
 namespace roq {
 namespace gate_io_futures {
 
-using flags::Flags;
+struct API final {
+  std::string_view get_contracts;
+  // factory
+  static API create();
+};
 
 }  // namespace gate_io_futures
 }  // namespace roq

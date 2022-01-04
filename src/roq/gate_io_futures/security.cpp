@@ -1,13 +1,13 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/security.h"
+#include "roq/gate_io_futures/security.h"
 
 #include "roq/utils/safe_cast.h"
 
 #include "roq/core/clock.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 Security::Security(const Config &config, const std::string_view &account)
     : account_(account), hasher_(
@@ -34,5 +34,5 @@ std::string Security::create_signature_api_v2(
   return hasher_.create_headers_v2(method, path, query, body, utils::safe_cast(now));
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

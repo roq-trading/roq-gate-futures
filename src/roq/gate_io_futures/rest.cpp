@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/rest.h"
+#include "roq/gate_io_futures/rest.h"
 
 #include <algorithm>
 #include <utility>
@@ -15,12 +15,12 @@
 
 #include "roq/core/metrics/factory.h"
 
-#include "roq/gate_io/flags.h"
+#include "roq/gate_io_futures/flags.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 namespace {
 static const auto NAME = "rest"sv;
@@ -59,8 +59,8 @@ Rest::Rest(Handler &handler, core::io::Context &context, uint16_t stream_id, Sha
       profile_{
           .currencies = create_metrics(name_, "currencies"sv),
           .currencies_ack = create_metrics(name_, "currencies_ack"sv),
-          .currency_pairs = create_metrics(name_, "currency_pairs"sv),
-          .currency_pairs_ack = create_metrics(name_, "currency_pairs_ack"sv),
+          .contracts = create_metrics(name_, "contracts"sv),
+          .contracts_ack = create_metrics(name_, "contracts_ack"sv),
       },
       latency_{
           .ping = create_metrics(name_, "ping"sv),
@@ -89,8 +89,8 @@ void Rest::operator()(metrics::Writer &writer) {
       // profile
       .write(profile_.currencies, metrics::PROFILE)
       .write(profile_.currencies_ack, metrics::PROFILE)
-      .write(profile_.currency_pairs, metrics::PROFILE)
-      .write(profile_.currency_pairs_ack, metrics::PROFILE)
+      .write(profile_.contracts, metrics::PROFILE)
+      .write(profile_.contracts_ack, metrics::PROFILE)
       // latency
       .write(latency_.ping, metrics::LATENCY);
 }
@@ -145,8 +145,8 @@ uint32_t Rest::download(RestState state) {
     case RestState::CURRENCIES:
       get_currencies();
       return 1;
-    case RestState::CURRENCY_PAIRS:
-      get_currency_pairs();
+    case RestState::CONTRACTS:
+      get_contracts();
       return 1;
     case RestState::DONE:
       (*this)(ConnectionStatus::READY);
@@ -213,12 +213,12 @@ void Rest::operator()(const server::Trace<json::Currencies> &event) {
   log::info<4>("currencies={}"sv, currencies);
 }
 
-// currency_pairs
+// contracts
 
-void Rest::get_currency_pairs() {
-  profile_.currency_pairs([&]() {
+void Rest::get_contracts() {
+  profile_.contracts([&]() {
     auto method = core::http::Method::GET;
-    auto path = "/spot/currency_pairs"sv;
+    auto path = shared_.api.get_contracts;
     core::web::Request request{
         .method = method,
         .path = path,
@@ -231,21 +231,20 @@ void Rest::get_currency_pairs() {
     };
     auto sequence = download_.sequence();
     connection_(
-        "currency_pairs"sv,
+        "contracts"sv,
         request,
         [this, sequence]([[maybe_unused]] auto &request_id, auto &response) {
           auto trace_info = server::create_trace_info();
           server::Trace event(trace_info, response);
-          get_currency_pairs_ack(event, sequence);
+          get_contracts_ack(event, sequence);
         });
   });
 }
 
-void Rest::get_currency_pairs_ack(
-    const server::Trace<core::web::Response> &event, uint32_t sequence) {
-  profile_.currency_pairs_ack([&]() {
+void Rest::get_contracts_ack(const server::Trace<core::web::Response> &event, uint32_t sequence) {
+  profile_.contracts_ack([&]() {
     auto &[trace_info, response] = event;
-    auto state = RestState::CURRENCY_PAIRS;
+    auto state = RestState::CONTRACTS;
     try {
       auto [status, category, body] = response.result();
       log::debug(R"(status={}, category={}, body="{}")"sv, status, category, body);
@@ -255,8 +254,8 @@ void Rest::get_currency_pairs_ack(
       }
       response.expect(core::http::Status::OK);
       core::json::Buffer buffer(decode_buffer_);
-      auto currency_pairs = core::json::Parser::create<json::CurrencyPairs>(body, buffer);
-      server::Trace event(trace_info, currency_pairs);
+      auto contracts = core::json::Parser::create<json::Contracts>(body, buffer);
+      server::Trace event(trace_info, contracts);
       (*this)(event);
       download_.check(state);
     } catch (core::NetworkError &e) {
@@ -266,16 +265,16 @@ void Rest::get_currency_pairs_ack(
   });
 }
 
-void Rest::operator()(const server::Trace<json::CurrencyPairs> &event) {
-  auto &[trace_info, currency_pairs] = event;
-  log::info<4>("currency_pairs={}"sv, currency_pairs);
+void Rest::operator()(const server::Trace<json::Contracts> &event) {
+  auto &[trace_info, contracts] = event;
+  log::info<4>("contracts={}"sv, contracts);
   std::vector<std::string> symbols;
-  symbols.reserve(std::size(currency_pairs.data));
+  symbols.reserve(std::size(contracts.data));
   size_t counter = 0;
-  for (size_t i = 0; i < std::size(currency_pairs.data); ++i) {
-    auto &item = currency_pairs.data[i];
+  for (size_t i = 0; i < std::size(contracts.data); ++i) {
+    auto &item = contracts.data[i];
     log::info<2>("item={}"sv, item);
-    auto symbol = item.id;
+    auto symbol = item.name;
     if (shared_.discard_symbol(symbol))
       continue;
     if (all_symbols_.emplace(symbol).second)  // only include new
@@ -287,14 +286,14 @@ void Rest::operator()(const server::Trace<json::CurrencyPairs> &event) {
         .symbol = symbol,
         .description = symbol,
         .security_type = {},
-        .base_currency = item.base,
-        .quote_currency = item.quote,
+        .base_currency = {},
+        .quote_currency = {},
         .margin_currency = {},
         .commission_currency = {},
-        .tick_size = NaN,  // precision ?
+        .tick_size = item.order_price_round,
         .multiplier = 1.0,
-        .min_trade_vol = item.min_quote_amount,
-        .max_trade_vol = NaN,
+        .min_trade_vol = item.order_size_min,
+        .max_trade_vol = item.order_size_max,
         .trade_vol_step_size = NaN,
         .option_type = {},
         .strike_currency = {},
@@ -309,14 +308,14 @@ void Rest::operator()(const server::Trace<json::CurrencyPairs> &event) {
     server::create_trace_and_dispatch(handler_, trace_info, reference_data, true);
   }
   if (!std::empty(symbols)) {
-    SymbolsUpdate currency_pairs_update{
+    SymbolsUpdate contracts_update{
         .symbols = symbols,
     };
-    handler_(currency_pairs_update);
+    handler_(contracts_update);
   }
   if (ROQ_UNLIKELY(counter > 0))
-    log::info("Symbols {} / {}"sv, counter, std::size(currency_pairs.data));
+    log::info("Symbols {} / {}"sv, counter, std::size(contracts.data));
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

@@ -8,20 +8,21 @@ else
 	PREFIX=
 fi
 
-NAME="gate-io"
+NAME="gate-io-futures"
 
 CONFIG_FILE="$CWD/config/$NAME.toml"
 
 URI="api.gateio.ws"
 
 REST_URI="https://$URI/api/v4"
-WS_URI="wss://$URI/ws/v4/"
+WS_URI="wss://$URI/ws/v4/btc"
 
-$PREFIX ./roq-gate-io \
-	--name "gate-io" \
+$PREFIX ./roq-gate-io-futures \
+	--name "gate-io-futures" \
 	--config_file "$CONFIG_FILE" \
 	--client_listen_address $CWD/$NAME.sock \
 	--metrics_listen_address 1234 \
 	--rest_uri "$REST_URI" \
 	--ws_uri "$WS_URI" \
+	--api "btc" \
 	$@

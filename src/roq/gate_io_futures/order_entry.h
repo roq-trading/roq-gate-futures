@@ -21,12 +21,12 @@
 #include "roq/download.h"
 #include "roq/server.h"
 
-#include "roq/gate_io/order_entry_state.h"
-#include "roq/gate_io/security.h"
-#include "roq/gate_io/shared.h"
+#include "roq/gate_io_futures/order_entry_state.h"
+#include "roq/gate_io_futures/security.h"
+#include "roq/gate_io_futures/shared.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class OrderEntry final : public core::web::Client::Handler {
  public:
@@ -103,5 +103,5 @@ class OrderEntry final : public core::web::Client::Handler {
   server::Download<OrderEntryState> download_;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

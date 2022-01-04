@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/drop_copy.h"
+#include "roq/gate_io_futures/drop_copy.h"
 
 #include "roq/utils/mask.h"
 #include "roq/utils/update.h"
@@ -9,14 +9,14 @@
 
 #include "roq/core/json/buffer.h"
 
-#include "roq/gate_io/flags.h"
+#include "roq/gate_io_futures/flags.h"
 
-#include "roq/gate_io/json/utils.h"
+#include "roq/gate_io_futures/json/utils.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 namespace {
 static const auto NAME = "ex"sv;
@@ -222,5 +222,5 @@ void DropCopy::parse(const std::string_view &message) {
   });
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

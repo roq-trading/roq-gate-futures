@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/gateway.h"
+#include "roq/gate_io_futures/gateway.h"
 
 #include <algorithm>
 #include <cctype>
@@ -12,14 +12,14 @@
 #include "roq/core/clock.h"
 #include "roq/core/utils.h"
 
-#include "roq/gate_io/flags.h"
+#include "roq/gate_io_futures/flags.h"
 
-#include "roq/gate_io/json/utils.h"
+#include "roq/gate_io_futures/json/utils.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 namespace {
 static auto create_security(const Config &config) {
@@ -245,5 +245,5 @@ OrderEntry &Gateway::get_order_entry(const std::string_view &account) {
   throw RuntimeErrorException(R"(Unknown account="{}")"sv, account);
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

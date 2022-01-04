@@ -10,7 +10,7 @@
 #include "roq/server.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 namespace json {
 
 struct Parser final {
@@ -24,5 +24,5 @@ struct Parser final {
 };
 
 }  // namespace json
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

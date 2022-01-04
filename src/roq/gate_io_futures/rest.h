@@ -21,15 +21,15 @@
 #include "roq/download.h"
 #include "roq/server.h"
 
-#include "roq/gate_io/rest_state.h"
-#include "roq/gate_io/security.h"
-#include "roq/gate_io/shared.h"
+#include "roq/gate_io_futures/rest_state.h"
+#include "roq/gate_io_futures/security.h"
+#include "roq/gate_io_futures/shared.h"
 
-#include "roq/gate_io/json/currencies.h"
-#include "roq/gate_io/json/currency_pairs.h"
+#include "roq/gate_io_futures/json/contracts.h"
+#include "roq/gate_io_futures/json/currencies.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class Rest final : public core::web::Client::Handler {
  public:
@@ -72,9 +72,9 @@ class Rest final : public core::web::Client::Handler {
   void get_currencies_ack(const server::Trace<core::web::Response> &, uint32_t sequence);
   void operator()(const server::Trace<json::Currencies> &);
 
-  void get_currency_pairs();
-  void get_currency_pairs_ack(const server::Trace<core::web::Response> &, uint32_t sequence);
-  void operator()(const server::Trace<json::CurrencyPairs> &);
+  void get_contracts();
+  void get_contracts_ack(const server::Trace<core::web::Response> &, uint32_t sequence);
+  void operator()(const server::Trace<json::Contracts> &);
 
  private:
   Handler &handler_;
@@ -90,7 +90,7 @@ class Rest final : public core::web::Client::Handler {
     core::metrics::Counter disconnect;
   } counter_;
   struct {
-    core::metrics::Profile currencies, currencies_ack, currency_pairs, currency_pairs_ack;
+    core::metrics::Profile currencies, currencies_ack, contracts, contracts_ack;
   } profile_;
   struct {
     core::metrics::Latency ping;
@@ -103,5 +103,5 @@ class Rest final : public core::web::Client::Handler {
   server::Download<RestState> download_;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

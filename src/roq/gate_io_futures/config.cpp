@@ -1,17 +1,17 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/config.h"
+#include "roq/gate_io_futures/config.h"
 
 #include <utility>
 
 #include "roq/logging.h"
 
-#include "roq/gate_io/flags.h"
+#include "roq/gate_io_futures/flags.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 Config::Config(const std::string_view &config_path, const std::string_view &secrets_path) {
   server::ConfigReader::parse_file(*this, config_path, secrets_path);
@@ -100,5 +100,5 @@ void Config::operator()(const std::string_view &key, toml::node &) {
   log::warn(R"(Unexpected: key="{}")"sv, key);
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

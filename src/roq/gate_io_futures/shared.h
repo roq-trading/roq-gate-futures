@@ -16,8 +16,10 @@
 
 #include "roq/core/limit/rate_limiter.h"
 
+#include "roq/gate_io_futures/api.h"
+
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 struct Shared final {
   explicit Shared(server::Dispatcher &);
@@ -45,6 +47,7 @@ struct Shared final {
   }
 
  public:
+  const API api;
   core::page_aligned_vector<MBPUpdate> bids, asks, final_bids, final_asks;
 
  private:
@@ -55,5 +58,5 @@ struct Shared final {
   core::Symbols symbols;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

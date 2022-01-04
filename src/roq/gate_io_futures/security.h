@@ -7,12 +7,12 @@
 
 #include "roq/core/http/method.h"
 
-#include "roq/gate_io/config.h"
+#include "roq/gate_io_futures/config.h"
 
-#include "roq/gate_io/tools/hasher.h"
+#include "roq/gate_io_futures/tools/hasher.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class Security final {
  public:
@@ -39,5 +39,5 @@ class Security final {
   tools::Hasher hasher_;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

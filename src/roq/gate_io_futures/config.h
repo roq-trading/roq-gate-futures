@@ -14,7 +14,7 @@
 #include "roq/server.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class Config final : public server::Config, public server::ConfigReader::Handler {
  public:
@@ -45,17 +45,17 @@ class Config final : public server::Config, public server::ConfigReader::Handler
   absl::flat_hash_map<std::string, server::RateLimit> rate_limits;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq
 
 template <>
-struct fmt::formatter<roq::gate_io::Config> {
+struct fmt::formatter<roq::gate_io_futures::Config> {
   template <typename Context>
   constexpr auto parse(Context &ctx) {
     return std::begin(ctx);
   }
   template <typename Context>
-  auto format(const roq::gate_io::Config &value, Context &ctx) {
+  auto format(const roq::gate_io_futures::Config &value, Context &ctx) {
     using namespace std::literals;
     return fmt::format_to(
         ctx.out(),

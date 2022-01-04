@@ -22,6 +22,12 @@
       "description": "exchange identifier (string)"
     },
     {
+      "name": "api",
+      "type": "std::string",
+      "default": "btc",
+      "description": "api (btc,usdt)"
+    },
+    {
       "name": "rest_uri",
       "type": "roq::core::URI",
       "validator": "roq::core::flags::URI<std::string>",

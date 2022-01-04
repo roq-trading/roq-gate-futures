@@ -3,7 +3,7 @@
 "type": "enum",
 "values": [
 	{ "name": "currencies" },
-	{ "name": "currency_pairs" },
+	{ "name": "contracts" },
 	{ "name": "done" }
 ]
 }

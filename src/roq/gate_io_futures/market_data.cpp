@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/market_data.h"
+#include "roq/gate_io_futures/market_data.h"
 
 #include <algorithm>
 
@@ -15,14 +15,14 @@
 
 #include "roq/core/metrics/factory.h"
 
-#include "roq/gate_io/flags.h"
+#include "roq/gate_io_futures/flags.h"
 
-#include "roq/gate_io/json/utils.h"
+#include "roq/gate_io_futures/json/utils.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 namespace {
 static const auto NAME = "md"sv;
@@ -217,5 +217,5 @@ void MarketData::parse(const std::string_view &message) {
   });
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

@@ -12,12 +12,31 @@
 #include "roq/core/charconv/datetime.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 namespace json {
 
 template <typename T>
 inline void update(T &result, const core::json::value_t &value) {
   result = core::json::get<T>(value);
+}
+
+template <>
+inline void update(std::chrono::seconds &result, const core::json::value_t &value) {
+  return std::visit(
+      overloaded{
+          [&](const core::json::null_t &) { result = std::chrono::seconds{}; },
+          [](bool) { throw std::bad_cast(); },
+          [&](int64_t value) { result = std::chrono::seconds{value}; },
+          [&](double value) { result = std::chrono::seconds{static_cast<int64_t>(value)}; },
+          [&](const std::string_view &value) {
+            result =
+                core::charconv::datetime_from_string<std::remove_reference<decltype(result)>::type>(
+                    value);
+          },
+          [](const core::json::object_t &) { throw std::bad_cast(); },
+          [](const core::json::array_t &) { throw std::bad_cast(); },
+      },
+      value);
 }
 
 template <>
@@ -82,5 +101,5 @@ inline void update(std::chrono::nanoseconds &result, const core::json::value_t &
 }
 
 }  // namespace json
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

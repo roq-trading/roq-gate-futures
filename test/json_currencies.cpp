@@ -4,10 +4,10 @@
 
 #include "roq/core/json/parser.h"
 
-#include "roq/gate_io/json/currencies.h"
+#include "roq/gate_io_futures/json/currencies.h"
 
 using namespace roq;
-using namespace roq::gate_io;
+using namespace roq::gate_io_futures;
 
 using namespace std::literals;
 using namespace std::chrono_literals;

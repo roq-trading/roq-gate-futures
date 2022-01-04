@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/application.h"
+#include "roq/gate_io_futures/application.h"
 
 using namespace std::literals;
 
@@ -9,7 +9,7 @@ static const auto DESCRIPTION = "Roq Gate.io Gateway"sv;
 }  // namespace
 
 int main(int argc, char **argv) {
-  return roq::gate_io::Application(
+  return roq::gate_io_futures::Application(
              argc, argv, DESCRIPTION, ROQ_BUILD_VERSION, ROQ_BUILD_TYPE, ROQ_GIT_DESCRIBE_HASH)
       .run();
 }

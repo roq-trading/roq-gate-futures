@@ -11,7 +11,7 @@
 #include "roq/core/crypto/hmac.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 namespace tools {
 
 class Hasher final {
@@ -46,5 +46,5 @@ class Hasher final {
 };
 
 }  // namespace tools
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

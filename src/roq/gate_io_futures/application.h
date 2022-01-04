@@ -5,7 +5,7 @@
 #include "roq/service.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class Application final : public roq::Service {
  public:
@@ -15,5 +15,5 @@ class Application final : public roq::Service {
   int main(int, char **) override;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

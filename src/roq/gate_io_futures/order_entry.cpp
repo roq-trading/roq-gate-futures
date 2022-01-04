@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/order_entry.h"
+#include "roq/gate_io_futures/order_entry.h"
 
 #include <utility>
 
@@ -11,14 +11,14 @@
 
 #include "roq/core/metrics/factory.h"
 
-#include "roq/gate_io/flags.h"
+#include "roq/gate_io_futures/flags.h"
 
-#include "roq/gate_io/json/utils.h"
+#include "roq/gate_io_futures/json/utils.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 namespace {
 static const auto NAME = "om"sv;
@@ -187,5 +187,5 @@ uint32_t OrderEntry::download(OrderEntryState state) {
   return {};
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

@@ -1,15 +1,15 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_io/application.h"
+#include "roq/gate_io_futures/application.h"
 
-#include "roq/gate_io/config.h"
-#include "roq/gate_io/flags.h"
-#include "roq/gate_io/gateway.h"
+#include "roq/gate_io_futures/config.h"
+#include "roq/gate_io_futures/flags.h"
+#include "roq/gate_io_futures/gateway.h"
 
 using namespace std::literals;
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 int Application::main(int, char **) {
   log::info(R"(Parse config_file="{}")"sv, Flags::config_file());
@@ -20,5 +20,5 @@ int Application::main(int, char **) {
   return EXIT_SUCCESS;
 }
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq

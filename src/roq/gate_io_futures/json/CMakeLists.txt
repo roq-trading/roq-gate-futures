@@ -7,14 +7,14 @@ include(RoqAutogen)
 set(AUTOGEN_SCHEMAS
     currencies_item.json
     currencies.json
-    currency_pairs_item.json
-    currency_pairs.json)
+    contracts_item.json
+    contracts.json)
 
 roq_autogen(
   OUTPUT
   AUTOGEN_HEADERS
   NAMESPACE
-  "roq/gate_io/json"
+  "roq/gate_io_futures/json"
   OUTPUT_TYPE
   "json"
   FILE_TYPE
@@ -28,7 +28,7 @@ roq_autogen(
   OUTPUT
   AUTOGEN_SOURCES
   NAMESPACE
-  "roq/gate_io/json"
+  "roq/gate_io_futures/json"
   OUTPUT_TYPE
   "json"
   FILE_TYPE

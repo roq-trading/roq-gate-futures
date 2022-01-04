@@ -2,7 +2,7 @@ set(TARGET_NAME "${PROJECT_NAME}-test")
 
 set(SOURCES
     json_currencies.cpp
-    json_currency_pairs.cpp
+    json_contracts.cpp
     main.cpp)
 
 add_executable("${TARGET_NAME}" ${SOURCES})

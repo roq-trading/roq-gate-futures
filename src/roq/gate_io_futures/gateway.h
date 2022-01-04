@@ -13,16 +13,16 @@
 
 #include "roq/core/io/context.h"
 
-#include "roq/gate_io/config.h"
-#include "roq/gate_io/drop_copy.h"
-#include "roq/gate_io/market_data.h"
-#include "roq/gate_io/order_entry.h"
-#include "roq/gate_io/rest.h"
-#include "roq/gate_io/security.h"
-#include "roq/gate_io/shared.h"
+#include "roq/gate_io_futures/config.h"
+#include "roq/gate_io_futures/drop_copy.h"
+#include "roq/gate_io_futures/market_data.h"
+#include "roq/gate_io_futures/order_entry.h"
+#include "roq/gate_io_futures/rest.h"
+#include "roq/gate_io_futures/security.h"
+#include "roq/gate_io_futures/shared.h"
 
 namespace roq {
-namespace gate_io {
+namespace gate_io_futures {
 
 class Gateway final : public server::Handler,
                       public Rest::Handler,
@@ -95,5 +95,5 @@ class Gateway final : public server::Handler,
   std::vector<std::unique_ptr<MarketData>> market_data_;
 };
 
-}  // namespace gate_io
+}  // namespace gate_io_futures
 }  // namespace roq
