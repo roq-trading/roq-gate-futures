@@ -1,0 +1,7 @@
+{
+"name": "SubscribeResult",
+"type": "comp",
+"values": [
+	{ "name": "status", "type": "std::string_view" }
+]
+}

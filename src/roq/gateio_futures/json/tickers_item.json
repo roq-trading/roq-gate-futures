@@ -1,0 +1,21 @@
+{
+"name": "TickersItem",
+"type": "item",
+"values": [
+	{ "name": "contract", "type": "std::string_view" },
+	{ "name": "last", "type": "double" },
+	{ "name": "change_percentage", "type": "double" },
+	{ "name": "funding_rate", "type": "double" },
+	{ "name": "mark_price", "type": "double" },
+	{ "name": "index_price", "type": "double" },
+	{ "name": "total_size", "type": "double" },
+	{ "name": "volume_24h", "type": "double" },
+	{ "name": "quanto_base_rate", "type": "double" },
+	{ "name": "volume_24h_usd", "type": "double" },
+	{ "name": "volume_24h_btc", "type": "double" },
+	{ "name": "funding_rate_indicative", "type": "double" },
+	{ "name": "volume_24h_quote", "type": "double" },
+	{ "name": "volume_24h_settle", "type": "double" },
+	{ "name": "volume_24h_base", "type": "double" }
+]
+}

@@ -1,3 +1,7 @@
+book_ticker.h
+book_ticker.cpp
+book_ticker_result.h
+book_ticker_result.cpp
 channel.h
 channel.cpp
 contracts_item.h
@@ -16,3 +20,15 @@ mark_type.h
 mark_type.cpp
 message.h
 message.cpp
+subscribe.h
+subscribe.cpp
+subscribe_result.h
+subscribe_result.cpp
+tickers_item.h
+tickers_item.cpp
+tickers.h
+tickers.cpp
+trades_item.h
+trades_item.cpp
+trades.h
+trades.cpp

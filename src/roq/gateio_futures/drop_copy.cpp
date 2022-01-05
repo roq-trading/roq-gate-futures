@@ -222,5 +222,21 @@ void DropCopy::parse(const std::string_view &message) {
   });
 }
 
+void DropCopy::operator()(server::Trace<json::Subscribe> const &) {
+  log::fatal("Unexpected"sv);
+}
+
+void DropCopy::operator()(server::Trace<json::Tickers> const &) {
+  log::fatal("Unexpected"sv);
+}
+
+void DropCopy::operator()(server::Trace<json::Trades> const &) {
+  log::fatal("Unexpected"sv);
+}
+
+void DropCopy::operator()(server::Trace<json::BookTicker> const &) {
+  log::fatal("Unexpected"sv);
+}
+
 }  // namespace gateio_futures
 }  // namespace roq

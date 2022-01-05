@@ -1,12 +1,12 @@
 {
-"name": "BookTicker",
+"name": "Subscribe",
 "type": "comp",
 "values": [
 	{ "name": "id" },
 	{ "name": "time", "type": "std::chrono::seconds" },
 	{ "name": "channel", "type": "Channel" },
 	{ "name": "event", "type": "Event" },
-	{ "name": "result", "type": "BookTickerResult" },
+	{ "name": "result", "type": "SubscribeResult" },
 	{ "name": "error" }
 ]
 }

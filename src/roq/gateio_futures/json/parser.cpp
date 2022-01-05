@@ -24,8 +24,11 @@ bool Parser::dispatch(
     case Event::UNKNOWN:
       assert(false);
       break;
-    case Event::SUBSCRIBE:
+    case Event::SUBSCRIBE: {
+      auto subscribe = core::json::Parser::create<Subscribe>(message, buffer);
+      server::create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
+    }
     case Event::UPDATE:
       switch (message_.channel) {
         case Channel::UNDEFINED:
@@ -33,12 +36,21 @@ bool Parser::dispatch(
         case Channel::UNKNOWN:
           assert(false);
           break;
-        case Channel::TICKERS:
+        case Channel::TICKERS: {
+          auto tickers = core::json::Parser::create<Tickers>(message, buffer);
+          server::create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
-        case Channel::TRADES:
+        }
+        case Channel::TRADES: {
+          auto trades = core::json::Parser::create<Trades>(message, buffer);
+          server::create_trace_and_dispatch(handler, trace_info, trades);
           return true;
-        case Channel::BOOK_TICKER:
+        }
+        case Channel::BOOK_TICKER: {
+          auto book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
+          server::create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
+        }
         case Channel::ORDER_BOOK_UPDATE:
           return true;
       }

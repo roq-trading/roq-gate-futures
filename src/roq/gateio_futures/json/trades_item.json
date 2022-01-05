@@ -1,0 +1,12 @@
+{
+"name": "TradesItem",
+"type": "item",
+"values": [
+	{ "name": "size", "type": "double" },
+	{ "name": "id", "type": "int64_t" },
+	{ "name": "create_time", "type": "std::chrono::seconds" },
+	{ "name": "create_time_ms", "type": "std::chrono::milliseconds" },
+	{ "name": "price", "type": "double" },
+	{ "name": "contract", "type": "std::string_view" }
+]
+}
