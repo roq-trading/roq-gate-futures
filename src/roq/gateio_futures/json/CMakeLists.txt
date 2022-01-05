@@ -5,10 +5,15 @@ set(SOURCES parser.cpp utils.cpp)
 include(RoqAutogen)
 
 set(AUTOGEN_SCHEMAS
+    channel.json
+    contracts_item.json
+    contracts.json
+    contract_type.json
     currencies_item.json
     currencies.json
-    contracts_item.json
-    contracts.json)
+    event.json
+    mark_type.json
+    message.json)
 
 roq_autogen(
   OUTPUT

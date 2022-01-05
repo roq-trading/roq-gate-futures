@@ -274,6 +274,7 @@ void Rest::operator()(const server::Trace<json::Contracts> &event) {
   for (size_t i = 0; i < std::size(contracts.data); ++i) {
     auto &item = contracts.data[i];
     log::info<2>("item={}"sv, item);
+    log::debug("item={}"sv, item);
     auto symbol = item.name;
     if (shared_.discard_symbol(symbol))
       continue;

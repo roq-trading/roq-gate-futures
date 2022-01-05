@@ -54,15 +54,15 @@ void emplace(MBPUpdate &result, const T &item) {
 MarketData::MarketData(
     Handler &handler, core::io::Context &context, uint32_t stream_id, Shared &shared, size_t index)
     : handler_(handler), stream_id_(stream_id), name_(fmt::format("{}:{}"sv, stream_id_, NAME)),
-      index_(index), ping_frequency_(Flags::ws_ping_freq()), connection_(
-                                                                 *this,
-                                                                 context,
-                                                                 Flags::ws_uri(),
-                                                                 {},
-                                                                 Flags::ws_ping_freq(),
-                                                                 Flags::decode_buffer_size(),
-                                                                 Flags::encode_buffer_size(),
-                                                                 []() { return std::string(); }),
+      index_(index), connection_(
+                         *this,
+                         context,
+                         Flags::ws_uri(),
+                         {},
+                         Flags::ws_ping_freq(),
+                         Flags::decode_buffer_size(),
+                         Flags::encode_buffer_size(),
+                         []() { return std::string(); }),
       decode_buffer_(Flags::decode_buffer_size()),
       request_id_(static_cast<uint64_t>(stream_id_) * 1000000),  // scale (debugging)
       counter_{
@@ -77,7 +77,6 @@ MarketData::MarketData(
       },
       latency_{
           .ping = create_metrics(name_, "ping"sv),
-          .heartbeat = create_metrics(name_, "heartbeat"sv),
       },
       shared_(shared) {
 }
@@ -93,8 +92,6 @@ void MarketData::operator()(const Event<Stop> &) {
 void MarketData::operator()(const Event<Timer> &event) {
   auto now = event.value.now;
   connection_.refresh(now);
-  if (ready() && next_ping_ < now)
-    send_ping(now);
 }
 
 void MarketData::operator()(metrics::Writer &writer) {
@@ -108,8 +105,7 @@ void MarketData::operator()(metrics::Writer &writer) {
       .write(profile_.trade, metrics::PROFILE)
       .write(profile_.realtimes, metrics::PROFILE)
       // latency
-      .write(latency_.ping, metrics::LATENCY)
-      .write(latency_.heartbeat, metrics::LATENCY);
+      .write(latency_.ping, metrics::LATENCY);
 }
 
 void MarketData::subscribe(size_t start_from) {
@@ -170,38 +166,46 @@ void MarketData::operator()(ConnectionStatus status) {
 void MarketData::subscribe(const roq::span<std::string const> &symbols) {
   if (std::empty(symbols))
     return;
-  subscribe("bookTicker"sv, symbols);
-  subscribe("realtimes"sv, symbols);
-  subscribe("trade"sv, symbols);
-  subscribe("depth"sv, symbols);
+  subscribe("futures.tickers"sv, symbols);
+  subscribe("futures.trades"sv, symbols);
+  subscribe("futures.book_ticker"sv, symbols);
+  // subscribe("spot.order_book_update"sv, symbols);  // XXX needs a second argument with the period
 }
 
 void MarketData::subscribe(
-    const std::string_view &topic, const roq::span<std::string const> &symbols) {
+    const std::string_view &channel, const roq::span<std::string const> &symbols) {
   assert(!std::empty(symbols));
-  for (auto &symbol : symbols) {
+  if (true) {
+    std::chrono::seconds now = utils::safe_cast(core::get_realtime_clock());
     auto message = fmt::format(
         R"({{)"
-        R"("topic":"{}",)"
-        R"("event":"sub",)"
-        R"("params":{{)"
-        R"("symbol":"{}",)"
-        R"("binary":false)"
-        R"(}})"
+        R"("time":{},)"
+        R"("channel":"{}",)"
+        R"("event":"subscribe",)"
+        R"("payload":["{}"])"
         R"(}})"sv,
-        topic,
-        symbol);
+        now.count(),
+        channel,
+        fmt::join(symbols, R"(",")"));
     log::debug("message={}"sv, message);
     connection_.send_text(message);
+  } else {
+    for (auto &symbol : symbols) {
+      std::chrono::seconds now = utils::safe_cast(core::get_realtime_clock());
+      auto message = fmt::format(
+          R"({{)"
+          R"("time":{},)"
+          R"("channel":"{}",)"
+          R"("event":"subscribe",)"
+          R"("payload":["{}"])"
+          R"(}})"sv,
+          now.count(),
+          channel,
+          symbol);
+      log::debug("message={}"sv, message);
+      connection_.send_text(message);
+    }
   }
-}
-
-void MarketData::send_ping(std::chrono::nanoseconds now) {
-  assert(ping_frequency_.count() > 0);
-  next_ping_ = now + ping_frequency_ / 2;
-  auto message = fmt::format(R"({{"ping":{}}})"sv, now.count());
-  // log::debug("message={}"sv, message);
-  connection_.send_text(message);
 }
 
 void MarketData::parse(const std::string_view &message) {
@@ -209,7 +213,10 @@ void MarketData::parse(const std::string_view &message) {
     try {
       auto trace_info = server::create_trace_info();
       core::json::Buffer buffer(decode_buffer_);
-      json::Parser::dispatch(*this, message, buffer, trace_info);
+      if (json::Parser::dispatch(*this, message, buffer, trace_info)) {
+      } else {
+        log::warn(R"(message="{}")"sv, message);
+      }
     } catch (...) {
       log::warn(R"(message="{}")"sv, message);
       core::tools::UnhandledException::terminate();

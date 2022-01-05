@@ -1,0 +1,12 @@
+{
+"name": "Message",
+"type": "comp",
+"values": [
+	{ "name": "time" },
+	{ "name": "id" },
+	{ "name": "channel", "type": "Channel" },
+	{ "name": "event", "type": "Event" },
+	{ "name": "result" },
+	{ "name": "error" }
+]
+}

@@ -1,0 +1,8 @@
+{
+"name": "Event",
+"type": "enum",
+"values": [
+	{ "name": "subscribe" },
+	{ "name": "update" }
+]
+}

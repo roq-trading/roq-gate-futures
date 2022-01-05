@@ -68,9 +68,7 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
   void operator()(ConnectionStatus);
 
   void subscribe(const roq::span<std::string const> &symbols);
-  void subscribe(const std::string_view &topic, const roq::span<std::string const> &symbols);
-
-  void send_ping(std::chrono::nanoseconds now);
+  void subscribe(const std::string_view &channel, const roq::span<std::string const> &symbols);
 
   void parse(const std::string_view &message);
 
@@ -82,7 +80,6 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
   const uint16_t stream_id_;
   const std::string name_;
   const size_t index_;
-  const std::chrono::nanoseconds ping_frequency_;
   // web socket
   core::web::ClientSocket connection_;
   // buffers
@@ -97,14 +94,12 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
     core::metrics::Profile parse, book_ticker, depth, trade, realtimes;
   } profile_;
   struct {
-    core::metrics::Latency ping, heartbeat;
+    core::metrics::Latency ping;
   } latency_;
   // cache
   Shared &shared_;
   // state
   ConnectionStatus status_ = {};
-  // ping
-  std::chrono::nanoseconds next_ping_ = {};
 };
 
 }  // namespace gateio_futures

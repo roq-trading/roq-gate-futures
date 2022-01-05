@@ -45,7 +45,7 @@
       "name": "rest_ping_path",
       "type": "std::string",
       "validator": "roq::core::flags::Path<std::string>",
-      "default": "/api/v1/status",
+      "default": "/",
       "description": "URI path used for REST connection keep-alive messages"
     },
     {
@@ -100,7 +100,7 @@
       "name": "ws_uri",
       "type": "roq::core::URI",
       "validator": "roq::core::flags::URI<std::string>",
-      "default": "wss://api.gateio.ws/ws/v4/",
+      "default": "wss://api.gateio.ws/ws/v4/btc",
       "description": "WS end-point (URI)"
     },
     {

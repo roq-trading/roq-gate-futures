@@ -1,0 +1,10 @@
+{
+"name": "Channel",
+"type": "enum",
+"values": [
+	{ "raw": "futures.tickers", "name": "tickers" },
+	{ "raw": "futures.trades", "name": "trades" },
+	{ "raw": "futures.book_ticker", "name": "book_ticker" },
+	{ "raw": "futures.order_book_update", "name": "order_book_update" }
+]
+}
