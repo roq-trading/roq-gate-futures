@@ -1,0 +1,191 @@
+/* Copyright (c) 2017-2022, Hans Erik Thrane */
+
+#include "roq/gate_futures/order_entry.h"
+
+#include <utility>
+
+#include "roq/utils/mask.h"
+#include "roq/utils/number.h"
+#include "roq/utils/safe_cast.h"
+#include "roq/utils/update.h"
+
+#include "roq/core/metrics/factory.h"
+
+#include "roq/gate_futures/flags.h"
+
+#include "roq/gate_futures/json/utils.h"
+
+using namespace std::literals;
+
+namespace roq {
+namespace gate_futures {
+
+namespace {
+static const auto NAME = "om"sv;
+static const auto SUPPORTS = utils::Mask{
+    SupportType::CREATE_ORDER,
+    SupportType::CANCEL_ORDER,
+    SupportType::ORDER_ACK,
+    SupportType::FUNDS,
+};
+
+static const auto ALLOW_PIPELINING = true;
+
+struct create_metrics final : public core::metrics::Factory {
+  explicit create_metrics(const std::string_view &group, const std::string_view &function)
+      : core::metrics::Factory(server::Flags::name(), group, function) {}
+};
+}  // namespace
+
+OrderEntry::OrderEntry(
+    Handler &handler,
+    core::io::Context &context,
+    uint16_t stream_id,
+    Security &security,
+    Shared &shared)
+    : handler_(handler), stream_id_(stream_id),
+      name_(fmt::format("{}:{}:{}"sv, stream_id_, NAME, security.get_account())),
+      connection_(
+          *this,
+          context,
+          Flags::decode_buffer_size(),
+          Flags::encode_buffer_size(),
+          core::URI(Flags::rest_uri()),
+          ROQ_PACKAGE_NAME,
+          core::http::Connection::KEEP_ALIVE,
+          ALLOW_PIPELINING,
+          Flags::rest_request_timeout(),
+          Flags::rest_ping_freq(),
+          Flags::rest_ping_path()),
+      decode_buffer_(Flags::decode_buffer_size()),
+      counter_{
+          .disconnect = create_metrics(name_, "disconnect"sv),
+      },
+      profile_{
+          .create_order = create_metrics(name_, "create_order"sv),
+          .create_order_ack = create_metrics(name_, "create_order_ack"sv),
+          .cancel_order = create_metrics(name_, "cancel_order"sv),
+          .cancel_order_ack = create_metrics(name_, "cancel_order_ack"sv),
+          .cancel_all_orders = create_metrics(name_, "cancel_all_orders"sv),
+          .cancel_all_orders_ack = create_metrics(name_, "cancel_all_orders_ack"sv),
+      },
+      latency_{
+          .ping = create_metrics(name_, "ping"sv),
+      },
+      security_(security), shared_(shared),
+      download_(Flags::rest_request_timeout(), [this](auto state) { return download(state); }) {
+}
+
+void OrderEntry::operator()(const Event<Start> &) {
+  connection_.start();
+}
+
+void OrderEntry::operator()(const Event<Stop> &) {
+  connection_.stop();
+}
+
+void OrderEntry::operator()(const Event<Timer> &event) {
+  auto now = event.value.now;
+  connection_.refresh(now);
+}
+
+void OrderEntry::operator()(metrics::Writer &writer) {
+  writer
+      // counter
+      .write(counter_.disconnect, metrics::COUNTER)
+      // profile
+      .write(profile_.create_order, metrics::PROFILE)
+      .write(profile_.create_order_ack, metrics::PROFILE)
+      .write(profile_.cancel_order, metrics::PROFILE)
+      .write(profile_.cancel_order_ack, metrics::PROFILE)
+      .write(profile_.cancel_all_orders, metrics::PROFILE)
+      .write(profile_.cancel_all_orders_ack, metrics::PROFILE)
+      // latency
+      .write(latency_.ping, metrics::LATENCY);
+}
+
+uint16_t OrderEntry::operator()(
+    const Event<CreateOrder> &,
+    const oms::Order &,
+    [[maybe_unused]] const std::string_view &request_id) {
+  throw oms::NotSupportedException();
+}
+
+uint16_t OrderEntry::operator()(
+    const Event<ModifyOrder> &,
+    const oms::Order &,
+    [[maybe_unused]] const std::string_view &request_id,
+    [[maybe_unused]] const std::string_view &previous_request_id) {
+  throw oms::NotSupportedException();
+}
+
+uint16_t OrderEntry::operator()(
+    [[maybe_unused]] const Event<CancelOrder> &,
+    [[maybe_unused]] const oms::Order &,
+    [[maybe_unused]] const std::string_view &request_id,
+    [[maybe_unused]] const std::string_view &previous_request_id) {
+  throw oms::NotSupportedException();
+}
+
+uint16_t OrderEntry::operator()(
+    const Event<CancelAllOrders> &, [[maybe_unused]] const std::string_view &request_id) {
+  throw oms::NotSupportedException();
+}
+
+void OrderEntry::operator()(const core::web::Client::Connected &) {
+  if (download_.downloading()) {
+    download_.bump();
+  } else {
+    (*this)(ConnectionStatus::DOWNLOADING);
+    download_.begin();
+  }
+}
+
+void OrderEntry::operator()(const core::web::Client::Disconnected &) {
+  ++counter_.disconnect;
+  (*this)(ConnectionStatus::DISCONNECTED);
+  if (!download_.downloading())
+    download_.reset();
+}
+
+void OrderEntry::operator()(const core::web::Client::Latency &latency) {
+  auto trace_info = server::create_trace_info();
+  ExternalLatency external_latency{
+      .stream_id = stream_id_,
+      .latency = latency.sample,
+  };
+  server::create_trace_and_dispatch(handler_, trace_info, external_latency);
+  latency_.ping.update(latency.sample);
+}
+
+void OrderEntry::operator()(ConnectionStatus status) {
+  if (utils::update(status_, status)) {
+    auto trace_info = server::create_trace_info();
+    StreamStatus stream_status{
+        .stream_id = stream_id_,
+        .account = security_.get_account(),
+        .supports = SUPPORTS.get(),
+        .status = status_,
+        .type = StreamType::REST,
+        .priority = Priority::PRIMARY,
+    };
+    log::info("stream_status={}"sv, stream_status);
+    server::create_trace_and_dispatch(handler_, trace_info, stream_status);
+  }
+}
+
+uint32_t OrderEntry::download(OrderEntryState state) {
+  switch (state) {
+    case OrderEntryState::UNDEFINED:
+      assert(false);
+      break;
+    case OrderEntryState::DONE:
+      (*this)(ConnectionStatus::READY);
+      return {};
+  }
+  assert(false);
+  return {};
+}
+
+}  // namespace gate_futures
+}  // namespace roq
