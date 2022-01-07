@@ -70,7 +70,7 @@ include_directories(
 
 # sub-projects
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/roq/gate")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/roq/gate_futures")
 
 # test
 
