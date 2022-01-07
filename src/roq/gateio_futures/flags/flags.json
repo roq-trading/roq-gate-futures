@@ -18,7 +18,7 @@
       "name": "exchange",
       "type": "std::string",
       "validator": "roq::core::flags::NonEmpty<std::string>",
-      "default": "gateio-futures",
+      "default": "gate.io-futures",
       "description": "exchange identifier (string)"
     },
     {
