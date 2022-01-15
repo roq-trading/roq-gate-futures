@@ -23,7 +23,7 @@ API API::create() {
         .get_contracts = "/futures/usdt/contracts"sv,
     };
   }
-  throw RuntimeErrorException(R"(Unknown api="{}")"sv, api);
+  throw RuntimeError(R"(Unknown api="{}")"sv, api);
 }
 
 }  // namespace gate_futures

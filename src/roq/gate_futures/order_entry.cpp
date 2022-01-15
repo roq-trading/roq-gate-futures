@@ -108,7 +108,7 @@ uint16_t OrderEntry::operator()(
     const Event<CreateOrder> &,
     const oms::Order &,
     [[maybe_unused]] const std::string_view &request_id) {
-  throw oms::NotSupportedException();
+  throw oms::NotSupported("not supported"sv);
 }
 
 uint16_t OrderEntry::operator()(
@@ -116,7 +116,7 @@ uint16_t OrderEntry::operator()(
     const oms::Order &,
     [[maybe_unused]] const std::string_view &request_id,
     [[maybe_unused]] const std::string_view &previous_request_id) {
-  throw oms::NotSupportedException();
+  throw oms::NotSupported("not supported"sv);
 }
 
 uint16_t OrderEntry::operator()(
@@ -124,12 +124,12 @@ uint16_t OrderEntry::operator()(
     [[maybe_unused]] const oms::Order &,
     [[maybe_unused]] const std::string_view &request_id,
     [[maybe_unused]] const std::string_view &previous_request_id) {
-  throw oms::NotSupportedException();
+  throw oms::NotSupported("not supported"sv);
 }
 
 uint16_t OrderEntry::operator()(
     const Event<CancelAllOrders> &, [[maybe_unused]] const std::string_view &request_id) {
-  throw oms::NotSupportedException();
+  throw oms::NotSupported("not supported"sv);
 }
 
 void OrderEntry::operator()(const core::web::Client::Connected &) {
