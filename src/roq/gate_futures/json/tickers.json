@@ -6,7 +6,7 @@
 	{ "name": "time", "type": "std::chrono::seconds" },
 	{ "name": "channel", "type": "Channel" },
 	{ "name": "event", "type": "Event" },
-	{ "name": "result", "type": "roq::span<TickersItem>" },
+	{ "name": "result", "type": "std::span<TickersItem>" },
 	{ "name": "error" }
 ]
 }

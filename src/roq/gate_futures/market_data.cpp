@@ -173,7 +173,7 @@ void MarketData::operator()(ConnectionStatus status) {
   }
 }
 
-void MarketData::subscribe(const roq::span<std::string const> &symbols) {
+void MarketData::subscribe(const std::span<std::string const> &symbols) {
   if (std::empty(symbols))
     return;
   subscribe("futures.tickers"sv, symbols);
@@ -183,7 +183,7 @@ void MarketData::subscribe(const roq::span<std::string const> &symbols) {
 }
 
 void MarketData::subscribe(
-    const std::string_view &channel, const roq::span<std::string const> &symbols) {
+    const std::string_view &channel, const std::span<std::string const> &symbols) {
   assert(!std::empty(symbols));
   if (true) {
     std::chrono::seconds now = utils::safe_cast(core::get_realtime_clock());

@@ -67,8 +67,8 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
  private:
   void operator()(ConnectionStatus);
 
-  void subscribe(const roq::span<std::string const> &symbols);
-  void subscribe(const std::string_view &channel, const roq::span<std::string const> &symbols);
+  void subscribe(const std::span<std::string const> &symbols);
+  void subscribe(const std::string_view &channel, const std::span<std::string const> &symbols);
 
   void parse(const std::string_view &message);
 
