@@ -314,7 +314,7 @@ void Rest::operator()(const server::Trace<json::Contracts> &event) {
     };
     handler_(contracts_update);
   }
-  if (ROQ_UNLIKELY(counter > 0))
+  if (counter > 0) [[unlikely]]
     log::info("Symbols {} / {}"sv, counter, std::size(contracts.data));
 }
 
