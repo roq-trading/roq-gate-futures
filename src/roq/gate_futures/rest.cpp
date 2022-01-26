@@ -370,7 +370,6 @@ void Rest::get_order_book_ack(
     auto &[trace_info, response] = event;
     try {
       auto [status, category, body] = response.result();
-      log::debug(R"(status={}, category={}, body="{}")"sv, status, category, body);
       response.expect(core::http::Status::OK);
       core::json::Buffer buffer(decode_buffer_);
       auto order_book = core::json::Parser::create<json::OrderBook>(body, buffer);
@@ -384,7 +383,7 @@ void Rest::get_order_book_ack(
 
 void Rest::operator()(const server::Trace<json::OrderBook> &event, const std::string_view &symbol) {
   auto &[trace_info, order_book] = event;
-  log::debug("order_book={}"sv, order_book);
+  log::info<3>("trace_info={}, order_book={}"sv, trace_info, order_book);
   auto sequence = order_book.id;
   auto &collector = shared_.mbp_collector[symbol];
   core::back_emplacer bids(shared_.bids), asks(shared_.asks);

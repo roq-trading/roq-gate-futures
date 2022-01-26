@@ -1,0 +1,29 @@
+I0126 11:59:09.273316 1925718 rest.cpp:373] DEBUG: status=OK, category=SUCCESS, body="{"current":1643194749.126,
+"asks":[{"s":2746,"p":"37980.7"},{"s":3500,"p":"37981"},{"s":921,"p":"37983.7"},{"s":671,"p":"37986.8"},{"s":513,"p":"37986.9"},{"s":6,"p":"37989.5"},{"s":5975,"p":"37990.1"},{"s":2,"p":"37992.4"},{"s":262,"p":"37994"},{"s":4150,"p":"37995.1"}],
+"bids":[{"s":192249,"p":"37980.6"},{"s":394,"p":"37980.5"},{"s":5821,"p":"37977"},{"s":2,"p":"37976.3"},{"s":9048,"p":"37974.9"},{"s":2,"p":"37972.5"},{"s":14397,"p":"37971.8"},{"s":2646,"p":"37969.6"},{"s":8787,"p":"37969.1"},{"s":23915,"p":"37969"}],"id":11145726126,"update":1643194749.124}
+"
+I0126 11:59:09.273357 1925718 rest.cpp:387] DEBUG: order_book={current=1643194749.126, 
+
+REST
+
+bids=[{price=37980.6, size=192249}, {price=37980.5, size=394}, {price=37977, size=5821}, {price=37976.3, size=2}, {price=37974.9, size=9048}, {price=37972.5, size=2}, {price=37971.8, size=14397}, {price=37969.6, size=2646}, {price=37969.1, size=8787}, {price=37969, size=23915}],
+asks=[{price=37980.7, size=2746}, {price=37981, size=3500}, {price=37983.7, size=921}, {price=37986.8, size=671}, {price=37986.9, size=513}, {price=37989.5, size=6}, {price=37990.1, size=5975}, {price=37992.4, size=2}, {price=37994, size=262}, {price=37995.1, size=4150}],
+id=11145726126
+
+
+I0126 11:59:09.273364 1925718 mbp_sequencer.cpp:67] DEBUG: Snapshot is after last update, making a copy and wait for updates to catch up
+
+first_update_id=11145725255, last_update_id=11145726254,
+bids=[{price=37958, size=0}, {price=37958.4, size=0}, {price=37959.8, size=0}, {price=37960.2, size=0}, {price=37961, size=0}, {price=37962.2, size=0}, {price=37963.2, size=0}, {price=37967.9, size=0}, {price=37968.9, size=0}, {price=37969, size=0},
+             {price=37969.6, size=3646}, {price=37971.8, size=7887}, {price=37971.9, size=6}, {price=37972.5, size=2}, {price=37974.9, size=6825}, {price=37976.3, size=2}, {price=37977, size=5821}, {price=37979.5, size=7101}, {price=37980.6, size=189067}, {price=37980.9, size=351639}],
+asks=[{price=37969.1, size=0}, {price=37971.7, size=0}, {price=37971.8, size=0}, {price=37971.9, size=0}, {price=37972.8, size=0}, {price=37976.9, size=0}, {price=37977, size=0}, {price=37979.3, size=0}, {price=37980.9, size=0},
+             {price=37981, size=25126}, {price=37986.8, size=1280}, {price=37986.9, size=513}, {price=37989.5, size=6}, {price=37990.1, size=5975}, {price=37994, size=262}, {price=37995.1, size=4150}, {price=37995.2, size=141}, {price=37995.6, size=921}, {price=37997.7, size=5264}]}}
+
+Notice:
+- update contains snapshot 11145725255 < 11145726126 < 11145726254
+- bids has 37980.9 (new / from update)
+- asks has 37980.7 (snapshot / from request)
+
+==> inverted book
+
+I0126 11:59:09.413865 1925718 market_by_price.cpp:788] DEBUG: *** BAD STATE ***

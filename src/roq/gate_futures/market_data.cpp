@@ -285,6 +285,24 @@ void MarketData::operator()(server::Trace<json::Tickers> const &event) {
               .begin_time_utc = {},
               .end_time_utc = {},
           },
+          {
+              .type = StatisticsType::INDEX_VALUE,
+              .value = item.index_price,
+              .begin_time_utc = {},
+              .end_time_utc = {},
+          },
+          {
+              .type = StatisticsType::FUNDING_RATE,
+              .value = item.funding_rate,
+              .begin_time_utc = {},
+              .end_time_utc = {},
+          },
+          {
+              .type = StatisticsType::FUNDING_RATE_PREDICTION,
+              .value = item.funding_rate_indicative,
+              .begin_time_utc = {},
+              .end_time_utc = {},
+          },
       };
       const StatisticsUpdate statistics_update{
           .stream_id = stream_id_,
@@ -364,7 +382,6 @@ void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
     auto &[trace_info, order_book_update] = event;
     log::info<3>("trace_info={}, order_book_update={}"sv, trace_info, order_book_update);
-    log::debug("order_book_update={}"sv, order_book_update);
     auto &result = order_book_update.result;
     auto &symbol = result.symbol;
     auto first_sequence = result.first_update_id;
@@ -384,7 +401,7 @@ void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
           last_sequence,
           first_sequence - 1,
           [&](auto &bids, auto &asks) {  // update
-            log::debug(R"(PUBLISH UPDATE symbol="{}")"sv, symbol);
+            // log::debug(R"(PUBLISH UPDATE symbol="{}")"sv, symbol);
             MarketByPriceUpdate market_by_price_update{
                 .stream_id = stream_id_,
                 .exchange = Flags::exchange(),
