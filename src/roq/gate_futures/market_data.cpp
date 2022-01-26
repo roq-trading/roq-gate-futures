@@ -382,7 +382,7 @@ void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
           asks,
           first_sequence,
           last_sequence,
-          {},
+          first_sequence - 1,
           [&](auto &bids, auto &asks) {  // update
             log::debug(R"(PUBLISH UPDATE symbol="{}")"sv, symbol);
             MarketByPriceUpdate market_by_price_update{
