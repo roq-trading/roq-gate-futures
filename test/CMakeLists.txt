@@ -5,6 +5,8 @@ set(SOURCES
     json_currencies.cpp
     json_contracts.cpp
     json_message.cpp
+    json_order_book.cpp
+    json_order_book_update.cpp
     json_subscribe.cpp
     json_tickers.cpp
     main.cpp)

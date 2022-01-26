@@ -16,11 +16,13 @@ API API::create() {
   if (api.compare("btc"sv) == 0) {
     return {
         .get_contracts = "/futures/btc/contracts"sv,
+        .get_order_book = "/futures/btc/order_book"sv,
     };
   }
   if (api.compare("usdt"sv) == 0) {
     return {
         .get_contracts = "/futures/usdt/contracts"sv,
+        .get_order_book = "/futures/usdt/order_book"sv,
     };
   }
   throw RuntimeError(R"(Unknown api="{}")"sv, api);

@@ -13,8 +13,11 @@
 
 #include "roq/core/memory.h"
 #include "roq/core/symbols.h"
+#include "roq/core/timer_queue.h"
 
 #include "roq/core/limit/rate_limiter.h"
+
+#include "roq/core/market/mbp_sequencer.h"
 
 #include "roq/gate_futures/api.h"
 
@@ -51,12 +54,15 @@ struct Shared final {
   core::page_aligned_vector<MBPUpdate> bids, asks, final_bids, final_asks;
   core::page_aligned_vector<Trade> trades;
 
+  absl::flat_hash_map<std::string, core::market::MBP_Sequencer> mbp_collector;
+
  private:
   server::Dispatcher &dispatcher_;
 
  public:
   core::limit::RateLimiter rate_limiter;
   core::Symbols symbols;
+  core::TimerQueue depth_request_queue;
 };
 
 }  // namespace gate_futures

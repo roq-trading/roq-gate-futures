@@ -69,6 +69,11 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
 
   void subscribe(const std::span<std::string const> &symbols);
   void subscribe(const std::string_view &channel, const std::span<std::string const> &symbols);
+  void subscribe(
+      const std::string_view &channel,
+      const std::span<std::string const> &symbols,
+      const std::chrono::milliseconds frequency,
+      uint32_t depth);
 
   void parse(const std::string_view &message);
 
@@ -76,6 +81,7 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
   void operator()(server::Trace<json::Tickers> const &) override;
   void operator()(server::Trace<json::Trades> const &) override;
   void operator()(server::Trace<json::BookTicker> const &) override;
+  void operator()(server::Trace<json::OrderBookUpdate> const &) override;
 
  private:
   Handler &handler_;
@@ -94,7 +100,7 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
     core::metrics::Counter disconnect;
   } counter_;
   struct {
-    core::metrics::Profile parse, subscribe, tickers, trades, book_ticker;
+    core::metrics::Profile parse, subscribe, tickers, trades, book_ticker, order_book_update;
   } profile_;
   struct {
     core::metrics::Latency ping;

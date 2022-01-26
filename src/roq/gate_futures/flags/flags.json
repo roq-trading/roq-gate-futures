@@ -175,6 +175,19 @@
       "type": "bool",
       "default": false,
       "description": "allow price inversion?"
+    },
+    {
+      "name": "order_book_depth",
+      "type": "uint32_t",
+      "default": 10,
+      "description": "order book depth"
+    },
+    {
+      "name": "order_book_freq",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::core::flags::TimePeriod",
+      "default": "1000ms",
+      "description": "order book frequency"
     }
   ]
 }

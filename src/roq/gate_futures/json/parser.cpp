@@ -52,6 +52,8 @@ bool Parser::dispatch(
           return true;
         }
         case Channel::ORDER_BOOK_UPDATE:
+          auto order_book_update = core::json::Parser::create<OrderBookUpdate>(message, buffer);
+          server::create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
       }
       break;

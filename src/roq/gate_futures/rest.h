@@ -27,6 +27,7 @@
 
 #include "roq/gate_futures/json/contracts.h"
 #include "roq/gate_futures/json/currencies.h"
+#include "roq/gate_futures/json/order_book.h"
 
 namespace roq {
 namespace gate_futures {
@@ -76,6 +77,13 @@ class Rest final : public core::web::Client::Handler {
   void get_contracts_ack(const server::Trace<core::web::Response> &, uint32_t sequence);
   void operator()(const server::Trace<json::Contracts> &);
 
+  void get_order_book(const std::string_view &symbol);
+  void get_order_book_ack(
+      const server::Trace<core::web::Response> &, const std::string_view &symbol);
+  void operator()(const server::Trace<json::OrderBook> &, const std::string_view &symbol);
+
+  void check_request_queue(std::chrono::nanoseconds now);
+
  private:
   Handler &handler_;
   // config
@@ -90,7 +98,8 @@ class Rest final : public core::web::Client::Handler {
     core::metrics::Counter disconnect;
   } counter_;
   struct {
-    core::metrics::Profile currencies, currencies_ack, contracts, contracts_ack;
+    core::metrics::Profile currencies, currencies_ack, contracts, contracts_ack, order_book,
+        order_book_ack;
   } profile_;
   struct {
     core::metrics::Latency ping;

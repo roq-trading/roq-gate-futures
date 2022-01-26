@@ -36,6 +36,17 @@ struct create_metrics final : public core::metrics::Factory {
   explicit create_metrics(const std::string_view &group, const std::string_view &function)
       : core::metrics::Factory(server::Flags::name(), group, function) {}
 };
+
+template <typename T>
+void emplace(MBPUpdate &result, const T &item) {
+  new (&result) MBPUpdate{
+      .price = item.price,
+      .quantity = item.size,
+      .implied_quantity = NaN,
+      .price_level = {},
+      .number_of_orders = {},
+  };
+}
 }  // namespace
 
 Rest::Rest(Handler &handler, core::io::Context &context, uint16_t stream_id, Shared &shared)
@@ -61,6 +72,8 @@ Rest::Rest(Handler &handler, core::io::Context &context, uint16_t stream_id, Sha
           .currencies_ack = create_metrics(name_, "currencies_ack"sv),
           .contracts = create_metrics(name_, "contracts"sv),
           .contracts_ack = create_metrics(name_, "contracts_ack"sv),
+          .order_book = create_metrics(name_, "order_book"sv),
+          .order_book_ack = create_metrics(name_, "order_book_ack"sv),
       },
       latency_{
           .ping = create_metrics(name_, "ping"sv),
@@ -80,6 +93,8 @@ void Rest::operator()(const Event<Stop> &) {
 void Rest::operator()(const Event<Timer> &event) {
   auto now = event.value.now;
   connection_.refresh(now);
+  if (ready())
+    check_request_queue(now);
 }
 
 void Rest::operator()(metrics::Writer &writer) {
@@ -91,6 +106,8 @@ void Rest::operator()(metrics::Writer &writer) {
       .write(profile_.currencies_ack, metrics::PROFILE)
       .write(profile_.contracts, metrics::PROFILE)
       .write(profile_.contracts_ack, metrics::PROFILE)
+      .write(profile_.order_book, metrics::PROFILE)
+      .write(profile_.order_book_ack, metrics::PROFILE)
       // latency
       .write(latency_.ping, metrics::LATENCY);
 }
@@ -316,6 +333,117 @@ void Rest::operator()(const server::Trace<json::Contracts> &event) {
   }
   if (counter > 0) [[unlikely]]
     log::info("Symbols {} / {}"sv, counter, std::size(contracts.data));
+}
+
+// order book
+
+void Rest::get_order_book(const std::string_view &symbol) {
+  profile_.order_book([&]() {
+    auto method = core::http::Method::GET;
+    auto path = shared_.api.get_order_book;
+    auto query =
+        fmt::format("?contract={}&limit={}&with_id=true"sv, symbol, Flags::order_book_depth());
+    core::web::Request request{
+        .method = method,
+        .path = path,
+        .query = query,
+        .accept = core::http::Accept::JSON,
+        .content_type = {},
+        .headers = {},
+        .body = {},
+        .quality_of_service = {},
+    };
+    connection_(
+        "order_book"sv,
+        request,
+        [this, symbol = std::string{symbol}]([[maybe_unused]] auto &request_id, auto &response) {
+          auto trace_info = server::create_trace_info();
+          server::Trace event(trace_info, response);
+          get_order_book_ack(event, symbol);
+        });
+  });
+}
+
+void Rest::get_order_book_ack(
+    const server::Trace<core::web::Response> &event, const std::string_view &symbol) {
+  profile_.order_book_ack([&]() {
+    auto &[trace_info, response] = event;
+    try {
+      auto [status, category, body] = response.result();
+      log::debug(R"(status={}, category={}, body="{}")"sv, status, category, body);
+      response.expect(core::http::Status::OK);
+      core::json::Buffer buffer(decode_buffer_);
+      auto order_book = core::json::Parser::create<json::OrderBook>(body, buffer);
+      server::Trace event(trace_info, order_book);
+      (*this)(event, symbol);
+    } catch (core::NetworkError &e) {
+      log::warn(R"(Exception type={}, what="{}")"sv, typeid(e).name(), e.what());
+    }
+  });
+}
+
+void Rest::operator()(const server::Trace<json::OrderBook> &event, const std::string_view &symbol) {
+  auto &[trace_info, order_book] = event;
+  log::debug("order_book={}"sv, order_book);
+  auto sequence = order_book.id;
+  auto &collector = shared_.mbp_collector[symbol];
+  core::back_emplacer bids(shared_.bids), asks(shared_.asks);
+  for (auto &item : order_book.bids)
+    bids.emplace_back([&item](auto &result) { emplace(result, item); });
+  for (auto &item : order_book.asks)
+    asks.emplace_back([&item](auto &result) { emplace(result, item); });
+  auto exchange_time_utc = std::chrono::nanoseconds{};
+  try {
+    collector(
+        bids,
+        asks,
+        sequence,
+        [&](auto &bids, auto &asks, auto sequence) {  // snapshot
+          log::debug(R"(PUBLISH SNAPSHOT symbol="{}", sequence={})"sv, symbol, sequence);
+          MarketByPriceUpdate market_by_price_update{
+              .stream_id = stream_id_,
+              .exchange = Flags::exchange(),
+              .symbol = symbol,
+              .bids = bids,
+              .asks = asks,
+              .update_type = UpdateType::SNAPSHOT,
+              .exchange_time_utc = exchange_time_utc,
+              .exchange_sequence = collector.last_sequence(),
+              .price_decimals = {},
+              .quantity_decimals = {},
+              .checksum = {},
+          };
+          server::Trace event(trace_info, market_by_price_update);
+          shared_(event, true, [&](auto &market_by_price) {
+            collector.apply(market_by_price, sequence, true);
+          });
+        },
+        [&](auto retries) {  // request
+          log::debug(R"(REQUEST symbol="{}" (retries={}))"sv, symbol, retries);
+          if (Flags::ws_mbp_request_max_retries() &&
+              Flags::ws_mbp_request_max_retries() < retries) {
+            log::fatal(R"(Unexpected: symbol="{}", retries={})"sv, symbol, retries);
+          }
+          shared_.depth_request_queue.emplace_back(symbol);
+        });
+  } catch (BadState &) {
+    log::warn(R"(RESUBSCRIBE symbol="{}")"sv, symbol);
+    // XXX HANS publish stale
+    collector.clear();
+    shared_.depth_request_queue.emplace_back(symbol);
+  }
+}
+
+// queue
+
+void Rest::check_request_queue(std::chrono::nanoseconds now) {
+  shared_.depth_request_queue.dispatch(
+      [&](auto now) { return shared_.rate_limiter.can_request(now); },
+      [&](auto &symbol) {
+        log::debug(R"(Requesting order book snapshot symbol="{}")"sv, symbol);
+        get_order_book(symbol);
+      },
+      now);
 }
 
 }  // namespace gate_futures

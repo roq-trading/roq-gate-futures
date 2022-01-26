@@ -1,0 +1,12 @@
+{
+"name": "OrderBookUpdate",
+"type": "comp",
+"values": [
+	{ "name": "id" },
+	{ "name": "time", "type": "std::chrono::seconds" },
+	{ "name": "channel", "type": "Channel" },
+	{ "name": "event", "type": "Event" },
+	{ "name": "result", "type": "OrderBookUpdateResult" },
+	{ "name": "error" }
+]
+}

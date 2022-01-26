@@ -1,0 +1,11 @@
+{
+"name": "OrderBook",
+"type": "comp",
+"values": [
+	{ "name": "current", "type": "double" },
+	{ "name": "asks", "type": "std::span<PriceSize>" },
+	{ "name": "bids", "type": "std::span<PriceSize>" },
+	{ "name": "id", "type": "int64_t" },
+	{ "name": "update", "type": "double" }
+]
+}

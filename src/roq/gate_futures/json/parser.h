@@ -10,6 +10,7 @@
 #include "roq/server.h"
 
 #include "roq/gate_futures/json/book_ticker.h"
+#include "roq/gate_futures/json/order_book_update.h"
 #include "roq/gate_futures/json/subscribe.h"
 #include "roq/gate_futures/json/tickers.h"
 #include "roq/gate_futures/json/trades.h"
@@ -24,13 +25,11 @@ struct Parser final {
     virtual void operator()(server::Trace<json::Tickers> const &) = 0;
     virtual void operator()(server::Trace<json::Trades> const &) = 0;
     virtual void operator()(server::Trace<json::BookTicker> const &) = 0;
+    virtual void operator()(server::Trace<json::OrderBookUpdate> const &) = 0;
   };
 
   static bool dispatch(
-      Handler &handler,
-      std::string_view const &message,
-      core::json::Buffer &,
-      server::TraceInfo const &);
+      Handler &, std::string_view const &message, core::json::Buffer &, server::TraceInfo const &);
 };
 
 }  // namespace json

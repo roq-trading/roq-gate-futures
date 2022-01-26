@@ -1,0 +1,12 @@
+{
+"name": "OrderBookUpdateResult",
+"type": "comp",
+"values": [
+	{ "raw": "t", "name": "timestamp", "type": "std::chrono::milliseconds" },
+	{ "raw": "s", "name": "symbol", "type": "std::string_view" },
+	{ "raw": "U", "name": "first_update_id", "type": "int64_t" },
+	{ "raw": "u", "name": "last_update_id", "type": "int64_t" },
+	{ "raw": "b", "name": "bids", "type": "std::span<PriceSize>" },
+	{ "raw": "a", "name": "asks", "type": "std::span<PriceSize>" }
+]
+}

@@ -7,6 +7,7 @@
 	{ "name": "withdraw_disabled", "type": "bool" },
 	{ "name": "withdraw_delayed", "type": "bool" },
 	{ "name": "deposit_disabled", "type": "bool" },
-	{ "name": "trade_disabled", "type": "bool" }
+	{ "name": "trade_disabled", "type": "bool" },
+	{ "name": "fixed_rate", "type": "double" }
 ]
 }

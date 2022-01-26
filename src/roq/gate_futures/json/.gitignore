@@ -20,6 +20,14 @@ mark_type.h
 mark_type.cpp
 message.h
 message.cpp
+order_book.h
+order_book.cpp
+order_book_update.h
+order_book_update.cpp
+order_book_update_result.h
+order_book_update_result.cpp
+price_size.h
+price_size.cpp
 subscribe.h
 subscribe.cpp
 subscribe_result.h

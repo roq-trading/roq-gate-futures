@@ -16,6 +16,10 @@ set(AUTOGEN_SCHEMAS
     event.json
     mark_type.json
     message.json
+    order_book.json
+    order_book_update.json
+    order_book_update_result.json
+    price_size.json
     subscribe.json
     subscribe_result.json
     tickers_item.json

@@ -1,0 +1,8 @@
+{
+"name": "PriceSize",
+"type": "item",
+"values": [
+	{ "raw": "p", "name": "price", "type": "double" },
+	{ "raw": "s", "name": "size", "type": "double" }
+]
+}
