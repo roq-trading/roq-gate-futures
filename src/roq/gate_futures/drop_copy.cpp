@@ -238,5 +238,9 @@ void DropCopy::operator()(server::Trace<json::BookTicker> const &) {
   log::fatal("Unexpected"sv);
 }
 
+void DropCopy::operator()(server::Trace<json::OrderBookUpdate> const &) {
+  log::fatal("Unexpected"sv);
+}
+
 }  // namespace gate_futures
 }  // namespace roq

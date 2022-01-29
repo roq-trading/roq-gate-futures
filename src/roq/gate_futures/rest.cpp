@@ -382,7 +382,9 @@ void Rest::get_order_book_ack(
 }
 
 void Rest::operator()(const server::Trace<json::OrderBook> &event, const std::string_view &symbol) {
-  auto &[trace_info, order_book] = event;
+  // auto &[trace_info, order_book] = event;
+  auto &trace_info = event.trace_info;
+  auto &order_book = event.value;
   log::info<3>("trace_info={}, order_book={}"sv, trace_info, order_book);
   auto sequence = order_book.id;
   auto &collector = shared_.mbp_collector[symbol];

@@ -380,7 +380,9 @@ void MarketData::operator()(server::Trace<json::BookTicker> const &event) {
 
 void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
-    auto &[trace_info, order_book_update] = event;
+    // auto &[trace_info, order_book_update] = event;
+    auto &trace_info = event.trace_info;
+    auto &order_book_update = event.value;
     log::info<3>("trace_info={}, order_book_update={}"sv, trace_info, order_book_update);
     auto &result = order_book_update.result;
     auto &symbol = result.symbol;
