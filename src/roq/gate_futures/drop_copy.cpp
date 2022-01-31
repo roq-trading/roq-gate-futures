@@ -19,8 +19,8 @@ namespace roq {
 namespace gate_futures {
 
 namespace {
-static const auto NAME = "ex"sv;
-static const auto SUPPORTS = utils::Mask{
+const auto NAME = "ex"sv;
+const auto SUPPORTS = utils::Mask{
     SupportType::ORDER,
     SupportType::TRADE,
     SupportType::FUNDS,
@@ -32,7 +32,7 @@ struct create_metrics final : public core::metrics::Factory {
 };
 
 /*
-static OrderStatus compute_order_status(
+OrderStatus compute_order_status(
     json::OrderChangeType change_type, json::OrderStatus status, double remain_size) {
   switch (change_type) {
     case json::OrderChangeType::UNDEFINED:
