@@ -11,6 +11,8 @@ set(SOURCES
     json_tickers.cpp
     main.cpp)
 
+roq_gitignore(OUTPUT ".gitignore" SOURCES "${TARGET_NAME}")
+
 add_executable("${TARGET_NAME}" ${SOURCES})
 
 target_link_libraries("${TARGET_NAME}" "${PROJECT_NAME}-json" roq-logging::roq-logging gtest_main
