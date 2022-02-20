@@ -197,7 +197,7 @@ void MarketData::subscribe(
     const std::string_view &channel, const std::span<std::string const> &symbols) {
   assert(!std::empty(symbols));
   if (true) {
-    std::chrono::seconds now = utils::safe_cast(core::get_realtime_clock());
+    std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
     auto message = fmt::format(
         R"({{)"
         R"("time":{},)"
@@ -212,7 +212,7 @@ void MarketData::subscribe(
     connection_.send_text(message);
   } else {
     for (auto &symbol : symbols) {
-      std::chrono::seconds now = utils::safe_cast(core::get_realtime_clock());
+      std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
       auto message = fmt::format(
           R"({{)"
           R"("time":{},)"
@@ -236,7 +236,7 @@ void MarketData::subscribe(
     const uint32_t depth) {
   assert(!std::empty(symbols));
   for (auto &symbol : symbols) {
-    std::chrono::seconds now = utils::safe_cast(core::get_realtime_clock());
+    std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
     auto message = fmt::format(
         R"({{)"
         R"("time":{},)"

@@ -5,6 +5,8 @@
 #include <string>
 #include <string_view>
 
+#include "roq/core/download.h"
+
 #include "roq/core/metrics/counter.h"
 #include "roq/core/metrics/latency.h"
 #include "roq/core/metrics/profile.h"
@@ -13,7 +15,6 @@
 
 #include "roq/core/web/client_socket.h"
 
-#include "roq/download.h"
 #include "roq/server.h"
 
 #include "roq/gate_futures/drop_copy_state.h"
@@ -109,7 +110,7 @@ class DropCopy final : public core::web::ClientSocket::Handler, json::Parser::Ha
   bool welcome_ = false;
   bool ready_ = false;
   ConnectionStatus status_ = {};
-  server::Download<DropCopyState> download_;
+  core::Download<DropCopyState> download_;
   std::chrono::nanoseconds logon_timeout_ = {};
   std::chrono::nanoseconds next_ping_ = {};
 };
