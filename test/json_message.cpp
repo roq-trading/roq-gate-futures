@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include "roq/core/json/parser.h"
 
@@ -12,7 +12,9 @@ using namespace roq::gate_futures;
 using namespace std::literals;
 using namespace std::chrono_literals;
 
-TEST(json_message, subscribe_success) {
+using namespace Catch::literals;
+
+TEST_CASE("json_message_subscribe_success", "json_message") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"
@@ -28,7 +30,7 @@ TEST(json_message, subscribe_success) {
   auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
-TEST(json_message, book_ticker) {
+TEST_CASE("json_message_book_ticker", "json_message") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"
@@ -50,7 +52,7 @@ TEST(json_message, book_ticker) {
   auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
-TEST(json_message, tickers) {
+TEST_CASE("json_message_tickers", "json_message") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365849,)"
@@ -81,7 +83,7 @@ TEST(json_message, tickers) {
   auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
-TEST(json_message, trades) {
+TEST_CASE("json_message_trades", "json_message") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641366055,)"

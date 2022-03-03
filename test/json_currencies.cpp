@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include "roq/core/json/parser.h"
 
@@ -12,8 +12,10 @@ using namespace roq::gate_futures;
 using namespace std::literals;
 using namespace std::chrono_literals;
 
+using namespace Catch::literals;
+
 // note! reduced
-TEST(json_currencies, item) {
+TEST_CASE("json_currencies_item", "json_currencies") {
   auto message = R"([{)"
                  R"("currency":"AGLD",)"
                  R"("delisted":false,)"
@@ -34,5 +36,5 @@ TEST(json_currencies, item) {
   core::json::Buffer buffer_(buffer);
   auto obj = core::json::Parser::create<json::Currencies>(message, buffer_);
   auto &data = obj.data;
-  ASSERT_EQ(std::size(data), 2);
+  REQUIRE(std::size(data) == 2);
 }

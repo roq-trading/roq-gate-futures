@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include "roq/core/json/parser.h"
 
@@ -12,7 +12,9 @@ using namespace roq::gate_futures;
 using namespace std::literals;
 using namespace std::chrono_literals;
 
-TEST(json_order_book_update, simple_1) {
+using namespace Catch::literals;
+
+TEST_CASE("json_order_book_update_simple_1", "json_order_book_update") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1643180626,)"
@@ -51,25 +53,25 @@ TEST(json_order_book_update, simple_1) {
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
   auto obj = core::json::Parser::create<json::OrderBookUpdate>(message, buffer_);
-  EXPECT_EQ(obj.time, 1643180626s);
-  EXPECT_EQ(obj.channel, json::Channel::ORDER_BOOK_UPDATE);
-  EXPECT_EQ(obj.event, json::Event::UPDATE);
+  CHECK(obj.time == 1643180626s);
+  CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
+  CHECK(obj.event == json::Event::UPDATE);
   auto &result = obj.result;
-  EXPECT_EQ(result.timestamp, 1643180626827ms);
-  EXPECT_EQ(result.symbol, "BTC_USDT"sv);
-  EXPECT_EQ(result.first_update_id, 11140379005);
-  EXPECT_EQ(result.last_update_id, 11140379319);
-  ASSERT_EQ(std::size(result.bids), 9);
+  CHECK(result.timestamp == 1643180626827ms);
+  CHECK(result.symbol == "BTC_USDT"sv);
+  CHECK(result.first_update_id == 11140379005);
+  CHECK(result.last_update_id == 11140379319);
+  REQUIRE(std::size(result.bids) == 9);
   auto &b0 = result.bids[0];
-  EXPECT_DOUBLE_EQ(b0.price, 37203.3);
-  EXPECT_DOUBLE_EQ(b0.size, 1613.0);
-  ASSERT_EQ(std::size(result.asks), 9);
+  CHECK(b0.price == 37203.3_a);
+  CHECK(b0.size == 1613.0_a);
+  REQUIRE(std::size(result.asks) == 9);
   auto &a0 = result.asks[0];
-  EXPECT_DOUBLE_EQ(a0.price, 37210.2);
-  EXPECT_DOUBLE_EQ(a0.size, 206362.0);
+  CHECK(a0.price == 37210.2_a);
+  CHECK(a0.size == 206362.0_a);
 }
 
-TEST(json_order_book_update, simple_2) {
+TEST_CASE("json_order_book_update_simple_2", "json_order_book_update") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1643180627,)"
@@ -95,20 +97,20 @@ TEST(json_order_book_update, simple_2) {
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
   auto obj = core::json::Parser::create<json::OrderBookUpdate>(message, buffer_);
-  EXPECT_EQ(obj.time, 1643180627s);
-  EXPECT_EQ(obj.channel, json::Channel::ORDER_BOOK_UPDATE);
-  EXPECT_EQ(obj.event, json::Event::UPDATE);
+  CHECK(obj.time == 1643180627s);
+  CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
+  CHECK(obj.event == json::Event::UPDATE);
   auto &result = obj.result;
-  EXPECT_EQ(result.timestamp, 1643180627828ms);
-  EXPECT_EQ(result.symbol, "BTC_USDT"sv);
-  EXPECT_EQ(result.first_update_id, 11140379320);
-  EXPECT_EQ(result.last_update_id, 11140379509);
-  ASSERT_EQ(std::size(result.bids), 4);
+  CHECK(result.timestamp == 1643180627828ms);
+  CHECK(result.symbol == "BTC_USDT"sv);
+  CHECK(result.first_update_id == 11140379320);
+  CHECK(result.last_update_id == 11140379509);
+  REQUIRE(std::size(result.bids) == 4);
   auto &b0 = result.bids[0];
-  EXPECT_DOUBLE_EQ(b0.price, 37207.6);
-  EXPECT_DOUBLE_EQ(b0.size, 66016.0);
-  ASSERT_EQ(std::size(result.asks), 1);
+  CHECK(b0.price == 37207.6_a);
+  CHECK(b0.size == 66016.0_a);
+  REQUIRE(std::size(result.asks) == 1);
   auto &a0 = result.asks[0];
-  EXPECT_DOUBLE_EQ(a0.price, 37210.2);
-  EXPECT_DOUBLE_EQ(a0.size, 227146.0);
+  CHECK(a0.price == 37210.2_a);
+  CHECK(a0.size == 227146.0_a);
 }

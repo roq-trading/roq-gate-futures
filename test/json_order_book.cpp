@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include <gtest/gtest.h>
+#include <catch2/catch.hpp>
 
 #include "roq/core/json/parser.h"
 
@@ -12,7 +12,9 @@ using namespace roq::gate_futures;
 using namespace std::literals;
 using namespace std::chrono_literals;
 
-TEST(json_order_book, simple) {
+using namespace Catch::literals;
+
+TEST_CASE("json_order_book_simple", "json_order_book") {
   auto message = R"({)"
                  R"("current":1643191515.447,)"
                  R"("asks":[)"
@@ -45,15 +47,15 @@ TEST(json_order_book, simple) {
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
   auto obj = core::json::Parser::create<json::OrderBook>(message, buffer_);
-  EXPECT_DOUBLE_EQ(obj.current, 1643191515.447);
-  ASSERT_EQ(std::size(obj.asks), 10);
+  CHECK(obj.current == 1643191515.447_a);
+  REQUIRE(std::size(obj.asks) == 10);
   auto &a0 = obj.asks[0];
-  EXPECT_DOUBLE_EQ(a0.size, 117293.0);
-  EXPECT_DOUBLE_EQ(a0.price, 37705.6);
-  ASSERT_EQ(std::size(obj.bids), 10);
+  CHECK(a0.size == 117293.0_a);
+  CHECK(a0.price == 37705.6_a);
+  REQUIRE(std::size(obj.bids) == 10);
   auto &b0 = obj.bids[0];
-  EXPECT_DOUBLE_EQ(b0.size, 72890.0);
-  EXPECT_DOUBLE_EQ(b0.price, 37705.5);
-  EXPECT_EQ(obj.id, 11144476177);
-  EXPECT_DOUBLE_EQ(obj.update, 1643191515.446);
+  CHECK(b0.size == 72890.0_a);
+  CHECK(b0.price == 37705.5_a);
+  CHECK(obj.id == 11144476177);
+  CHECK(obj.update == 1643191515.446_a);
 }
