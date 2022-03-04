@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_order_book_simple", "json_order_book") {
+TEST_CASE("json_order_book_simple", "[json_order_book]") {
   auto message = R"({)"
                  R"("current":1643191515.447,)"
                  R"("asks":[)"

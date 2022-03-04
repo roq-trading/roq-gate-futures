@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 using namespace Catch::literals;
 
 // note! reduced
-TEST_CASE("json_currencies_item", "json_currencies") {
+TEST_CASE("json_currencies_item", "[json_currencies]") {
   auto message = R"([{)"
                  R"("currency":"AGLD",)"
                  R"("delisted":false,)"

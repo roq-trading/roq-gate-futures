@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_book_ticker_update", "json_book_ticker") {
+TEST_CASE("json_book_ticker_update", "[json_book_ticker]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"

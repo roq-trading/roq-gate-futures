@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_message_subscribe_success", "json_message") {
+TEST_CASE("json_message_subscribe_success", "[json_message]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"
@@ -30,7 +30,7 @@ TEST_CASE("json_message_subscribe_success", "json_message") {
   auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
-TEST_CASE("json_message_book_ticker", "json_message") {
+TEST_CASE("json_message_book_ticker", "[json_message]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"
@@ -52,7 +52,7 @@ TEST_CASE("json_message_book_ticker", "json_message") {
   auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
-TEST_CASE("json_message_tickers", "json_message") {
+TEST_CASE("json_message_tickers", "[json_message]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365849,)"
@@ -83,7 +83,7 @@ TEST_CASE("json_message_tickers", "json_message") {
   auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
-TEST_CASE("json_message_trades", "json_message") {
+TEST_CASE("json_message_trades", "[json_message]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641366055,)"

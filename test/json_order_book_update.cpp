@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_order_book_update_simple_1", "json_order_book_update") {
+TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1643180626,)"
@@ -71,7 +71,7 @@ TEST_CASE("json_order_book_update_simple_1", "json_order_book_update") {
   CHECK(a0.size == 206362.0_a);
 }
 
-TEST_CASE("json_order_book_update_simple_2", "json_order_book_update") {
+TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1643180627,)"

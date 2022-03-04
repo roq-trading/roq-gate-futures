@@ -15,7 +15,7 @@ using namespace std::chrono_literals;
 using namespace Catch::literals;
 
 // note! reduced
-TEST_CASE("json_contracts_simple_btc", "json_contracts") {
+TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
   auto message = R"([{)"
                  R"("funding_rate_indicative":"0.000462",)"
                  R"("mark_price_round":"0.01",)"
@@ -106,7 +106,7 @@ TEST_CASE("json_contracts_simple_btc", "json_contracts") {
 }
 
 // note! reduced
-TEST_CASE("json_contracts_simple_usdt", "json_contracts") {
+TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
   auto message = R"([{)"
                  R"("funding_rate_indicative":"0.0001",)"
                  R"("mark_price_round":"0.0001",)"
