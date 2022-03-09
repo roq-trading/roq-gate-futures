@@ -4,16 +4,16 @@
 
 #include <string_view>
 
-#include "roq/core/json/buffer.h"
-#include "roq/core/json/parser.h"
+#include "roq/core/json/buffer.hpp"
+#include "roq/core/json/parser.hpp"
 
-#include "roq/server.h"
+#include "roq/server.hpp"
 
-#include "roq/gate_futures/json/book_ticker.h"
-#include "roq/gate_futures/json/order_book_update.h"
-#include "roq/gate_futures/json/subscribe.h"
-#include "roq/gate_futures/json/tickers.h"
-#include "roq/gate_futures/json/trades.h"
+#include "roq/gate_futures/json/book_ticker.hpp"
+#include "roq/gate_futures/json/order_book_update.hpp"
+#include "roq/gate_futures/json/subscribe.hpp"
+#include "roq/gate_futures/json/tickers.hpp"
+#include "roq/gate_futures/json/trades.hpp"
 
 namespace roq {
 namespace gate_futures {

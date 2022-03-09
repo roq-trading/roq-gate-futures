@@ -1,10 +1,10 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_futures/security.h"
+#include "roq/gate_futures/security.hpp"
 
-#include "roq/utils/safe_cast.h"
+#include "roq/utils/safe_cast.hpp"
 
-#include "roq/core/clock.h"
+#include "roq/core/clock.hpp"
 
 namespace roq {
 namespace gate_futures {

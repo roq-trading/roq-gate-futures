@@ -5,11 +5,11 @@
 #include <string>
 #include <string_view>
 
-#include "roq/core/http/method.h"
+#include "roq/core/http/method.hpp"
 
-#include "roq/gate_futures/config.h"
+#include "roq/gate_futures/config.hpp"
 
-#include "roq/gate_futures/tools/hasher.h"
+#include "roq/gate_futures/tools/hasher.hpp"
 
 namespace roq {
 namespace gate_futures {

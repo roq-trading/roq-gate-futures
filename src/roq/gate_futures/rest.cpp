@@ -1,21 +1,21 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_futures/rest.h"
+#include "roq/gate_futures/rest.hpp"
 
 #include <algorithm>
 #include <utility>
 
-#include "roq/utils/mask.h"
-#include "roq/utils/update.h"
+#include "roq/utils/mask.hpp"
+#include "roq/utils/update.hpp"
 
-#include "roq/core/back_emplacer.h"
-#include "roq/core/charconv.h"
+#include "roq/core/back_emplacer.hpp"
+#include "roq/core/charconv.hpp"
 
-#include "roq/core/json/parser.h"
+#include "roq/core/json/parser.hpp"
 
-#include "roq/core/metrics/factory.h"
+#include "roq/core/metrics/factory.hpp"
 
-#include "roq/gate_futures/flags.h"
+#include "roq/gate_futures/flags.hpp"
 
 using namespace std::literals;
 

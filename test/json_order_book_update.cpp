@@ -2,9 +2,9 @@
 
 #include <catch2/catch.hpp>
 
-#include "roq/core/json/parser.h"
+#include "roq/core/json/parser.hpp"
 
-#include "roq/gate_futures/json/order_book_update.h"
+#include "roq/gate_futures/json/order_book_update.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;

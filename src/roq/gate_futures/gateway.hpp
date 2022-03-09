@@ -9,17 +9,17 @@
 #include <utility>
 #include <vector>
 
-#include "roq/server.h"
+#include "roq/server.hpp"
 
-#include "roq/core/io/context.h"
+#include "roq/core/io/context.hpp"
 
-#include "roq/gate_futures/config.h"
-#include "roq/gate_futures/drop_copy.h"
-#include "roq/gate_futures/market_data.h"
-#include "roq/gate_futures/order_entry.h"
-#include "roq/gate_futures/rest.h"
-#include "roq/gate_futures/security.h"
-#include "roq/gate_futures/shared.h"
+#include "roq/gate_futures/config.hpp"
+#include "roq/gate_futures/drop_copy.hpp"
+#include "roq/gate_futures/market_data.hpp"
+#include "roq/gate_futures/order_entry.hpp"
+#include "roq/gate_futures/rest.hpp"
+#include "roq/gate_futures/security.hpp"
+#include "roq/gate_futures/shared.hpp"
 
 namespace roq {
 namespace gate_futures {

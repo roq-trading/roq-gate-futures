@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "roq/gate_futures/flags/flags.h"
+#include "roq/gate_futures/flags/flags.hpp"
 
 namespace roq {
 namespace gate_futures {

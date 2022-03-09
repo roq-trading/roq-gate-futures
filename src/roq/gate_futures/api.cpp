@@ -1,10 +1,10 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_futures/api.h"
+#include "roq/gate_futures/api.hpp"
 
-#include "roq/exceptions.h"
+#include "roq/exceptions.hpp"
 
-#include "roq/gate_futures/flags.h"
+#include "roq/gate_futures/flags.hpp"
 
 using namespace std::literals;
 

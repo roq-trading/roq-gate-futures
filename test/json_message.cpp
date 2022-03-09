@@ -2,9 +2,9 @@
 
 #include <catch2/catch.hpp>
 
-#include "roq/core/json/parser.h"
+#include "roq/core/json/parser.hpp"
 
-#include "roq/gate_futures/json/message.h"
+#include "roq/gate_futures/json/message.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;

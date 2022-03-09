@@ -1,10 +1,10 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_futures/application.h"
+#include "roq/gate_futures/application.hpp"
 
-#include "roq/gate_futures/config.h"
-#include "roq/gate_futures/flags.h"
-#include "roq/gate_futures/gateway.h"
+#include "roq/gate_futures/config.hpp"
+#include "roq/gate_futures/flags.hpp"
+#include "roq/gate_futures/gateway.hpp"
 
 using namespace std::literals;
 

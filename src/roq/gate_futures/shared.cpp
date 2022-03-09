@@ -1,8 +1,8 @@
 /* Copyright (c) 2017-2022, Hans Erik Thrane */
 
-#include "roq/gate_futures/shared.h"
+#include "roq/gate_futures/shared.hpp"
 
-#include "roq/gate_futures/flags.h"
+#include "roq/gate_futures/flags.hpp"
 
 namespace roq {
 namespace gate_futures {
