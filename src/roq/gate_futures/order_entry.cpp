@@ -4,7 +4,7 @@
 
 #include <utility>
 
-#include "roq/utils/mask.hpp"
+#include "roq/mask.hpp"
 #include "roq/utils/number.hpp"
 #include "roq/utils/safe_cast.hpp"
 #include "roq/utils/update.hpp"
@@ -22,7 +22,7 @@ namespace gate_futures {
 
 namespace {
 const auto NAME = "om"sv;
-const auto SUPPORTS = utils::Mask{
+const auto SUPPORTS = Mask{
     SupportType::CREATE_ORDER,
     SupportType::CANCEL_ORDER,
     SupportType::ORDER_ACK,
