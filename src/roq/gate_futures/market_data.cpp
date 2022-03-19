@@ -181,7 +181,7 @@ void MarketData::operator()(ConnectionStatus status) {
   }
 }
 
-void MarketData::subscribe(const std::span<std::string const> &symbols) {
+void MarketData::subscribe(const std::span<Symbol const> &symbols) {
   if (std::empty(symbols))
     return;
   subscribe("futures.tickers"sv, symbols);
@@ -195,7 +195,7 @@ void MarketData::subscribe(const std::span<std::string const> &symbols) {
 }
 
 void MarketData::subscribe(
-    const std::string_view &channel, const std::span<std::string const> &symbols) {
+    const std::string_view &channel, const std::span<Symbol const> &symbols) {
   assert(!std::empty(symbols));
   if (true) {
     std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
@@ -232,7 +232,7 @@ void MarketData::subscribe(
 
 void MarketData::subscribe(
     const std::string_view &channel,
-    const std::span<std::string const> &symbols,
+    const std::span<Symbol const> &symbols,
     const std::chrono::milliseconds frequency,
     const uint32_t depth) {
   assert(!std::empty(symbols));

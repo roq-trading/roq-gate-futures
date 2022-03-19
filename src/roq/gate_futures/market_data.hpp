@@ -67,11 +67,11 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
  private:
   void operator()(ConnectionStatus);
 
-  void subscribe(const std::span<std::string const> &symbols);
-  void subscribe(const std::string_view &channel, const std::span<std::string const> &symbols);
+  void subscribe(const std::span<Symbol const> &symbols);
+  void subscribe(const std::string_view &channel, const std::span<Symbol const> &symbols);
   void subscribe(
       const std::string_view &channel,
-      const std::span<std::string const> &symbols,
+      const std::span<Symbol const> &symbols,
       const std::chrono::milliseconds frequency,
       uint32_t depth);
 
