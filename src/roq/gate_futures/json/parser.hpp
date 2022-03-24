@@ -21,15 +21,15 @@ namespace json {
 
 struct Parser final {
   struct Handler {
-    virtual void operator()(server::Trace<json::Subscribe> const &) = 0;
-    virtual void operator()(server::Trace<json::Tickers> const &) = 0;
-    virtual void operator()(server::Trace<json::Trades> const &) = 0;
-    virtual void operator()(server::Trace<json::BookTicker> const &) = 0;
-    virtual void operator()(server::Trace<json::OrderBookUpdate> const &) = 0;
+    virtual void operator()(Trace<json::Subscribe> const &) = 0;
+    virtual void operator()(Trace<json::Tickers> const &) = 0;
+    virtual void operator()(Trace<json::Trades> const &) = 0;
+    virtual void operator()(Trace<json::BookTicker> const &) = 0;
+    virtual void operator()(Trace<json::OrderBookUpdate> const &) = 0;
   };
 
   static bool dispatch(
-      Handler &, std::string_view const &message, core::json::Buffer &, server::TraceInfo const &);
+      Handler &, std::string_view const &message, core::json::Buffer &, TraceInfo const &);
 };
 
 }  // namespace json

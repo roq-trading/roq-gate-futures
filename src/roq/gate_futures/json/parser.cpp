@@ -16,7 +16,7 @@ bool Parser::dispatch(
     Handler &handler,
     std::string_view const &message,
     core::json::Buffer &buffer,
-    server::TraceInfo const &trace_info) {
+    TraceInfo const &trace_info) {
   auto message_ = core::json::Parser::create<Message>(message, buffer);
   switch (message_.event) {
     case Event::UNDEFINED:
@@ -26,7 +26,7 @@ bool Parser::dispatch(
       break;
     case Event::SUBSCRIBE: {
       auto subscribe = core::json::Parser::create<Subscribe>(message, buffer);
-      server::create_trace_and_dispatch(handler, trace_info, subscribe);
+      create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
     case Event::UPDATE:
@@ -38,22 +38,22 @@ bool Parser::dispatch(
           break;
         case Channel::TICKERS: {
           auto tickers = core::json::Parser::create<Tickers>(message, buffer);
-          server::create_trace_and_dispatch(handler, trace_info, tickers);
+          create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case Channel::TRADES: {
           auto trades = core::json::Parser::create<Trades>(message, buffer);
-          server::create_trace_and_dispatch(handler, trace_info, trades);
+          create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case Channel::BOOK_TICKER: {
           auto book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
-          server::create_trace_and_dispatch(handler, trace_info, book_ticker);
+          create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
         case Channel::ORDER_BOOK_UPDATE:
           auto order_book_update = core::json::Parser::create<OrderBookUpdate>(message, buffer);
-          server::create_trace_and_dispatch(handler, trace_info, order_book_update);
+          create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
       }
       break;

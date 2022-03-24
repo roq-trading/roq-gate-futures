@@ -28,14 +28,14 @@ namespace gate_futures {
 class MarketData final : public core::web::ClientSocket::Handler, public json::Parser::Handler {
  public:
   struct Handler {
-    virtual void operator()(const server::Trace<StreamStatus> &) = 0;
-    virtual void operator()(const server::Trace<ExternalLatency> &) = 0;
-    virtual void operator()(const server::Trace<MarketStatus> &, bool is_last) = 0;
-    virtual void operator()(const server::Trace<TopOfBook> &, bool is_last) = 0;
+    virtual void operator()(const Trace<StreamStatus> &) = 0;
+    virtual void operator()(const Trace<ExternalLatency> &) = 0;
+    virtual void operator()(const Trace<MarketStatus> &, bool is_last) = 0;
+    virtual void operator()(const Trace<TopOfBook> &, bool is_last) = 0;
     virtual void operator()(
-        const server::Trace<MarketByPriceUpdate> &, bool is_last, bool refresh) = 0;
-    virtual void operator()(const server::Trace<TradeSummary> &, bool is_last) = 0;
-    virtual void operator()(const server::Trace<StatisticsUpdate> &, bool is_last) = 0;
+        const Trace<MarketByPriceUpdate> &, bool is_last, bool refresh) = 0;
+    virtual void operator()(const Trace<TradeSummary> &, bool is_last) = 0;
+    virtual void operator()(const Trace<StatisticsUpdate> &, bool is_last) = 0;
   };
 
   MarketData(Handler &, core::io::Context &, uint32_t stream_id, Shared &, size_t index);
@@ -77,11 +77,11 @@ class MarketData final : public core::web::ClientSocket::Handler, public json::P
 
   void parse(const std::string_view &message);
 
-  void operator()(server::Trace<json::Subscribe> const &) override;
-  void operator()(server::Trace<json::Tickers> const &) override;
-  void operator()(server::Trace<json::Trades> const &) override;
-  void operator()(server::Trace<json::BookTicker> const &) override;
-  void operator()(server::Trace<json::OrderBookUpdate> const &) override;
+  void operator()(Trace<json::Subscribe> const &) override;
+  void operator()(Trace<json::Tickers> const &) override;
+  void operator()(Trace<json::Trades> const &) override;
+  void operator()(Trace<json::BookTicker> const &) override;
+  void operator()(Trace<json::OrderBookUpdate> const &) override;
 
  private:
   Handler &handler_;

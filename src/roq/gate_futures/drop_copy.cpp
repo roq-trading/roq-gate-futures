@@ -148,7 +148,7 @@ void DropCopy::operator()(const core::web::ClientSocket::Latency &latency) {
       .account = security_.get_account(),
       .latency = latency.sample,
   };
-  server::create_trace_and_dispatch(handler_, trace_info, external_latency);
+  create_trace_and_dispatch(handler_, trace_info, external_latency);
   latency_.ping.update(latency.sample);
 }
 
@@ -172,7 +172,7 @@ void DropCopy::operator()(ConnectionStatus status) {
         .priority = Priority::PRIMARY,
     };
     log::info("stream_status={}"sv, stream_status);
-    server::create_trace_and_dispatch(handler_, trace_info, stream_status);
+    create_trace_and_dispatch(handler_, trace_info, stream_status);
   }
 }
 
@@ -228,23 +228,23 @@ void DropCopy::parse(const std::string_view &message) {
   });
 }
 
-void DropCopy::operator()(server::Trace<json::Subscribe> const &) {
+void DropCopy::operator()(Trace<json::Subscribe> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(server::Trace<json::Tickers> const &) {
+void DropCopy::operator()(Trace<json::Tickers> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(server::Trace<json::Trades> const &) {
+void DropCopy::operator()(Trace<json::Trades> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(server::Trace<json::BookTicker> const &) {
+void DropCopy::operator()(Trace<json::BookTicker> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(server::Trace<json::OrderBookUpdate> const &) {
+void DropCopy::operator()(Trace<json::OrderBookUpdate> const &) {
   log::fatal("Unexpected"sv);
 }
 

@@ -153,7 +153,7 @@ void MarketData::operator()(const core::web::ClientSocket::Latency &latency) {
       .account = {},
       .latency = latency.sample,
   };
-  server::create_trace_and_dispatch(handler_, trace_info, external_latency);
+  create_trace_and_dispatch(handler_, trace_info, external_latency);
   latency_.ping.update(latency.sample);
 }
 
@@ -177,7 +177,7 @@ void MarketData::operator()(ConnectionStatus status) {
         .priority = Priority::PRIMARY,
     };
     log::info("stream_status={}"sv, stream_status);
-    server::create_trace_and_dispatch(handler_, trace_info, stream_status);
+    create_trace_and_dispatch(handler_, trace_info, stream_status);
   }
 }
 
@@ -271,7 +271,7 @@ void MarketData::parse(const std::string_view &message) {
   });
 }
 
-void MarketData::operator()(server::Trace<json::Subscribe> const &event) {
+void MarketData::operator()(Trace<json::Subscribe> const &event) {
   profile_.subscribe([&]() {
     auto &[trace_info, subscribe] = event;
     log::info<3>("trace_info={}, subscribe={}"sv, trace_info, subscribe);
@@ -279,7 +279,7 @@ void MarketData::operator()(server::Trace<json::Subscribe> const &event) {
   });
 }
 
-void MarketData::operator()(server::Trace<json::Tickers> const &event) {
+void MarketData::operator()(Trace<json::Tickers> const &event) {
   profile_.tickers([&]() {
     auto &[trace_info, tickers] = event;
     log::info<3>("trace_info={}, tickers={}"sv, trace_info, tickers);
@@ -318,12 +318,12 @@ void MarketData::operator()(server::Trace<json::Tickers> const &event) {
           .update_type = UpdateType::INCREMENTAL,
           .exchange_time_utc = utils::safe_cast(tickers.time),
       };
-      server::create_trace_and_dispatch(handler_, trace_info, statistics_update, true);
+      create_trace_and_dispatch(handler_, trace_info, statistics_update, true);
     }
   });
 }
 
-void MarketData::operator()(server::Trace<json::Trades> const &event) {
+void MarketData::operator()(Trace<json::Trades> const &event) {
   profile_.trades([&]() {
     auto &[trace_info, trades] = event;
     log::info<3>("trace_info={}, trades={}"sv, trace_info, trades);
@@ -341,7 +341,7 @@ void MarketData::operator()(server::Trace<json::Trades> const &event) {
               .trades = trades_,
               .exchange_time_utc = utils::safe_cast(timestamp),
           };
-          server::create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
+          create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
         }
         contract = item.contract;
         timestamp = {};
@@ -357,12 +357,12 @@ void MarketData::operator()(server::Trace<json::Trades> const &event) {
           .trades = trades_,
           .exchange_time_utc = utils::safe_cast(timestamp),
       };
-      server::create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
+      create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
     }
   });
 }
 
-void MarketData::operator()(server::Trace<json::BookTicker> const &event) {
+void MarketData::operator()(Trace<json::BookTicker> const &event) {
   profile_.book_ticker([&]() {
     auto &[trace_info, book_ticker] = event;
     log::info<3>("trace_info={}, book_ticker={}"sv, trace_info, book_ticker);
@@ -380,11 +380,11 @@ void MarketData::operator()(server::Trace<json::BookTicker> const &event) {
         .update_type = UpdateType::INCREMENTAL,
         .exchange_time_utc = utils::safe_cast(result.timestamp),
     };
-    server::create_trace_and_dispatch(handler_, trace_info, top_of_book, true);
+    create_trace_and_dispatch(handler_, trace_info, top_of_book, true);
   });
 }
 
-void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
+void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
     // auto &[trace_info, order_book_update] = event;
     auto &trace_info = event.trace_info;
@@ -423,7 +423,7 @@ void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
                 .quantity_decimals = {},
                 .checksum = {},
             };
-            server::create_trace_and_dispatch(
+            create_trace_and_dispatch(
                 handler_, trace_info, market_by_price_update, true, false);
           },
           [&](auto &bids, auto &asks, auto sequence) {  // snapshot
@@ -441,7 +441,7 @@ void MarketData::operator()(server::Trace<json::OrderBookUpdate> const &event) {
                 .quantity_decimals = {},
                 .checksum = {},
             };
-            server::Trace event(trace_info, market_by_price_update);
+            Trace event(trace_info, market_by_price_update);
             shared_(event, true, [&](auto &market_by_price) {
               collector.apply(market_by_price, sequence, true);
             });
