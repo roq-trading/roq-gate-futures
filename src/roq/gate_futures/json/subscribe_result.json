@@ -1,7 +1,10 @@
 {
-"name": "SubscribeResult",
-"type": "comp",
-"values": [
-	{ "name": "status", "type": "std::string_view" }
-]
+  "name": "SubscribeResult",
+  "type": "comp",
+  "values": [
+    {
+      "name": "status",
+      "type": "std::string_view"
+    }
+  ]
 }

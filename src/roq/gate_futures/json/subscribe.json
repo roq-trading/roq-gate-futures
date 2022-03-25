@@ -1,12 +1,28 @@
 {
-"name": "Subscribe",
-"type": "comp",
-"values": [
-	{ "name": "id" },
-	{ "name": "time", "type": "std::chrono::seconds" },
-	{ "name": "channel", "type": "Channel" },
-	{ "name": "event", "type": "Event" },
-	{ "name": "result", "type": "SubscribeResult" },
-	{ "name": "error" }
-]
+  "name": "Subscribe",
+  "type": "comp",
+  "values": [
+    {
+      "name": "id"
+    },
+    {
+      "name": "time",
+      "type": "std::chrono::seconds"
+    },
+    {
+      "name": "channel",
+      "type": "Channel"
+    },
+    {
+      "name": "event",
+      "type": "Event"
+    },
+    {
+      "name": "result",
+      "type": "SubscribeResult"
+    },
+    {
+      "name": "error"
+    }
+  ]
 }

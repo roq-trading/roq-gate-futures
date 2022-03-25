@@ -1,7 +1,10 @@
 {
-"name": "Contracts",
-"type": "array",
-"values": [
-	{ "name": "data", "type": "std::span<ContractsItem>" }
-]
+  "name": "Contracts",
+  "type": "array",
+  "values": [
+    {
+      "name": "data",
+      "type": "std::span<ContractsItem>"
+    }
+  ]
 }

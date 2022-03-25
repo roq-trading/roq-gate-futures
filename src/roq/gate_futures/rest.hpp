@@ -78,8 +78,7 @@ class Rest final : public core::web::Client::Handler {
   void operator()(const Trace<json::Contracts> &);
 
   void get_order_book(const std::string_view &symbol);
-  void get_order_book_ack(
-      const Trace<core::web::Response> &, const std::string_view &symbol);
+  void get_order_book_ack(const Trace<core::web::Response> &, const std::string_view &symbol);
   void operator()(const Trace<json::OrderBook> &, const std::string_view &symbol);
 
   void check_request_queue(std::chrono::nanoseconds now);

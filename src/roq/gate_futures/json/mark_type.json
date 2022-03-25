@@ -1,7 +1,9 @@
 {
-"name": "MarkType",
-"type": "enum",
-"values": [
-	{ "name": "index" }
-]
+  "name": "MarkType",
+  "type": "enum",
+  "values": [
+    {
+      "name": "index"
+    }
+  ]
 }

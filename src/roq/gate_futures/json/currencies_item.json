@@ -1,13 +1,34 @@
 {
-"name": "CurrenciesItem",
-"type": "item",
-"values": [
-	{ "name": "currency", "type": "std::string_view" },
-	{ "name": "delisted", "type": "bool" },
-	{ "name": "withdraw_disabled", "type": "bool" },
-	{ "name": "withdraw_delayed", "type": "bool" },
-	{ "name": "deposit_disabled", "type": "bool" },
-	{ "name": "trade_disabled", "type": "bool" },
-	{ "name": "fixed_rate", "type": "double" }
-]
+  "name": "CurrenciesItem",
+  "type": "item",
+  "values": [
+    {
+      "name": "currency",
+      "type": "std::string_view"
+    },
+    {
+      "name": "delisted",
+      "type": "bool"
+    },
+    {
+      "name": "withdraw_disabled",
+      "type": "bool"
+    },
+    {
+      "name": "withdraw_delayed",
+      "type": "bool"
+    },
+    {
+      "name": "deposit_disabled",
+      "type": "bool"
+    },
+    {
+      "name": "trade_disabled",
+      "type": "bool"
+    },
+    {
+      "name": "fixed_rate",
+      "type": "double"
+    }
+  ]
 }

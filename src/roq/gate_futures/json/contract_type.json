@@ -1,9 +1,15 @@
 {
-"name": "ContractType",
-"type": "enum",
-"values": [
-	{ "name": "index" },
-	{ "name": "direct" },
-	{ "name": "inverse" }
-]
+  "name": "ContractType",
+  "type": "enum",
+  "values": [
+    {
+      "name": "index"
+    },
+    {
+      "name": "direct"
+    },
+    {
+      "name": "inverse"
+    }
+  ]
 }

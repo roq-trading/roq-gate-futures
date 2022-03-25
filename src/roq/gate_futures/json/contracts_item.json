@@ -1,45 +1,162 @@
 {
-"name": "ContractsItem",
-"type": "item",
-"values": [
-	{ "name": "funding_rate_indicative", "type": "double" },
-	{ "name": "mark_price_round", "type": "double" },
-	{ "name": "funding_offset", "type": "double" },
-	{ "name": "in_delisting", "type": "bool" },
-	{ "name": "risk_limit_base", "type": "double" },
-	{ "name": "interest_rate", "type": "double" },
-	{ "name": "index_price", "type": "double" },
-	{ "name": "order_price_round", "type": "double" },
-	{ "name": "order_size_min", "type": "double" },
-	{ "name": "ref_rebate_rate", "type": "double" },
-	{ "name": "name", "type": "std::string_view" },
-	{ "name": "ref_discount_rate", "type": "double" },
-	{ "name": "order_price_deviate", "type": "double" },
-	{ "name": "maintenance_rate", "type": "double" },
-	{ "name": "mark_type", "type": "MarkType" },
-	{ "name": "funding_interval", "type": "int64_t" },
-	{ "name": "type", "type": "ContractType" },
-	{ "name": "risk_limit_step", "type": "double" },
-	{ "name": "enable_bonus", "type": "bool" },
-	{ "name": "leverage_min", "type": "double" },
-	{ "name": "funding_rate", "type": "double" },
-	{ "name": "last_price", "type": "double" },
-	{ "name": "mark_price", "type": "double" },
-	{ "name": "order_size_max", "type": "double" },
-	{ "name": "funding_next_apply", "type": "std::chrono::seconds" },
-	{ "name": "short_users", "type": "int32_t" },
-	{ "name": "config_change_time", "type": "std::chrono::seconds" },
-	{ "name": "trade_size", "type": "double" },
-	{ "name": "position_size", "type": "double" },
-	{ "name": "long_users", "type": "int32_t" },
-	{ "name": "quanto_multiplier", "type": "double" },
-	{ "name": "funding_impact_value", "type": "double" },
-	{ "name": "leverage_max", "type": "double" },
-	{ "name": "risk_limit_max", "type": "double" },
-	{ "name": "maker_fee_rate", "type": "double" },
-	{ "name": "taker_fee_rate", "type": "double" },
-	{ "name": "orders_limit", "type": "double" },
-	{ "name": "trade_id", "type": "int64_t" },
-	{ "name": "orderbook_id", "type": "int64_t" }
-]
+  "name": "ContractsItem",
+  "type": "item",
+  "values": [
+    {
+      "name": "funding_rate_indicative",
+      "type": "double"
+    },
+    {
+      "name": "mark_price_round",
+      "type": "double"
+    },
+    {
+      "name": "funding_offset",
+      "type": "double"
+    },
+    {
+      "name": "in_delisting",
+      "type": "bool"
+    },
+    {
+      "name": "risk_limit_base",
+      "type": "double"
+    },
+    {
+      "name": "interest_rate",
+      "type": "double"
+    },
+    {
+      "name": "index_price",
+      "type": "double"
+    },
+    {
+      "name": "order_price_round",
+      "type": "double"
+    },
+    {
+      "name": "order_size_min",
+      "type": "double"
+    },
+    {
+      "name": "ref_rebate_rate",
+      "type": "double"
+    },
+    {
+      "name": "name",
+      "type": "std::string_view"
+    },
+    {
+      "name": "ref_discount_rate",
+      "type": "double"
+    },
+    {
+      "name": "order_price_deviate",
+      "type": "double"
+    },
+    {
+      "name": "maintenance_rate",
+      "type": "double"
+    },
+    {
+      "name": "mark_type",
+      "type": "MarkType"
+    },
+    {
+      "name": "funding_interval",
+      "type": "int64_t"
+    },
+    {
+      "name": "type",
+      "type": "ContractType"
+    },
+    {
+      "name": "risk_limit_step",
+      "type": "double"
+    },
+    {
+      "name": "enable_bonus",
+      "type": "bool"
+    },
+    {
+      "name": "leverage_min",
+      "type": "double"
+    },
+    {
+      "name": "funding_rate",
+      "type": "double"
+    },
+    {
+      "name": "last_price",
+      "type": "double"
+    },
+    {
+      "name": "mark_price",
+      "type": "double"
+    },
+    {
+      "name": "order_size_max",
+      "type": "double"
+    },
+    {
+      "name": "funding_next_apply",
+      "type": "std::chrono::seconds"
+    },
+    {
+      "name": "short_users",
+      "type": "int32_t"
+    },
+    {
+      "name": "config_change_time",
+      "type": "std::chrono::seconds"
+    },
+    {
+      "name": "trade_size",
+      "type": "double"
+    },
+    {
+      "name": "position_size",
+      "type": "double"
+    },
+    {
+      "name": "long_users",
+      "type": "int32_t"
+    },
+    {
+      "name": "quanto_multiplier",
+      "type": "double"
+    },
+    {
+      "name": "funding_impact_value",
+      "type": "double"
+    },
+    {
+      "name": "leverage_max",
+      "type": "double"
+    },
+    {
+      "name": "risk_limit_max",
+      "type": "double"
+    },
+    {
+      "name": "maker_fee_rate",
+      "type": "double"
+    },
+    {
+      "name": "taker_fee_rate",
+      "type": "double"
+    },
+    {
+      "name": "orders_limit",
+      "type": "double"
+    },
+    {
+      "name": "trade_id",
+      "type": "int64_t"
+    },
+    {
+      "name": "orderbook_id",
+      "type": "int64_t"
+    }
+  ]
 }

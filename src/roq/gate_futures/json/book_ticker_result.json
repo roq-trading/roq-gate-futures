@@ -1,13 +1,41 @@
 {
-"name": "BookTickerResult",
-"type": "comp",
-"values": [
-	{ "raw": "t", "name": "timestamp", "type": "std::chrono::milliseconds" },
-	{ "raw": "u", "name": "update_id", "type": "int64_t" },
-	{ "raw": "s", "name": "contract", "type": "std::string_view" },
-	{ "raw": "b", "name": "best_bid_price", "type": "double" },
-	{ "raw": "B", "name": "best_bid_size", "type": "double" },
-	{ "raw": "a", "name": "best_ask_price", "type": "double" },
-	{ "raw": "A", "name": "best_ask_size", "type": "double" }
-]
+  "name": "BookTickerResult",
+  "type": "comp",
+  "values": [
+    {
+      "raw": "t",
+      "name": "timestamp",
+      "type": "std::chrono::milliseconds"
+    },
+    {
+      "raw": "u",
+      "name": "update_id",
+      "type": "int64_t"
+    },
+    {
+      "raw": "s",
+      "name": "contract",
+      "type": "std::string_view"
+    },
+    {
+      "raw": "b",
+      "name": "best_bid_price",
+      "type": "double"
+    },
+    {
+      "raw": "B",
+      "name": "best_bid_size",
+      "type": "double"
+    },
+    {
+      "raw": "a",
+      "name": "best_ask_price",
+      "type": "double"
+    },
+    {
+      "raw": "A",
+      "name": "best_ask_size",
+      "type": "double"
+    }
+  ]
 }
