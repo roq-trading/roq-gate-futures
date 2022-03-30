@@ -26,7 +26,7 @@ namespace gate_futures {
 
 namespace {
 const auto NAME = "md"sv;
-const auto SUPPORTS = Mask{
+const Mask<SupportType> SUPPORTS{
     SupportType::MARKET_STATUS,
     SupportType::TOP_OF_BOOK,
     SupportType::MARKET_BY_PRICE,
@@ -171,7 +171,7 @@ void MarketData::operator()(ConnectionStatus status) {
     StreamStatus stream_status{
         .stream_id = stream_id_,
         .account = {},
-        .supports = SUPPORTS.get(),
+        .supports = SUPPORTS,
         .status = status_,
         .type = StreamType::WEB_SOCKET,
         .priority = Priority::PRIMARY,

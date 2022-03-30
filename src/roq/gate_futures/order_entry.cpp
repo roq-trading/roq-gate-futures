@@ -22,7 +22,7 @@ namespace gate_futures {
 
 namespace {
 const auto NAME = "om"sv;
-const auto SUPPORTS = Mask{
+const Mask<SupportType> SUPPORTS{
     SupportType::CREATE_ORDER,
     SupportType::CANCEL_ORDER,
     SupportType::ORDER_ACK,
@@ -169,7 +169,7 @@ void OrderEntry::operator()(ConnectionStatus status) {
     StreamStatus stream_status{
         .stream_id = stream_id_,
         .account = security_.get_account(),
-        .supports = SUPPORTS.get(),
+        .supports = SUPPORTS,
         .status = status_,
         .type = StreamType::REST,
         .priority = Priority::PRIMARY,
