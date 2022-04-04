@@ -20,7 +20,7 @@ namespace gate_futures {
 
 namespace {
 const auto NAME = "ex"sv;
-const Mask<SupportType> SUPPORTS{
+const Mask SUPPORTS{
     SupportType::ORDER,
     SupportType::TRADE,
     SupportType::FUNDS,
