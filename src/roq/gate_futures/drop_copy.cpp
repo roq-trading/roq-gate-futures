@@ -56,9 +56,9 @@ OrderStatus compute_order_status(
       break;
     case json::OrderChangeType::MATCH:
     case json::OrderChangeType::FILLED:
-      return utils::compare(remain_size, 0.0) == 0 ? OrderStatus::COMPLETED : OrderStatus::WORKING;
-    case json::OrderChangeType::CANCELED:
-      return OrderStatus::CANCELED;
+      return utils::is_zero(remain_size) ?
+OrderStatus::COMPLETED : OrderStatus::WORKING; case json::OrderChangeType::CANCELED: return
+OrderStatus::CANCELED;
   }
   return json::map(status);
 }
