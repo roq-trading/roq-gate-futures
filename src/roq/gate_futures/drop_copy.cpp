@@ -48,17 +48,17 @@ auto create_connection(auto &handler, auto &context, const auto &uri, const auto
 OrderStatus compute_order_status(
     json::OrderChangeType change_type, json::OrderStatus status, double remain_size) {
   switch (change_type) {
-    case json::OrderChangeType::UNDEFINED:
+    using enum json::OrderChangeType::type_t;
+    case UNDEFINED:
       break;
-    case json::OrderChangeType::UNKNOWN:
+    case UNKNOWN:
       break;
-    case json::OrderChangeType::OPEN:
+    case OPEN:
       break;
-    case json::OrderChangeType::MATCH:
-    case json::OrderChangeType::FILLED:
-      return utils::is_zero(remain_size) ?
-OrderStatus::COMPLETED : OrderStatus::WORKING; case json::OrderChangeType::CANCELED: return
-OrderStatus::CANCELED;
+    case MATCH:
+    case FILLED:
+      return utils::is_zero(remain_size) ?  OrderStatus::COMPLETED : OrderStatus::WORKING;
+    case CANCELED: return OrderStatus::CANCELED;
   }
   return json::map(status);
 }
@@ -178,13 +178,14 @@ void DropCopy::operator()(ConnectionStatus status) {
 
 uint32_t DropCopy::download(DropCopyState state) {
   switch (state) {
-    case DropCopyState::UNDEFINED:
+    using enum DropCopyState;
+    case UNDEFINED:
       assert(false);
       break;
-    case DropCopyState::SUBSCRIBE:
+    case SUBSCRIBE:
       subscribe();
       return {};
-    case DropCopyState::DONE:
+    case DONE:
       (*this)(ConnectionStatus::READY);
       assert(!ready_);
       ready_ = true;

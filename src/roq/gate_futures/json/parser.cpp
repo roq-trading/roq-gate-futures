@@ -19,39 +19,41 @@ bool Parser::dispatch(
     TraceInfo const &trace_info) {
   auto message_ = core::json::Parser::create<Message>(message, buffer);
   switch (message_.event) {
-    case Event::UNDEFINED:
+    using enum Event::type_t;
+    case UNDEFINED:
       break;
-    case Event::UNKNOWN:
+    case UNKNOWN:
       assert(false);
       break;
-    case Event::SUBSCRIBE: {
+    case SUBSCRIBE: {
       auto subscribe = core::json::Parser::create<Subscribe>(message, buffer);
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
-    case Event::UPDATE:
+    case UPDATE:
       switch (message_.channel) {
-        case Channel::UNDEFINED:
+        using enum Channel::type_t;
+        case UNDEFINED:
           break;
-        case Channel::UNKNOWN:
+        case UNKNOWN:
           assert(false);
           break;
-        case Channel::TICKERS: {
+        case TICKERS: {
           auto tickers = core::json::Parser::create<Tickers>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
-        case Channel::TRADES: {
+        case TRADES: {
           auto trades = core::json::Parser::create<Trades>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
-        case Channel::BOOK_TICKER: {
+        case BOOK_TICKER: {
           auto book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
-        case Channel::ORDER_BOOK_UPDATE:
+        case ORDER_BOOK_UPDATE:
           auto order_book_update = core::json::Parser::create<OrderBookUpdate>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
