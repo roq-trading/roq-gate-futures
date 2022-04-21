@@ -381,6 +381,7 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
         },
         .update_type = UpdateType::INCREMENTAL,
         .exchange_time_utc = utils::safe_cast(result.timestamp),
+        .exchange_sequence = {},
     };
     create_trace_and_dispatch(handler_, trace_info, top_of_book, true);
   });
