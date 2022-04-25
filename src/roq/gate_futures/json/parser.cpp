@@ -26,7 +26,7 @@ bool Parser::dispatch(
       assert(false);
       break;
     case SUBSCRIBE: {
-      auto subscribe = core::json::Parser::create<Subscribe>(message, buffer);
+      const auto subscribe = core::json::Parser::create<Subscribe>(message, buffer);
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
@@ -39,22 +39,23 @@ bool Parser::dispatch(
           assert(false);
           break;
         case TICKERS: {
-          auto tickers = core::json::Parser::create<Tickers>(message, buffer);
+          const auto tickers = core::json::Parser::create<Tickers>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case TRADES: {
-          auto trades = core::json::Parser::create<Trades>(message, buffer);
+          const auto trades = core::json::Parser::create<Trades>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case BOOK_TICKER: {
-          auto book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
+          const auto book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
         case ORDER_BOOK_UPDATE:
-          auto order_book_update = core::json::Parser::create<OrderBookUpdate>(message, buffer);
+          const auto order_book_update =
+              core::json::Parser::create<OrderBookUpdate>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
       }

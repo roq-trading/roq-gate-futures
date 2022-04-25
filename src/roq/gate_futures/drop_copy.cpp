@@ -143,7 +143,7 @@ void DropCopy::operator()(const core::web::ClientSocket::Close &) {
 
 void DropCopy::operator()(const core::web::ClientSocket::Latency &latency) {
   auto trace_info = server::create_trace_info();
-  ExternalLatency external_latency{
+  const ExternalLatency external_latency{
       .stream_id = stream_id_,
       .account = security_.get_account(),
       .latency = latency.sample,
@@ -163,7 +163,7 @@ void DropCopy::operator()(const core::web::ClientSocket::Binary &) {
 void DropCopy::operator()(ConnectionStatus status) {
   if (utils::update(status_, status)) {
     auto trace_info = server::create_trace_info();
-    StreamStatus stream_status{
+    const StreamStatus stream_status{
         .stream_id = stream_id_,
         .account = security_.get_account(),
         .supports = SUPPORTS,
@@ -231,23 +231,23 @@ void DropCopy::parse(const std::string_view &message) {
   });
 }
 
-void DropCopy::operator()(Trace<json::Subscribe> const &) {
+void DropCopy::operator()(Trace<json::Subscribe const> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::Tickers> const &) {
+void DropCopy::operator()(Trace<json::Tickers const> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::Trades> const &) {
+void DropCopy::operator()(Trace<json::Trades const> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::BookTicker> const &) {
+void DropCopy::operator()(Trace<json::BookTicker const> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::OrderBookUpdate> const &) {
+void DropCopy::operator()(Trace<json::OrderBookUpdate const> const &) {
   log::fatal("Unexpected"sv);
 }
 
