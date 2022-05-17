@@ -29,6 +29,10 @@
     {
       "name": "fixed_rate",
       "type": "double"
+    },
+    {
+      "name": "chain",
+      "type": "std::string_view"
     }
   ]
 }
