@@ -28,8 +28,7 @@ struct Parser final {
     virtual void operator()(Trace<json::OrderBookUpdate const> const &) = 0;
   };
 
-  static bool dispatch(
-      Handler &, std::string_view const &message, core::json::Buffer &, TraceInfo const &);
+  static bool dispatch(Handler &, std::string_view const &message, core::json::Buffer &, TraceInfo const &);
 };
 
 }  // namespace json

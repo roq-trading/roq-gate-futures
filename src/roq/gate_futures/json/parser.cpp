@@ -13,10 +13,7 @@ namespace gate_futures {
 namespace json {
 
 bool Parser::dispatch(
-    Handler &handler,
-    std::string_view const &message,
-    core::json::Buffer &buffer,
-    TraceInfo const &trace_info) {
+    Handler &handler, std::string_view const &message, core::json::Buffer &buffer, TraceInfo const &trace_info) {
   auto message_ = core::json::Parser::create<Message>(message, buffer);
   switch (message_.event) {
     using enum Event::type_t;
@@ -26,7 +23,7 @@ bool Parser::dispatch(
       assert(false);
       break;
     case SUBSCRIBE: {
-      const auto subscribe = core::json::Parser::create<Subscribe>(message, buffer);
+      auto const subscribe = core::json::Parser::create<Subscribe>(message, buffer);
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
@@ -39,23 +36,22 @@ bool Parser::dispatch(
           assert(false);
           break;
         case TICKERS: {
-          const auto tickers = core::json::Parser::create<Tickers>(message, buffer);
+          auto const tickers = core::json::Parser::create<Tickers>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case TRADES: {
-          const auto trades = core::json::Parser::create<Trades>(message, buffer);
+          auto const trades = core::json::Parser::create<Trades>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case BOOK_TICKER: {
-          const auto book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
+          auto const book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
         case ORDER_BOOK_UPDATE:
-          const auto order_book_update =
-              core::json::Parser::create<OrderBookUpdate>(message, buffer);
+          auto const order_book_update = core::json::Parser::create<OrderBookUpdate>(message, buffer);
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
       }
