@@ -65,10 +65,11 @@ void emplace(MBPUpdate &result, const T &item) {
 
 template <typename T>
 void emplace(Trade &result, const T &value) {
+  auto const side = utils::compare(value.size, 0.0) == std::strong_ordering::less ? Side::SELL : Side::BUY;
   new (&result) Trade{
-      .side = {},
+      .side = side,
       .price = value.price,
-      .quantity = value.size,
+      .quantity = std::fabs(value.size),
       .trade_id = {},
   };
 }
