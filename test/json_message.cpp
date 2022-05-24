@@ -27,7 +27,7 @@ TEST_CASE("json_message_subscribe_success", "[json_message]") {
                  R"(})";
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Message>(message, buffer_);
+  [[maybe_unused]] auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
 TEST_CASE("json_message_book_ticker", "[json_message]") {
@@ -49,7 +49,7 @@ TEST_CASE("json_message_book_ticker", "[json_message]") {
                  R"(})";
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Message>(message, buffer_);
+  [[maybe_unused]] auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
 TEST_CASE("json_message_tickers", "[json_message]") {
@@ -80,7 +80,7 @@ TEST_CASE("json_message_tickers", "[json_message]") {
                  R"(})";
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Message>(message, buffer_);
+  [[maybe_unused]] auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }
 
 TEST_CASE("json_message_trades", "[json_message]") {
@@ -102,5 +102,5 @@ TEST_CASE("json_message_trades", "[json_message]") {
                  R"(})";
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Message>(message, buffer_);
+  [[maybe_unused]] auto obj = core::json::Parser::create<json::Message>(message, buffer_);
 }

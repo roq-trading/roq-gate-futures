@@ -33,5 +33,5 @@ TEST_CASE("json_book_ticker_update", "[json_book_ticker]") {
                  R"(})";
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::BookTicker>(message, buffer_);
+  [[maybe_unused]] auto obj = core::json::Parser::create<json::BookTicker>(message, buffer_);
 }

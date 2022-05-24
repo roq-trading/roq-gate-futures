@@ -27,5 +27,5 @@ TEST_CASE("json_subscribe_success", "[json_subscribe]") {
                  R"(})";
   core::Buffer buffer(8192);
   core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Subscribe>(message, buffer_);
+  [[maybe_unused]] auto obj = core::json::Parser::create<json::Subscribe>(message, buffer_);
 }
