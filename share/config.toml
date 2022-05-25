@@ -1,4 +1,7 @@
-symbols = "BTCUSD.*"
+symbols = [
+  "^BTC_USD[A-Z]?$",
+  "^ETH_USD[A-Z]?$"
+]
 
 [accounts]
 
