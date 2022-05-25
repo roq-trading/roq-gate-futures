@@ -306,6 +306,18 @@ void MarketData::operator()(Trace<json::Tickers const> const &event) {
               .begin_time_utc = {},
               .end_time_utc = {},
           },
+          {
+              .type = StatisticsType::HIGHEST_TRADED_PRICE,
+              .value = item.high_24h,
+              .begin_time_utc = {},
+              .end_time_utc = {},
+          },
+          {
+              .type = StatisticsType::LOWEST_TRADED_PRICE,
+              .value = item.low_24h,
+              .begin_time_utc = {},
+              .end_time_utc = {},
+          },
       };
       const StatisticsUpdate statistics_update{
           .stream_id = stream_id_,

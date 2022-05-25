@@ -61,6 +61,24 @@
     {
       "name": "volume_24h_base",
       "type": "double"
+    },
+    {
+      "name": "low_24h",
+      "type": "double"
+    },
+    {
+      "name": "high_24h",
+      "type": "double"
+    },
+    {
+      "name": "volume_24_usd",
+      "type": "double",
+      "comment": "exchange typo ??? shouldn't it be 24h?"
+    },
+    {
+      "name": "volume_24_btc",
+      "type": "double",
+      "comment": "exchange typo ??? shouldn't it be 24h?"
     }
   ]
 }
