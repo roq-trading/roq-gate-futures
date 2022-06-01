@@ -44,7 +44,7 @@ auto create_connection(auto &handler, auto &context) {
   core::web::ClientSocket::Config config{
       .always_reconnect = true,
       .connection_timeout = server::Flags::net_connection_timeout(),
-      .disconnect_on_idle_timeout = {},
+      .disconnect_on_idle_timeout = server::Flags::net_disconnect_on_idle_timeout(),
       .validate_certificate = server::Flags::net_tls_validate_certificate(),
       .uris = {&uri, 1},
       .query = {},
@@ -283,6 +283,7 @@ void MarketData::operator()(Trace<json::Tickers const> const &event) {
   profile_.tickers([&]() {
     auto &[trace_info, tickers] = event;
     log::info<3>("trace_info={}, tickers={}"sv, trace_info, tickers);
+    connection_.touch(trace_info.source_receive_time);
     for (auto &item : tickers.result) {
       Statistics statistics[] = {
           {
@@ -339,6 +340,7 @@ void MarketData::operator()(Trace<json::Trades const> const &event) {
   profile_.trades([&]() {
     auto &[trace_info, trades] = event;
     log::info<3>("trace_info={}, trades={}"sv, trace_info, trades);
+    connection_.touch(trace_info.source_receive_time);
     auto &result = trades.result;
     core::back_emplacer trades_(shared_.trades);
     std::string_view contract;
@@ -378,6 +380,7 @@ void MarketData::operator()(Trace<json::BookTicker const> const &event) {
   profile_.book_ticker([&]() {
     auto &[trace_info, book_ticker] = event;
     log::info<3>("trace_info={}, book_ticker={}"sv, trace_info, book_ticker);
+    connection_.touch(trace_info.source_receive_time);
     auto &result = book_ticker.result;
     const TopOfBook top_of_book{
         .stream_id = stream_id_,
@@ -403,6 +406,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate const> const &event) {
     auto &trace_info = event.trace_info;
     auto &order_book_update = event.value;
     log::info<3>("trace_info={}, order_book_update={}"sv, trace_info, order_book_update);
+    connection_.touch(trace_info.source_receive_time);
     auto &result = order_book_update.result;
     auto &symbol = result.symbol;
     auto first_sequence = result.first_update_id;
