@@ -396,7 +396,7 @@ void Rest::operator()(Trace<json::OrderBook const> const &event, std::string_vie
     bids.emplace_back([&item](auto &result) { emplace(result, item); });
   for (auto &item : order_book.asks)
     asks.emplace_back([&item](auto &result) { emplace(result, item); });
-  auto exchange_time_utc = std::chrono::nanoseconds{};
+  auto exchange_time_utc = std::chrono::nanoseconds{static_cast<int64_t>(order_book.update * 1.0e9)};
   try {
     collector(
         bids,
