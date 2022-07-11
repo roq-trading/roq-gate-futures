@@ -70,7 +70,7 @@ OrderStatus compute_order_status(
 
 DropCopy::DropCopy(
     Handler &handler,
-    core::io::Context &context,
+    io::Context &context,
     uint16_t stream_id,
     Security &security,
     Shared &shared,
