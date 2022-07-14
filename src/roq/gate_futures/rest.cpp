@@ -227,7 +227,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response const> const &event, uin
       Trace event(trace_info, currencies);
       (*this)(event);
       download_.check(state);
-    } catch (core::NetworkError &e) {
+    } catch (NetworkError &e) {
       log::warn(R"(Exception type={}, what="{}")"sv, typeid(e).name(), e.what());
       download_.retry(state);
     }
@@ -281,7 +281,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response const> const &event, uint
       Trace event(trace_info, contracts);
       (*this)(event);
       download_.check(state);
-    } catch (core::NetworkError &e) {
+    } catch (NetworkError &e) {
       log::warn(R"(Exception type={}, what="{}")"sv, typeid(e).name(), e.what());
       download_.retry(state);
     }
@@ -381,7 +381,7 @@ void Rest::get_order_book_ack(Trace<web::rest::Response const> const &event, std
       const auto order_book = core::json::Parser::create<json::OrderBook>(body, buffer);
       Trace event(trace_info, order_book);
       (*this)(event, symbol);
-    } catch (core::NetworkError &e) {
+    } catch (NetworkError &e) {
       log::warn(R"(Exception type={}, what="{}")"sv, typeid(e).name(), e.what());
     }
   });
