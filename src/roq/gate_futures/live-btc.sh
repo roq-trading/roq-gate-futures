@@ -20,8 +20,10 @@ WS_URI="wss://fx-ws.$URI/v4/ws/btc"
 $PREFIX ./roq-gate-futures \
 	--name "gate-futures" \
 	--config_file "$CONFIG_FILE" \
-	--client_listen_address $CWD/$NAME.sock \
-	--metrics_listen_address 1234 \
+  --event_log_dir "$HOME/var/lib/roq/data" \                                                                            
+  --event_log_symlink \                                                                                                 
+  --client_listen_address "$HOME/run/$NAME.sock" \                                                                      
+  --metrics_listen_address "$HOME/run/${NAME}_metrics.sock" \
 	--rest_uri "$REST_URI" \
 	--ws_uri "$WS_URI" \
 	--api "btc" \
