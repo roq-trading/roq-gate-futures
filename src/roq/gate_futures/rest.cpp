@@ -210,7 +210,7 @@ void Rest::get_currencies() {
   });
 }
 
-void Rest::get_currencies_ack(Trace<web::rest::Response const> const &event, uint32_t sequence) {
+void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
   profile_.currencies_ack([&]() {
     auto &[trace_info, response] = event;
     auto state = RestState::CURRENCIES;
@@ -234,7 +234,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response const> const &event, uin
   });
 }
 
-void Rest::operator()(Trace<json::Currencies const> const &event) {
+void Rest::operator()(Trace<json::Currencies> const &event) {
   auto &[trace_info, currencies] = event;
   log::info<4>("currencies={}"sv, currencies);
 }
@@ -264,7 +264,7 @@ void Rest::get_contracts() {
   });
 }
 
-void Rest::get_contracts_ack(Trace<web::rest::Response const> const &event, uint32_t sequence) {
+void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
   profile_.contracts_ack([&]() {
     auto &[trace_info, response] = event;
     auto state = RestState::CONTRACTS;
@@ -288,7 +288,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response const> const &event, uint
   });
 }
 
-void Rest::operator()(Trace<json::Contracts const> const &event) {
+void Rest::operator()(Trace<json::Contracts> const &event) {
   auto &[trace_info, contracts] = event;
   log::info<4>("contracts={}"sv, contracts);
   std::vector<Symbol> symbols;
@@ -372,7 +372,7 @@ void Rest::get_order_book(std::string_view const &symbol) {
   });
 }
 
-void Rest::get_order_book_ack(Trace<web::rest::Response const> const &event, std::string_view const &symbol) {
+void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.order_book_ack([&]() {
     auto &[trace_info, response] = event;
     try {
@@ -388,7 +388,7 @@ void Rest::get_order_book_ack(Trace<web::rest::Response const> const &event, std
   });
 }
 
-void Rest::operator()(Trace<json::OrderBook const> const &event, std::string_view const &symbol) {
+void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view const &symbol) {
   // auto &[trace_info, order_book] = event;
   auto &trace_info = event.trace_info;
   auto &order_book = event.value;

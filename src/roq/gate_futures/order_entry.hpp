@@ -31,9 +31,9 @@ namespace gate_futures {
 class OrderEntry final : public web::rest::Client::Handler {
  public:
   struct Handler {
-    virtual void operator()(Trace<StreamStatus const> const &) = 0;
-    virtual void operator()(Trace<ExternalLatency const> const &) = 0;
-    virtual void operator()(Trace<FundsUpdate const> const &, bool is_last) = 0;
+    virtual void operator()(Trace<StreamStatus> const &) = 0;
+    virtual void operator()(Trace<ExternalLatency> const &) = 0;
+    virtual void operator()(Trace<FundsUpdate> const &, bool is_last) = 0;
   };
 
   OrderEntry(Handler &, io::Context &, uint16_t stream_id, Security &, Shared &);

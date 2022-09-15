@@ -21,11 +21,11 @@ namespace json {
 
 struct Parser final {
   struct Handler {
-    virtual void operator()(Trace<json::Subscribe const> const &) = 0;
-    virtual void operator()(Trace<json::Tickers const> const &) = 0;
-    virtual void operator()(Trace<json::Trades const> const &) = 0;
-    virtual void operator()(Trace<json::BookTicker const> const &) = 0;
-    virtual void operator()(Trace<json::OrderBookUpdate const> const &) = 0;
+    virtual void operator()(Trace<json::Subscribe> const &) = 0;
+    virtual void operator()(Trace<json::Tickers> const &) = 0;
+    virtual void operator()(Trace<json::Trades> const &) = 0;
+    virtual void operator()(Trace<json::BookTicker> const &) = 0;
+    virtual void operator()(Trace<json::OrderBookUpdate> const &) = 0;
   };
 
   static bool dispatch(Handler &, std::string_view const &message, core::json::Buffer &, TraceInfo const &);

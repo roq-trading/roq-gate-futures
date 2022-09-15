@@ -235,23 +235,23 @@ void DropCopy::parse(std::string_view const &message) {
   });
 }
 
-void DropCopy::operator()(Trace<json::Subscribe const> const &) {
+void DropCopy::operator()(Trace<json::Subscribe> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::Tickers const> const &) {
+void DropCopy::operator()(Trace<json::Tickers> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::Trades const> const &) {
+void DropCopy::operator()(Trace<json::Trades> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::BookTicker const> const &) {
+void DropCopy::operator()(Trace<json::BookTicker> const &) {
   log::fatal("Unexpected"sv);
 }
 
-void DropCopy::operator()(Trace<json::OrderBookUpdate const> const &) {
+void DropCopy::operator()(Trace<json::OrderBookUpdate> const &) {
   log::fatal("Unexpected"sv);
 }
 

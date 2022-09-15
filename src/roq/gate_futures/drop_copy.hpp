@@ -29,10 +29,10 @@ namespace gate_futures {
 class DropCopy final : public web::socket::Client::Handler, json::Parser::Handler {
  public:
   struct Handler {
-    virtual void operator()(Trace<StreamStatus const> const &) = 0;
-    virtual void operator()(Trace<ExternalLatency const> const &) = 0;
-    virtual void operator()(Trace<TradeUpdate const> const &, bool is_last, uint8_t user_id) = 0;
-    virtual void operator()(Trace<FundsUpdate const> const &, bool is_last) = 0;
+    virtual void operator()(Trace<StreamStatus> const &) = 0;
+    virtual void operator()(Trace<ExternalLatency> const &) = 0;
+    virtual void operator()(Trace<TradeUpdate> const &, bool is_last, uint8_t user_id) = 0;
+    virtual void operator()(Trace<FundsUpdate> const &, bool is_last) = 0;
   };
 
   DropCopy(
@@ -65,11 +65,11 @@ class DropCopy final : public web::socket::Client::Handler, json::Parser::Handle
   void operator()(web::socket::Client::Text const &) override;
   void operator()(web::socket::Client::Binary const &) override;
 
-  void operator()(Trace<json::Subscribe const> const &) override;
-  void operator()(Trace<json::Tickers const> const &) override;
-  void operator()(Trace<json::Trades const> const &) override;
-  void operator()(Trace<json::BookTicker const> const &) override;
-  void operator()(Trace<json::OrderBookUpdate const> const &) override;
+  void operator()(Trace<json::Subscribe> const &) override;
+  void operator()(Trace<json::Tickers> const &) override;
+  void operator()(Trace<json::Trades> const &) override;
+  void operator()(Trace<json::BookTicker> const &) override;
+  void operator()(Trace<json::OrderBookUpdate> const &) override;
 
  private:
   void operator()(ConnectionStatus);
