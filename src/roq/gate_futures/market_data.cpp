@@ -58,7 +58,7 @@ auto create_connection(auto &handler, auto &context) {
 }
 
 template <typename T>
-void emplace(MBPUpdate &result, const T &item) {
+void emplace(MBPUpdate &result, T const &item) {
   new (&result) MBPUpdate{
       .price = item.price,
       .quantity = item.size,
@@ -70,14 +70,17 @@ void emplace(MBPUpdate &result, const T &item) {
 }
 
 template <typename T>
-void emplace(Trade &result, const T &value) {
+void emplace(Trade &result, T const &value) {
   auto const side = utils::compare(value.size, 0.0) == std::strong_ordering::less ? Side::SELL : Side::BUY;
   new (&result) Trade{
       .side = side,
       .price = value.price,
       .quantity = std::fabs(value.size),
       .trade_id = {},
+      .taker_order_id = {},
+      .maker_order_id = {},
   };
+  core::charconv::to_string(std::back_inserter(result.trade_id), value.id);
 }
 }  // namespace
 
@@ -357,6 +360,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
               .symbol = contract,
               .trades = trades_,
               .exchange_time_utc = utils::safe_cast(timestamp),
+              .exchange_sequence = {},
           };
           create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
         }
