@@ -26,8 +26,11 @@ using namespace std::literals;
 namespace roq {
 namespace gate_futures {
 
+// === CONSTANTS ===
+
 namespace {
 auto const NAME = "md"sv;
+
 const Mask SUPPORTS{
     SupportType::MARKET_STATUS,
     SupportType::TOP_OF_BOOK,
@@ -35,11 +38,14 @@ const Mask SUPPORTS{
     SupportType::TRADE_SUMMARY,
     SupportType::STATISTICS,
 };
+}  // namespace
 
-struct create_metrics final : public core::metrics::Factory {
-  explicit create_metrics(std::string_view const &group, std::string_view const &function)
-      : core::metrics::Factory(server::Flags::name(), group, function) {}
-};
+// === HELPERS ===
+
+namespace {
+auto create_name(auto stream_id) {
+  return fmt::format("{}:{}"sv, stream_id, NAME);
+}
 
 auto create_connection(auto &handler, auto &context) {
   auto uri = Flags::ws_uri();
@@ -57,35 +63,16 @@ auto create_connection(auto &handler, auto &context) {
   return web::socket::ClientFactory::create(handler, context, config, []() { return std::string(); });
 }
 
-template <typename T>
-void emplace(MBPUpdate &result, T const &item) {
-  new (&result) MBPUpdate{
-      .price = item.price,
-      .quantity = item.size,
-      .implied_quantity = NaN,
-      .number_of_orders = {},
-      .update_action = {},
-      .price_level = {},
-  };
-}
-
-template <typename T>
-void emplace(Trade &result, T const &value) {
-  auto const side = utils::compare(value.size, 0.0) == std::strong_ordering::less ? Side::SELL : Side::BUY;
-  new (&result) Trade{
-      .side = side,
-      .price = value.price,
-      .quantity = std::fabs(value.size),
-      .trade_id = {},
-      .taker_order_id = {},
-      .maker_order_id = {},
-  };
-  core::charconv::to_string(std::back_inserter(result.trade_id), value.id);
-}
+struct create_metrics final : public core::metrics::Factory {
+  explicit create_metrics(auto const &group, auto const &function)
+      : core::metrics::Factory(server::Flags::name(), group, function) {}
+};
 }  // namespace
 
+// === IMPLEMENTATION ===
+
 MarketData::MarketData(Handler &handler, io::Context &context, uint32_t stream_id, Shared &shared, size_t index)
-    : handler_(handler), stream_id_(stream_id), name_(fmt::format("{}:{}"sv, stream_id_, NAME)), index_(index),
+    : handler_(handler), stream_id_(stream_id), name_(create_name(stream_id_)), index_(index),
       connection_(create_connection(*this, context)), decode_buffer_(Flags::decode_buffer_size()),
       request_id_(static_cast<uint64_t>(stream_id_) * 1000000),  // scale (debugging)
       counter_{
@@ -348,6 +335,18 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
     log::info<3>("trace_info={}, trades={}"sv, trace_info, trades);
     (*connection_).touch(trace_info.source_receive_time);
     auto &result = trades.result;
+    auto create_trade = []<typename T>(T &result, auto const &value) {
+      auto const side = utils::compare(value.size, 0.0) == std::strong_ordering::less ? Side::SELL : Side::BUY;
+      new (&result) Trade{
+          .side = side,
+          .price = value.price,
+          .quantity = std::fabs(value.size),
+          .trade_id = {},
+          .taker_order_id = {},
+          .maker_order_id = {},
+      };
+      core::charconv::to_string(std::back_inserter(result.trade_id), value.id);
+    };
     core::back_emplacer trades_(shared_.trades);
     std::string_view contract;
     decltype(json::TradesItem::create_time_ms) timestamp = {};
@@ -367,7 +366,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
         contract = item.contract;
         timestamp = {};
       }
-      trades_.emplace_back([&item](auto &result) { emplace(result, item); });
+      trades_.emplace_back([&](auto &result) { create_trade(result, item); });
       utils::update_max(timestamp, item.create_time_ms);
     }
     if (!std::empty(trades_)) {
@@ -409,7 +408,6 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
 
 void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
-    // auto &[trace_info, order_book_update] = event;
     auto &trace_info = event.trace_info;
     auto &order_book_update = event.value;
     log::info<3>("trace_info={}, order_book_update={}"sv, trace_info, order_book_update);
@@ -419,11 +417,21 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
     auto first_sequence = result.first_update_id;
     auto last_sequence = result.last_update_id;
     auto &collector = shared_.mbp_collector[symbol];
+    auto create_mbp_update = []<typename T>(T &result, auto const &item) {
+      new (&result) T{
+          .price = item.price,
+          .quantity = item.size,
+          .implied_quantity = NaN,
+          .number_of_orders = {},
+          .update_action = {},
+          .price_level = {},
+      };
+    };
     core::back_emplacer bids(shared_.bids), asks(shared_.asks);
     for (auto &item : result.bids)
-      bids.emplace_back([&item](auto &result) { emplace(result, item); });
+      bids.emplace_back([&](auto &result) { create_mbp_update(result, item); });
     for (auto &item : result.asks)
-      asks.emplace_back([&item](auto &result) { emplace(result, item); });
+      asks.emplace_back([&](auto &result) { create_mbp_update(result, item); });
     auto exchange_time_utc = result.timestamp;
     try {
       collector(

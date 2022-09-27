@@ -20,18 +20,24 @@ using namespace std::literals;
 namespace roq {
 namespace gate_futures {
 
+// === CONSTANTS ===
+
 namespace {
 auto const NAME = "ex"sv;
+
 const Mask SUPPORTS{
     SupportType::ORDER,
     SupportType::TRADE,
     SupportType::FUNDS,
 };
+}  // namespace
 
-struct create_metrics final : public core::metrics::Factory {
-  explicit create_metrics(std::string_view const &group, std::string_view const &function)
-      : core::metrics::Factory(server::Flags::name(), group, function) {}
-};
+// === HELPERS ===
+
+namespace {
+auto create_name(auto stream_id) {
+  return fmt::format("{}:{}"sv, stream_id, NAME);
+}
 
 auto create_connection(auto &handler, auto &context, auto const &uri, auto const &query) {
   io::web::URI uri_{uri};
@@ -49,26 +55,13 @@ auto create_connection(auto &handler, auto &context, auto const &uri, auto const
   return web::socket::ClientFactory::create(handler, context, config, []() { return std::string(); });
 }
 
-/*
-OrderStatus compute_order_status(
-    json::OrderChangeType change_type, json::OrderStatus status, double remain_size) {
-  switch (change_type) {
-    using enum json::OrderChangeType::type_t;
-    case UNDEFINED:
-      break;
-    case UNKNOWN:
-      break;
-    case OPEN:
-      break;
-    case MATCH:
-    case FILLED:
-      return utils::is_zero(remain_size) ?  OrderStatus::COMPLETED : OrderStatus::WORKING;
-    case CANCELED: return OrderStatus::CANCELED;
-  }
-  return json::map(status);
-}
-*/
+struct create_metrics final : public core::metrics::Factory {
+  explicit create_metrics(auto const &group, auto const &function)
+      : core::metrics::Factory(server::Flags::name(), group, function) {}
+};
 }  // namespace
+
+// === IMPLEMENTATION ===
 
 DropCopy::DropCopy(
     Handler &handler,
@@ -79,7 +72,7 @@ DropCopy::DropCopy(
     std::string_view const &uri,
     std::string_view const &query,
     std::chrono::nanoseconds ping_frequency)
-    : handler_(handler), stream_id_(stream_id), name_(fmt::format("{}:{}"sv, stream_id_, NAME)),
+    : handler_(handler), stream_id_(stream_id), name_(create_name(stream_id_)),
       connection_(create_connection(*this, context, uri, query)), ping_frequency_(ping_frequency),
       decode_buffer_(Flags::decode_buffer_size()),
       counter_{
