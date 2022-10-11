@@ -31,7 +31,7 @@ namespace gate_futures {
 namespace {
 auto const NAME = "md"sv;
 
-const Mask SUPPORTS{
+Mask const SUPPORTS{
     SupportType::MARKET_STATUS,
     SupportType::TOP_OF_BOOK,
     SupportType::MARKET_BY_PRICE,
@@ -252,7 +252,7 @@ void MarketData::parse(std::string_view const &message) {
   profile_.parse([&]() {
     try {
       auto trace_info = server::create_trace_info();
-      core::json::Buffer buffer(decode_buffer_);
+      core::json::Buffer buffer{decode_buffer_};
       if (json::Parser::dispatch(*this, message, buffer, trace_info)) {
       } else {
         log::warn(R"(message="{}")"sv, message);
@@ -347,7 +347,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
       };
       core::charconv::to_string(std::back_inserter(result.trade_id), value.id);
     };
-    core::back_emplacer trades_(shared_.trades);
+    core::back_emplacer trades_{shared_.trades};
     std::string_view contract;
     decltype(json::TradesItem::create_time_ms) timestamp = {};
     for (auto &item : result) {
@@ -427,7 +427,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
           .price_level = {},
       };
     };
-    core::back_emplacer bids(shared_.bids), asks(shared_.asks);
+    core::back_emplacer bids{shared_.bids}, asks{shared_.asks};
     for (auto &item : result.bids)
       bids.emplace_back([&](auto &result) { create_mbp_update(result, item); });
     for (auto &item : result.asks)
@@ -457,7 +457,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence) {
         log::debug(R"(PUBLISH SNAPSHOT symbol="{}", sequence={})"sv, symbol, sequence);
         auto market_by_price_update = create_update(bids, asks, UpdateType::SNAPSHOT, collector.last_sequence());
-        Trace event(trace_info, market_by_price_update);
+        Trace event{trace_info, market_by_price_update};
         shared_(event, true, [&](auto &market_by_price) { collector.apply(market_by_price, sequence, true); });
       };
       auto request_snapshot = [&](auto retries) {
