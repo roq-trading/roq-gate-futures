@@ -215,8 +215,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        core::json::Buffer buffer{decode_buffer_};
-        auto currencies = core::json::Parser::create<json::Currencies>(body, buffer);
+        json::Currencies currencies{body, decode_buffer_};
         Trace event_2{event, currencies};
         (*this)(event_2);
         download_.check(STATE);
@@ -265,8 +264,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        core::json::Buffer buffer{decode_buffer_};
-        auto contracts = core::json::Parser::create<json::Contracts>(body, buffer);
+        json::Contracts contracts{body, decode_buffer_};
         Trace event_2{event, contracts};
         (*this)(event_2);
         download_.check(STATE);
@@ -363,8 +361,7 @@ void Rest::get_order_book(std::string_view const &symbol) {
 void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.order_book_ack([&]() {
     auto handle_success = [&](auto &body) {
-      core::json::Buffer buffer{decode_buffer_};
-      auto order_book = core::json::Parser::create<json::OrderBook>(body, buffer);
+      json::OrderBook order_book{body, decode_buffer_};
       Trace event_2{event, order_book};
       (*this)(event_2, symbol);
     };
