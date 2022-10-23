@@ -25,7 +25,7 @@ API API::create() {
         .get_order_book = "/futures/usdt/order_book"sv,
     };
   }
-  throw RuntimeError(R"(Unknown api="{}")"sv, api);
+  throw RuntimeError{R"(Unknown api="{}")"sv, api};
 }
 
 }  // namespace gate_futures
