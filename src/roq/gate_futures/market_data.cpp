@@ -142,7 +142,7 @@ void MarketData::operator()(web::socket::Client::Close const &) {
 }
 
 void MarketData::operator()(web::socket::Client::Latency const &latency) {
-  auto trace_info = server::create_trace_info();
+  TraceInfo trace_info;
   const ExternalLatency external_latency{
       .stream_id = stream_id_,
       .account = {},
@@ -162,7 +162,7 @@ void MarketData::operator()(web::socket::Client::Binary const &) {
 
 void MarketData::operator()(ConnectionStatus status) {
   if (utils::update(status_, status)) {
-    auto trace_info = server::create_trace_info();
+    TraceInfo trace_info;
     const StreamStatus stream_status{
         .stream_id = stream_id_,
         .account = {},
@@ -191,7 +191,7 @@ void MarketData::subscribe(std::span<Symbol const> const &symbols) {
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols) {
   assert(!std::empty(symbols));
   if (true) {
-    std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
+    std::chrono::seconds now = utils::safe_cast(clock::get_realtime());
     auto message = fmt::format(
         R"({{)"
         R"("time":{},)"
@@ -206,7 +206,7 @@ void MarketData::subscribe(std::string_view const &channel, std::span<Symbol con
     (*connection_).send_text(message);
   } else {
     for (auto &symbol : symbols) {
-      std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
+      std::chrono::seconds now = utils::safe_cast(clock::get_realtime());
       auto message = fmt::format(
           R"({{)"
           R"("time":{},)"
@@ -230,7 +230,7 @@ void MarketData::subscribe(
     const uint32_t depth) {
   assert(!std::empty(symbols));
   for (auto &symbol : symbols) {
-    std::chrono::seconds now = utils::safe_cast(core::clock::GetRealTime());
+    std::chrono::seconds now = utils::safe_cast(clock::get_realtime());
     auto message = fmt::format(
         R"({{)"
         R"("time":{},)"
@@ -251,7 +251,7 @@ void MarketData::subscribe(
 void MarketData::parse(std::string_view const &message) {
   profile_.parse([&]() {
     try {
-      auto trace_info = server::create_trace_info();
+      TraceInfo trace_info;
       core::json::Buffer buffer{decode_buffer_};
       if (json::Parser::dispatch(*this, message, buffer, trace_info)) {
       } else {
