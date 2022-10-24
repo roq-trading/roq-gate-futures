@@ -11,6 +11,8 @@ using namespace std::literals;
 namespace roq {
 namespace gate_futures {
 
+// === IMPLEMENTATION ===
+
 API API::create() {
   auto api = Flags::api();
   if (api.compare("btc"sv) == 0) {

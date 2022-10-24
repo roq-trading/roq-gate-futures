@@ -7,12 +7,14 @@
 namespace roq {
 namespace gate_futures {
 
+// === IMPLEMENTATION ===
+
 Shared::Shared(server::Dispatcher &dispatcher)
-    : api(API::create()), bids(server::Flags::cache_mbp_max_depth()), asks(server::Flags::cache_mbp_max_depth()),
+    : api{API::create()}, bids(server::Flags::cache_mbp_max_depth()), asks(server::Flags::cache_mbp_max_depth()),
       final_bids(server::Flags::cache_mbp_max_depth()), final_asks(server::Flags::cache_mbp_max_depth()),
-      trades(server::Flags::cache_trades_max_depth()), dispatcher_(dispatcher),
-      rate_limiter(Flags::request_limit(), Flags::request_limit_interval()),
-      symbols(Flags::ws_max_subscriptions_per_stream()), depth_request_queue(Flags::ws_mbp_request_delay()) {
+      trades(server::Flags::cache_trades_max_depth()), dispatcher_{dispatcher},
+      rate_limiter{Flags::request_limit(), Flags::request_limit_interval()},
+      symbols{Flags::ws_max_subscriptions_per_stream()}, depth_request_queue{Flags::ws_mbp_request_delay()} {
 }
 
 }  // namespace gate_futures

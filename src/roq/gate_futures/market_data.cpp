@@ -31,7 +31,7 @@ namespace gate_futures {
 namespace {
 auto const NAME = "md"sv;
 
-Mask const SUPPORTS{
+auto const SUPPORTS = Mask{
     SupportType::MARKET_STATUS,
     SupportType::TOP_OF_BOOK,
     SupportType::MARKET_BY_PRICE,
@@ -71,10 +71,10 @@ struct create_metrics final : public core::metrics::Factory {
 
 // === IMPLEMENTATION ===
 
-MarketData::MarketData(Handler &handler, io::Context &context, uint32_t stream_id, Shared &shared, size_t index)
-    : handler_(handler), stream_id_(stream_id), name_(create_name(stream_id_)), index_(index),
-      connection_(create_connection(*this, context)), decode_buffer_(Flags::decode_buffer_size()),
-      request_id_(static_cast<uint64_t>(stream_id_) * 1000000),  // scale (debugging)
+MarketData::MarketData(Handler &handler, io::Context &context, uint16_t stream_id, Shared &shared, size_t index)
+    : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_)}, index_{index},
+      connection_{create_connection(*this, context)}, decode_buffer_{Flags::decode_buffer_size()},
+      request_id_{static_cast<uint64_t>(stream_id_) * 1000000},  // scale (debugging)
       counter_{
           .disconnect = create_metrics(name_, "disconnect"sv),
       },
@@ -89,7 +89,7 @@ MarketData::MarketData(Handler &handler, io::Context &context, uint32_t stream_i
       latency_{
           .ping = create_metrics(name_, "ping"sv),
       },
-      shared_(shared) {
+      shared_{shared} {
 }
 
 void MarketData::operator()(Event<Start> const &) {
