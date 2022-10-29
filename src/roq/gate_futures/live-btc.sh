@@ -24,7 +24,7 @@ $PREFIX ./roq-gate-futures \
   --event_log_dir "$HOME/var/lib/roq/data" \
   --event_log_symlink true \
   --client_listen_address "$HOME/run/$NAME.sock" \
-  --metrics_listen_address "$HOME/run/metrics/${NAME}.sock" \
+  --service_listen_address "$HOME/run/metrics/${NAME}.sock" \
   --rest_uri "$REST_URI" \
   --ws_uri "$WS_URI" \
   --api "btc" \
