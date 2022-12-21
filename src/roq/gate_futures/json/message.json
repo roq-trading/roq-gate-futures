@@ -6,6 +6,9 @@
       "name": "time"
     },
     {
+      "name": "time_ms"
+    },
+    {
       "name": "id"
     },
     {

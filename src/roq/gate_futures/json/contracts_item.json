@@ -157,6 +157,10 @@
     {
       "name": "orderbook_id",
       "type": "int64_t"
+    },
+    {
+      "name": "enable_credit",
+      "type": "bool"
     }
   ]
 }

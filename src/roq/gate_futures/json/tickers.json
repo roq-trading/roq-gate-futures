@@ -10,6 +10,10 @@
       "type": "std::chrono::seconds"
     },
     {
+      "name": "time_ms",
+      "type": "std::chrono::milliseconds"
+    },
+    {
       "name": "channel",
       "type": "Channel"
     },
