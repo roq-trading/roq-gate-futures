@@ -33,8 +33,6 @@ auto const SUPPORTS = Mask{
     SupportType::REFERENCE_DATA,
     SupportType::MARKET_STATUS,
 };
-
-auto const ALLOW_PIPELINING = true;
 }  // namespace
 
 // === HELPERS ===

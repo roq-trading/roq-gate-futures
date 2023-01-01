@@ -40,10 +40,8 @@ class DropCopy final : public web::socket::Client::Handler, json::Parser::Handle
       io::Context &,
       uint16_t stream_id,
       Security &,
-      Shared &,
       std::string_view const &uri,
-      std::string_view const &query,
-      std::chrono::nanoseconds ping_frequency);
+      std::string_view const &query);
 
   DropCopy(DropCopy &&) = delete;
   DropCopy(DropCopy const &) = delete;
@@ -89,7 +87,6 @@ class DropCopy final : public web::socket::Client::Handler, json::Parser::Handle
   const std::string name_;
   // web socket
   std::unique_ptr<web::socket::Client> connection_;
-  const std::chrono::nanoseconds ping_frequency_;
   // buffers
   core::Buffer decode_buffer_;
   // metrics
@@ -104,8 +101,6 @@ class DropCopy final : public web::socket::Client::Handler, json::Parser::Handle
   } latency_;
   // security
   Security &security_;
-  // cache
-  Shared &shared_;
   // state
   bool welcome_ = false;
   bool ready_ = false;
