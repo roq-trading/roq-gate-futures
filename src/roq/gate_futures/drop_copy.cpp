@@ -41,7 +41,7 @@ auto create_name(auto stream_id) {
 
 auto create_connection(auto &handler, auto &context, auto const &uri, auto const &query) {
   io::web::URI uri_{uri};
-  web::socket::Client::Config config{
+  auto config = web::socket::Client::Config{
       .always_reconnect = true,
       .connection_timeout = server::Flags::net_connection_timeout(),
       .disconnect_on_idle_timeout = {},
@@ -137,7 +137,7 @@ void DropCopy::operator()(web::socket::Client::Close const &) {
 
 void DropCopy::operator()(web::socket::Client::Latency const &latency) {
   TraceInfo trace_info;
-  const ExternalLatency external_latency{
+  auto external_latency = ExternalLatency{
       .stream_id = stream_id_,
       .account = security_.get_account(),
       .latency = latency.sample,
@@ -157,7 +157,7 @@ void DropCopy::operator()(web::socket::Client::Binary const &) {
 void DropCopy::operator()(ConnectionStatus status) {
   if (utils::update(status_, status)) {
     TraceInfo trace_info;
-    const StreamStatus stream_status{
+    auto stream_status = StreamStatus{
         .stream_id = stream_id_,
         .account = security_.get_account(),
         .supports = SUPPORTS,
