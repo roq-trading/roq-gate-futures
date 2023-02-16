@@ -425,7 +425,7 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
       }
       shared_.depth_request_queue.emplace_back(symbol);
     };
-    collector(shared_.bids, shared_.asks, sequence, publish_snapshot, request_snapshot);
+    collector(shared_.bids, shared_.asks, sequence, false, publish_snapshot, request_snapshot);
   } catch (BadState &) {
     log::warn(R"(RESUBSCRIBE symbol="{}")"sv, symbol);
     // XXX HANS publish stale
