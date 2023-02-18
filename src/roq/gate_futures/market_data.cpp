@@ -333,7 +333,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
     log::info<3>("trace_info={}, trades={}"sv, trace_info, trades);
     (*connection_).touch(trace_info.source_receive_time);
     auto &result = trades.result;
-    shared_.trades.clear();
+    auto &trades_2 = shared_.get_trades();
     auto emplace_back = [](auto &result, auto &value) {
       auto const side = utils::compare(value.size, 0.0) == std::strong_ordering::less ? Side::SELL : Side::BUY;
       auto trade = Trade{
@@ -351,29 +351,30 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
     decltype(json::TradesItem::create_time_ms) timestamp = {};
     for (auto &item : result) {
       if (item.contract.compare(contract) != 0) {
-        if (!std::empty(contract) && !std::empty(shared_.trades)) {
+        if (!std::empty(contract) && !std::empty(trades_2)) {
           auto trade_summary = TradeSummary{
               .stream_id = stream_id_,
               .exchange = Flags::exchange(),
               .symbol = contract,
-              .trades = shared_.trades,
+              .trades = trades_2,
               .exchange_time_utc = utils::safe_cast(timestamp),
               .exchange_sequence = {},
           };
           create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
+          trades_2.clear();
         }
         contract = item.contract;
         timestamp = {};
       }
-      emplace_back(shared_.trades, item);
+      emplace_back(trades_2, item);
       utils::update_max(timestamp, item.create_time_ms);
     }
-    if (!std::empty(shared_.trades)) {
+    if (!std::empty(trades_2)) {
       auto trade_summary = TradeSummary{
           .stream_id = stream_id_,
           .exchange = Flags::exchange(),
           .symbol = contract,
-          .trades = shared_.trades,
+          .trades = trades_2,
           .exchange_time_utc = utils::safe_cast(timestamp),
       };
       create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
@@ -415,9 +416,8 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
     auto &symbol = result.symbol;
     auto first_sequence = result.first_update_id;
     auto last_sequence = result.last_update_id;
-    auto &collector = shared_.mbp_collector[symbol];
-    shared_.bids.clear();
-    shared_.asks.clear();
+    auto &sequencer = shared_.mbp_sequencer[symbol];
+    auto &mbp = shared_.get_mbp();
     auto emplace_back = [](auto &result, auto &item) {
       auto mbp_update = MBPUpdate{
           .price = item.price,
@@ -430,9 +430,9 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       result.emplace_back(std::move(mbp_update));
     };
     for (auto &item : result.bids)
-      emplace_back(shared_.bids, item);
+      emplace_back(mbp.bids, item);
     for (auto &item : result.asks)
-      emplace_back(shared_.asks, item);
+      emplace_back(mbp.asks, item);
     auto exchange_time_utc = result.timestamp;
     try {
       auto create_update =
@@ -458,8 +458,8 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       };
       auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence) {
         log::debug(R"(PUBLISH SNAPSHOT symbol="{}", sequence={})"sv, symbol, sequence);
-        auto market_by_price_update = create_update(bids, asks, UpdateType::SNAPSHOT, collector.last_sequence());
-        auto apply_updates = [&](auto &market_by_price) { collector.apply(market_by_price, sequence, true); };
+        auto market_by_price_update = create_update(bids, asks, UpdateType::SNAPSHOT, sequencer.last_sequence());
+        auto apply_updates = [&](auto &market_by_price) { sequencer.apply(market_by_price, sequence, true); };
         Trace event{trace_info, market_by_price_update};
         shared_(event, true, apply_updates);
       };
@@ -470,9 +470,9 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
         }
         shared_.depth_request_queue.emplace_back(symbol);
       };
-      collector(
-          shared_.bids,
-          shared_.asks,
+      sequencer(
+          mbp.bids,
+          mbp.asks,
           first_sequence,
           last_sequence,
           first_sequence - 1,
@@ -481,7 +481,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
           request_snapshot);
     } catch (BadState &) {
       log::warn(R"(RESUBSCRIBE symbol="{}")"sv, symbol);
-      collector.clear();
+      sequencer.clear();
       shared_.depth_request_queue.emplace_back(symbol);
     }
   });

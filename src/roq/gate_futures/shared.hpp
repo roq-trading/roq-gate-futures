@@ -43,12 +43,29 @@ struct Shared final {
   }
 
  public:
-  const API api;
+  API const api;
 
-  std::vector<MBPUpdate> bids, asks;
+ private:
+  struct {
+    std::vector<MBPUpdate> bids, asks;
+    auto &clear() {
+      bids.clear();
+      asks.clear();
+      return *this;
+    }
+    bool empty() const { return std::empty(bids) && std::empty(asks); }
+  } mbp;
   std::vector<Trade> trades;
 
-  absl::flat_hash_map<Symbol, core::mbp::Sequencer> mbp_collector;
+ public:
+  auto &get_mbp() { return mbp.clear(); }
+
+  auto &get_trades() {
+    trades.clear();
+    return trades;
+  }
+
+  absl::flat_hash_map<Symbol, core::mbp::Sequencer> mbp_sequencer;
 
  private:
   server::Dispatcher &dispatcher_;
