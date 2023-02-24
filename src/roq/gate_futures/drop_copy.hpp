@@ -17,8 +17,8 @@
 
 #include "roq/server.hpp"
 
+#include "roq/gate_futures/authenticator.hpp"
 #include "roq/gate_futures/drop_copy_state.hpp"
-#include "roq/gate_futures/security.hpp"
 #include "roq/gate_futures/shared.hpp"
 
 #include "roq/gate_futures/json/parser.hpp"
@@ -38,7 +38,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handl
       Handler &,
       io::Context &,
       uint16_t stream_id,
-      Security &,
+      Authenticator &,
       std::string_view const &uri,
       std::string_view const &query);
 
@@ -98,8 +98,8 @@ struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handl
   struct {
     core::metrics::Latency ping, heartbeat;
   } latency_;
-  // security
-  Security &security_;
+  // authenticator
+  Authenticator &authenticator_;
   // state
   bool welcome_ = false;
   bool ready_ = false;

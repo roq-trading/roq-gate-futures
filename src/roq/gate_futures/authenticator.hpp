@@ -9,16 +9,16 @@
 
 #include "roq/gate_futures/config.hpp"
 
-#include "roq/gate_futures/tools/hasher.hpp"
+#include "roq/gate_futures/tools/crypto.hpp"
 
 namespace roq {
 namespace gate_futures {
 
-struct Security final {
-  Security(Config const &, std::string_view const &account);
+struct Authenticator final {
+  Authenticator(Config const &, std::string_view const &account);
 
-  Security(Security &&) = delete;
-  Security(Security const &) = delete;
+  Authenticator(Authenticator &&) = delete;
+  Authenticator(Authenticator const &) = delete;
 
   std::string_view get_account() const { return account_; }
 
@@ -28,8 +28,8 @@ struct Security final {
       web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body);
 
  private:
-  const std::string account_;
-  tools::Hasher hasher_;
+  std::string const account_;
+  tools::Crypto crypto_;
 };
 
 }  // namespace gate_futures

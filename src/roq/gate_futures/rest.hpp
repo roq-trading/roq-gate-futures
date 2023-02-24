@@ -22,7 +22,6 @@
 #include "roq/server.hpp"
 
 #include "roq/gate_futures/rest_state.hpp"
-#include "roq/gate_futures/security.hpp"
 #include "roq/gate_futures/shared.hpp"
 
 #include "roq/gate_futures/json/contracts.hpp"

@@ -21,8 +21,8 @@
 
 #include "roq/server.hpp"
 
+#include "roq/gate_futures/authenticator.hpp"
 #include "roq/gate_futures/order_entry_state.hpp"
-#include "roq/gate_futures/security.hpp"
 #include "roq/gate_futures/shared.hpp"
 
 namespace roq {
@@ -35,7 +35,7 @@ struct OrderEntry final : public web::rest::Client::Handler {
     virtual void operator()(Trace<FundsUpdate> const &, bool is_last) = 0;
   };
 
-  OrderEntry(Handler &, io::Context &, uint16_t stream_id, Security &);
+  OrderEntry(Handler &, io::Context &, uint16_t stream_id, Authenticator &);
 
   OrderEntry(OrderEntry &&) = delete;
   OrderEntry(OrderEntry const &) = delete;
@@ -93,8 +93,8 @@ struct OrderEntry final : public web::rest::Client::Handler {
   struct {
     core::metrics::Latency ping;
   } latency_;
-  // security
-  Security &security_;
+  // authenticator
+  Authenticator &authenticator_;
   // state
   ConnectionStatus status_ = {};
   core::Download<OrderEntryState> download_;
