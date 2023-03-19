@@ -161,6 +161,11 @@
     {
       "name": "enable_credit",
       "type": "bool"
+    },
+    {
+      "name": "create_time",
+      "type": "std::chrono::seconds",
+      "comment": "not sure if this is seconds or milliseconds"
     }
   ]
 }
