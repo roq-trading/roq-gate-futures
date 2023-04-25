@@ -17,9 +17,9 @@ bool Parser::dispatch(
   auto message_ = core::json::Parser::create<Message>(message, buffer);
   switch (message_.event) {
     using enum Event::type_t;
-    case UNDEFINED:
+    case UNDEFINED__:
       break;
-    case UNKNOWN:
+    case UNKNOWN__:
       assert(false);
       break;
     case SUBSCRIBE: {
@@ -30,9 +30,9 @@ bool Parser::dispatch(
     case UPDATE:
       switch (message_.channel) {
         using enum Channel::type_t;
-        case UNDEFINED:
+        case UNDEFINED__:
           break;
-        case UNKNOWN:
+        case UNKNOWN__:
           assert(false);
           break;
         case TICKERS: {
