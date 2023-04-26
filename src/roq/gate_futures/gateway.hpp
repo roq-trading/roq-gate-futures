@@ -69,7 +69,11 @@ struct Gateway final : public server::Handler,
   void operator()(Rest::SymbolsUpdate &) override;
 
   void ensure_symbol_slices(size_t size);
+
   // utilities
+
+  template <typename... Args>
+  void dispatch(Args &&...);
 
   OrderEntry &get_order_entry(std::string_view const &account);
 

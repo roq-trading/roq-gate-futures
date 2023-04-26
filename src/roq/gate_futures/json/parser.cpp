@@ -14,7 +14,7 @@ namespace json {
 
 bool Parser::dispatch(
     Handler &handler, std::string_view const &message, core::json::Buffer &buffer, TraceInfo const &trace_info) {
-  auto message_ = core::json::Parser::create<Message>(message, buffer);
+  Message message_{message, buffer};
   switch (message_.event) {
     using enum Event::type_t;
     case UNDEFINED__:
@@ -23,7 +23,7 @@ bool Parser::dispatch(
       assert(false);
       break;
     case SUBSCRIBE: {
-      auto const subscribe = core::json::Parser::create<Subscribe>(message, buffer);
+      Subscribe subscribe{message, buffer};
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
@@ -36,22 +36,22 @@ bool Parser::dispatch(
           assert(false);
           break;
         case TICKERS: {
-          auto const tickers = core::json::Parser::create<Tickers>(message, buffer);
+          Tickers tickers{message, buffer};
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case TRADES: {
-          auto const trades = core::json::Parser::create<Trades>(message, buffer);
+          Trades trades{message, buffer};
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case BOOK_TICKER: {
-          auto const book_ticker = core::json::Parser::create<BookTicker>(message, buffer);
+          BookTicker book_ticker{message, buffer};
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
         case ORDER_BOOK_UPDATE:
-          auto const order_book_update = core::json::Parser::create<OrderBookUpdate>(message, buffer);
+          OrderBookUpdate order_book_update{message, buffer};
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
       }
