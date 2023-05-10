@@ -3,7 +3,6 @@
 #include "roq/gate_futures/application.hpp"
 
 #include "roq/gate_futures/config.hpp"
-#include "roq/gate_futures/flags.hpp"
 #include "roq/gate_futures/gateway.hpp"
 #include "roq/gate_futures/settings.hpp"
 
@@ -21,9 +20,9 @@ auto const TYPE = server::Type::ORDER_MANAGEMENT;
 // === IMPLEMENTATION ===
 
 int Application::main(int, char **) {
-  auto settings = Settings::create(TYPE);
+  Settings settings{TYPE};
   Config config{settings};
-  auto context = server::create_io_context();
+  auto context = server::create_io_context(settings);
   server::Trading<Gateway>{settings, config, *context}.dispatch();
   return EXIT_SUCCESS;
 }

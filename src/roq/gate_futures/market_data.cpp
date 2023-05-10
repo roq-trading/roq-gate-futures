@@ -16,8 +16,6 @@
 
 #include "roq/web/socket/client_factory.hpp"
 
-#include "roq/gate_futures/flags.hpp"
-
 #include "roq/gate_futures/json/utils.hpp"
 
 using namespace std::literals;
@@ -47,7 +45,7 @@ auto create_name(auto stream_id) {
 }
 
 auto create_connection(auto &handler, auto &settings, auto &context) {
-  auto uri = Flags::ws_uri();
+  auto uri = settings.ws.uri;
   auto config = web::socket::Client::Config{
       // connection
       .interface = {},
@@ -63,10 +61,10 @@ auto create_connection(auto &handler, auto &settings, auto &context) {
       .query = {},
       .user_agent = ROQ_PACKAGE_NAME,
       .request_timeout = {},
-      .ping_frequency = Flags::ws_ping_freq(),
+      .ping_frequency = settings.ws.ping_freq,
       // implementation
-      .decode_buffer_size = Flags::decode_buffer_size(),
-      .encode_buffer_size = Flags::encode_buffer_size(),
+      .decode_buffer_size = settings.common.decode_buffer_size,
+      .encode_buffer_size = settings.common.encode_buffer_size,
   };
   return web::socket::ClientFactory::create(handler, context, config, []() { return std::string(); });
 }
@@ -81,7 +79,8 @@ struct create_metrics final : public core::metrics::Factory {
 
 MarketData::MarketData(Handler &handler, io::Context &context, uint16_t stream_id, Shared &shared, size_t index)
     : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_)}, index_{index},
-      connection_{create_connection(*this, shared.settings, context)}, decode_buffer_{Flags::decode_buffer_size()},
+      connection_{create_connection(*this, shared.settings, context)},
+      decode_buffer_{shared.settings.common.decode_buffer_size},
       counter_{
           .disconnect = create_metrics(shared.settings, name_, "disconnect"sv),
       },
@@ -196,7 +195,10 @@ void MarketData::subscribe(std::span<Symbol const> const &symbols) {
   subscribe("futures.trades"sv, symbols);
   subscribe("futures.book_ticker"sv, symbols);
   subscribe(
-      "futures.order_book_update"sv, symbols, utils::safe_cast(Flags::order_book_freq()), Flags::order_book_depth());
+      "futures.order_book_update"sv,
+      symbols,
+      utils::safe_cast(shared_.settings.common.order_book_freq),
+      shared_.settings.common.order_book_depth);
 }
 
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols) {
@@ -329,7 +331,7 @@ void MarketData::operator()(Trace<json::Tickers> const &event) {
       }};
       auto statistics_update = StatisticsUpdate{
           .stream_id = stream_id_,
-          .exchange = Flags::exchange(),
+          .exchange = shared_.settings.exchange,
           .symbol = item.contract,
           .statistics = statistics,
           .update_type = UpdateType::INCREMENTAL,
@@ -369,7 +371,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
         if (!std::empty(contract) && !std::empty(trades_2)) {
           auto trade_summary = TradeSummary{
               .stream_id = stream_id_,
-              .exchange = Flags::exchange(),
+              .exchange = shared_.settings.exchange,
               .symbol = contract,
               .trades = trades_2,
               .exchange_time_utc = timestamp,
@@ -388,7 +390,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
     if (!std::empty(trades_2)) {
       auto trade_summary = TradeSummary{
           .stream_id = stream_id_,
-          .exchange = Flags::exchange(),
+          .exchange = shared_.settings.exchange,
           .symbol = contract,
           .trades = trades_2,
           .exchange_time_utc = timestamp,
@@ -408,7 +410,7 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
     auto &result = book_ticker.result;
     auto top_of_book = TopOfBook{
         .stream_id = stream_id_,
-        .exchange = Flags::exchange(),
+        .exchange = shared_.settings.exchange,
         .symbol = result.contract,
         .layer{
             .bid_price = result.best_bid_price,
@@ -458,7 +460,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
           [&](auto &bids, auto &asks, auto update_type, auto exchange_sequence) -> MarketByPriceUpdate {
         return {
             .stream_id = stream_id_,
-            .exchange = Flags::exchange(),
+            .exchange = shared_.settings.exchange,
             .symbol = symbol,
             .bids = bids,
             .asks = asks,
@@ -485,7 +487,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       };
       auto request_snapshot = [&](auto retries) {
         log::debug(R"(REQUEST symbol="{}" (retries={}))"sv, symbol, retries);
-        if (Flags::ws_mbp_request_max_retries() && Flags::ws_mbp_request_max_retries() < retries) {
+        if (shared_.settings.ws.mbp_request_max_retries && shared_.settings.ws.mbp_request_max_retries < retries) {
           log::fatal(R"(Unexpected: symbol="{}", retries={})"sv, symbol, retries);
         }
         shared_.depth_request_queue.emplace_back(symbol);

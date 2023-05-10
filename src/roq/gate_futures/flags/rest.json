@@ -1,0 +1,82 @@
+{
+  "name": "REST",
+  "type": "flags",
+  "prefix": "rest_",
+  "values": [
+    {
+      "name": "uri",
+      "type": "roq::io::web::URI",
+      "validator": "roq::core::flags::URI",
+      "default": "https://api.gateio.ws/api/v4",
+      "description": "REST end-point (URI)"
+    },
+    {
+      "name": "proxy",
+      "type": "roq::io::web::URI",
+      "validator": "roq::core::flags::URI",
+      "description": "proxy end-point (URI)"
+    },
+    {
+      "name": "ping_freq",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::core::flags::TimePeriod",
+      "default": "5s",
+      "description": "ping frequency"
+    },
+    {
+      "name": "ping_path",
+      "type": "std::string",
+      "validator": "roq::core::flags::Path",
+      "default": "/",
+      "description": "URI path used for REST connection keep-alive messages"
+    },
+    {
+      "name": "request_timeout",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::core::flags::TimePeriod",
+      "default": "30s",
+      "description": "request: timeout"
+    },
+    {
+      "name": "download_orders_page_size",
+      "type": "uint32_t",
+      "validator": "roq::core::flags::NonZero<uint32_t>",
+      "default": 500,
+      "description": "page size used when downloading orders"
+    },
+    {
+      "name": "download_orders_begin",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::core::flags::TimePeriod",
+      "default": "24h",
+      "description": "download orders since (now - begin)"
+    },
+    {
+      "name": "download_only_active_orders",
+      "type": "bool",
+      "default": false,
+      "description": "download only active orders?"
+    },
+    {
+      "name": "download_fills_page_size",
+      "type": "uint32_t",
+      "validator": "roq::core::flags::NonZero<uint32_t>",
+      "default": 500,
+      "description": "page size used when downloading fills"
+    },
+    {
+      "name": "download_fills_begin",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::core::flags::TimePeriod",
+      "default": "24h",
+      "description": "download fills since (now - begin)"
+    },
+    {
+      "name": "token_refresh_freq",
+      "type": "std::chrono::nanoseconds",
+      "validator": "roq::core::flags::TimePeriod",
+      "default": "8h",
+      "description": "token refresh frequency"
+    }
+  ]
+}
