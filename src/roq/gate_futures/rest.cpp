@@ -416,8 +416,8 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
           .stream_id = stream_id_,
           .exchange = shared_.settings.exchange,
           .symbol = symbol,
-          .bids = bids,
-          .asks = asks,
+          .bids = {const_cast<MBPUpdate *>(std::data(bids)), std::size(bids)},  // FIXME
+          .asks = {const_cast<MBPUpdate *>(std::data(asks)), std::size(asks)},  // FIXME
           .update_type = UpdateType::SNAPSHOT,
           .exchange_time_utc = exchange_time_utc,
           .exchange_sequence = sequencer.last_sequence(),
