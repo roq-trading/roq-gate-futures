@@ -8,11 +8,11 @@
     },
     {
       "name": "asks",
-      "type": "std::span<PriceSize>"
+      "type": "std::span<PriceSize const>"
     },
     {
       "name": "bids",
-      "type": "std::span<PriceSize>"
+      "type": "std::span<PriceSize const>"
     },
     {
       "name": "id",

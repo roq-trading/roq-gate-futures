@@ -23,7 +23,7 @@
     },
     {
       "name": "result",
-      "type": "std::span<TradesItem>"
+      "type": "std::span<TradesItem const>"
     },
     {
       "name": "error"

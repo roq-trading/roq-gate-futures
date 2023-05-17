@@ -23,7 +23,7 @@
     },
     {
       "name": "result",
-      "type": "std::span<TickersItem>"
+      "type": "std::span<TickersItem const>"
     },
     {
       "name": "error"

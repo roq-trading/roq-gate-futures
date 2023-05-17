@@ -25,12 +25,12 @@
     {
       "raw": "b",
       "name": "bids",
-      "type": "std::span<PriceSize>"
+      "type": "std::span<PriceSize const>"
     },
     {
       "raw": "a",
       "name": "asks",
-      "type": "std::span<PriceSize>"
+      "type": "std::span<PriceSize const>"
     }
   ]
 }
