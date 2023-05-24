@@ -2,8 +2,6 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/parser.hpp"
-
 #include "roq/gate_futures/json/subscribe.hpp"
 
 using namespace roq;
@@ -25,7 +23,6 @@ TEST_CASE("json_subscribe_success", "[json_subscribe]") {
                  R"("status":"success")"
                  R"(})"
                  R"(})";
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  [[maybe_unused]] auto obj = core::json::Parser::create<json::Subscribe>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  [[maybe_unused]] auto obj = json::Subscribe::create(message, buffer);
 }

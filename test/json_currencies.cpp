@@ -2,8 +2,6 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/parser.hpp"
-
 #include "roq/gate_futures/json/currencies.hpp"
 
 using namespace roq;
@@ -32,9 +30,8 @@ TEST_CASE("json_currencies_item", "[json_currencies]") {
                  R"("trade_disabled":false)"
                  R"(})"
                  R"(])";
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Currencies>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::Currencies::create(message, buffer);
   auto &data = obj.data;
   REQUIRE(std::size(data) == 2);
 }

@@ -2,8 +2,6 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/parser.hpp"
-
 #include "roq/gate_futures/json/order_book_update.hpp"
 
 using namespace roq;
@@ -50,9 +48,8 @@ TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
                  R"(])"
                  R"(})"
                  R"(})"sv;
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::OrderBookUpdate>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::OrderBookUpdate::create(message, buffer);
   CHECK(obj.time == 1643180626s);
   CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
   CHECK(obj.event == json::Event::UPDATE);
@@ -94,9 +91,8 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
                  R"(])"
                  R"(})"
                  R"(})"sv;
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::OrderBookUpdate>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::OrderBookUpdate::create(message, buffer);
   CHECK(obj.time == 1643180627s);
   CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
   CHECK(obj.event == json::Event::UPDATE);

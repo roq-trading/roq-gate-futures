@@ -13,8 +13,11 @@ namespace gate_futures {
 namespace json {
 
 bool Parser::dispatch(
-    Handler &handler, std::string_view const &message, core::json::Buffer &buffer, TraceInfo const &trace_info) {
-  Message message_{message, buffer};
+    Handler &handler,
+    std::string_view const &message,
+    std::span<std::byte> const &buffer,
+    TraceInfo const &trace_info) {
+  auto message_ = Message::create(message, buffer);
   switch (message_.event) {
     using enum Event::type_t;
     case UNDEFINED__:
@@ -23,7 +26,7 @@ bool Parser::dispatch(
       assert(false);
       break;
     case SUBSCRIBE: {
-      Subscribe subscribe{message, buffer};
+      auto subscribe = Subscribe::create(message, buffer);
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
@@ -36,22 +39,22 @@ bool Parser::dispatch(
           assert(false);
           break;
         case TICKERS: {
-          Tickers tickers{message, buffer};
+          auto tickers = Tickers::create(message, buffer);
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case TRADES: {
-          Trades trades{message, buffer};
+          auto trades = Trades::create(message, buffer);
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case BOOK_TICKER: {
-          BookTicker book_ticker{message, buffer};
+          auto book_ticker = BookTicker::create(message, buffer);
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
         case ORDER_BOOK_UPDATE:
-          OrderBookUpdate order_book_update{message, buffer};
+          auto order_book_update = OrderBookUpdate::create(message, buffer);
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
       }

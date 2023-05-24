@@ -2,8 +2,6 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/parser.hpp"
-
 #include "roq/gate_futures/json/order_book.hpp"
 
 using namespace roq;
@@ -44,9 +42,8 @@ TEST_CASE("json_order_book_simple", "[json_order_book]") {
                  R"("id":11144476177,)"
                  R"("update":1643191515.446)"
                  R"(})"sv;
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::OrderBook>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::OrderBook::create(message, buffer);
   CHECK(obj.current == 1643191515.447_a);
   REQUIRE(std::size(obj.asks) == 10);
   auto &a0 = obj.asks[0];

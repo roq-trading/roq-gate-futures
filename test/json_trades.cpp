@@ -2,8 +2,6 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/parser.hpp"
-
 #include "roq/gate_futures/json/trades.hpp"
 
 using namespace roq;
@@ -31,7 +29,6 @@ TEST_CASE("json_trades_update", "[json_trades]") {
                  R"(})"
                  R"(])"
                  R"(})";
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Trades>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::Trades::create(message, buffer);
 }

@@ -2,8 +2,6 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/parser.hpp"
-
 #include "roq/gate_futures/json/contracts.hpp"
 
 using namespace roq;
@@ -98,9 +96,8 @@ TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
                  R"("orderbook_id":1131459666)"
                  R"(})"
                  R"(])";
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Contracts>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::Contracts::create(message, buffer);
   auto &data = obj.data;
   REQUIRE(std::size(data) == 2);
 }
@@ -189,9 +186,8 @@ TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
                  R"("orderbook_id":58911366)"
                  R"(})"
                  R"(])";
-  core::Buffer buffer(8192);
-  core::json::Buffer buffer_(buffer);
-  auto obj = core::json::Parser::create<json::Contracts>(message, buffer_);
+  std::vector<std::byte> buffer(8192);
+  auto obj = json::Contracts::create(message, buffer);
   auto &data = obj.data;
   REQUIRE(std::size(data) == 2);
 }
