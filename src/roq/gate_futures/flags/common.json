@@ -11,7 +11,7 @@
     {
       "name": "request_limit_interval",
       "type": "std::chrono::nanoseconds",
-      "validator": "roq::core::flags::TimePeriod",
+      "validator": "roq::flags::validators::TimePeriod",
       "default": "10s",
       "description": "request limit monitor interval"
     },
@@ -24,14 +24,14 @@
     {
       "name": "encode_buffer_size",
       "type": "uint32_t",
-      "validator": "roq::core::flags::NonZero<uint32_t>",
+      "validator": "roq::flags::validators::NonZero<uint32_t>",
       "default": 1048576,
       "description": "encode buffer size"
     },
     {
       "name": "decode_buffer_size",
       "type": "uint32_t",
-      "validator": "roq::core::flags::NonZero<uint32_t>",
+      "validator": "roq::flags::validators::NonZero<uint32_t>",
       "default": 10485760,
       "description": "decode buffer size"
     },
@@ -50,7 +50,7 @@
     {
       "name": "order_book_freq",
       "type": "std::chrono::nanoseconds",
-      "validator": "roq::core::flags::TimePeriod",
+      "validator": "roq::flags::validators::TimePeriod",
       "default": "100ms",
       "description": "order book frequency"
     }
