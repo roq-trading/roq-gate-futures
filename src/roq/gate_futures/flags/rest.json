@@ -40,7 +40,7 @@
     {
       "name": "download_orders_page_size",
       "type": "uint32_t",
-      "validator": "roq::flags::validators::NonZero<uint32_t>",
+      "required": true,
       "default": 500,
       "description": "page size used when downloading orders"
     },
@@ -60,7 +60,7 @@
     {
       "name": "download_fills_page_size",
       "type": "uint32_t",
-      "validator": "roq::flags::validators::NonZero<uint32_t>",
+      "required": true,
       "default": 500,
       "description": "page size used when downloading fills"
     },
