@@ -239,8 +239,8 @@ void MarketData::subscribe(std::string_view const &channel, std::span<Symbol con
 void MarketData::subscribe(
     std::string_view const &channel,
     std::span<Symbol const> const &symbols,
-    const std::chrono::milliseconds frequency,
-    const uint32_t depth) {
+    std::chrono::milliseconds const frequency,
+    uint32_t const depth) {
   assert(!std::empty(symbols));
   for (auto &symbol : symbols) {
     std::chrono::seconds now = utils::safe_cast(clock::get_realtime());
