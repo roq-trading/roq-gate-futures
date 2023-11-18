@@ -166,6 +166,10 @@
       "name": "create_time",
       "type": "std::chrono::seconds",
       "comment": "not sure if this is seconds or milliseconds"
+    },
+    {
+      "name": "funding_cap_ratio",
+      "type": "double"
     }
   ]
 }
