@@ -17,7 +17,7 @@
 
 #include "roq/core/limit/rate_limiter.hpp"
 
-#include "roq/utils/mbp/sequencer.hpp"
+#include "roq/market/mbp/sequencer.hpp"
 
 #include "roq/gate_futures/api.hpp"
 #include "roq/gate_futures/settings.hpp"
@@ -66,7 +66,7 @@ struct Shared final {
     return trades;
   }
 
-  absl::flat_hash_map<Symbol, utils::mbp::Sequencer> mbp_sequencer;
+  absl::flat_hash_map<Symbol, market::mbp::Sequencer> mbp_sequencer;
 
  private:
   server::Dispatcher &dispatcher_;
