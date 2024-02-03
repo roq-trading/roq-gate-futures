@@ -8,9 +8,9 @@
 #include <utility>
 #include <vector>
 
-#include "roq/core/metrics/counter.hpp"
-#include "roq/core/metrics/latency.hpp"
-#include "roq/core/metrics/profile.hpp"
+#include "roq/utils/metrics/counter.hpp"
+#include "roq/utils/metrics/latency.hpp"
+#include "roq/utils/metrics/profile.hpp"
 
 #include "roq/io/context.hpp"
 
@@ -93,13 +93,13 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
   std::vector<std::byte> decode_buffer_;
   // metrics
   struct {
-    core::metrics::Counter disconnect;
+    utils::metrics::Counter disconnect;
   } counter_;
   struct {
-    core::metrics::Profile parse, subscribe, tickers, trades, book_ticker, order_book_update;
+    utils::metrics::Profile parse, subscribe, tickers, trades, book_ticker, order_book_update;
   } profile_;
   struct {
-    core::metrics::Latency ping;
+    utils::metrics::Latency ping;
   } latency_;
   // cache
   Shared &shared_;
