@@ -478,8 +478,13 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
         auto market_by_price_update = create_update(bids, asks, UpdateType::INCREMENTAL, last_sequence);
         create_trace_and_dispatch(handler_, trace_info, market_by_price_update, true);
       };
-      auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence) {
-        log::debug(R"(PUBLISH SNAPSHOT symbol="{}", sequence={})"sv, symbol, sequence);
+      auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence, auto retries, auto delay) {
+        log::debug(
+            R"(PUBLISH SNAPSHOT symbol="{}", sequence={}, retries={}, delay={})"sv,
+            symbol,
+            sequence,
+            retries,
+            std::chrono::duration_cast<std::chrono::milliseconds>(delay));
         auto market_by_price_update = create_update(bids, asks, UpdateType::SNAPSHOT, sequencer.last_sequence());
         auto apply_updates = [&](auto &market_by_price) { sequencer.apply(market_by_price, sequence, true); };
         Trace event{trace_info, market_by_price_update};

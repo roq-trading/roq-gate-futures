@@ -414,8 +414,13 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
     emplace_back(mbp.asks, item);
   auto exchange_time_utc = std::chrono::nanoseconds{static_cast<int64_t>(order_book.update * 1.0e9)};
   try {
-    auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence) {
-      log::debug(R"(PUBLISH SNAPSHOT symbol="{}", sequence={})"sv, symbol, sequence);
+    auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence, auto retries, auto delay) {
+      log::debug(
+          R"(PUBLISH SNAPSHOT symbol="{}", sequence={}, retries={}, delay={})"sv,
+          symbol,
+          sequence,
+          retries,
+          std::chrono::duration_cast<std::chrono::milliseconds>(delay));
       auto market_by_price_update = MarketByPriceUpdate{
           .stream_id = stream_id_,
           .exchange = shared_.settings.exchange,
