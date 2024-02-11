@@ -225,7 +225,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        auto currencies = json::Currencies::create(body, decode_buffer_);
+        json::Currencies currencies{body, decode_buffer_};
         Trace event_2{event, currencies};
         (*this)(event_2);
         download_.check(STATE);
@@ -274,7 +274,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        auto contracts = json::Contracts::create(body, decode_buffer_);
+        json::Contracts contracts{body, decode_buffer_};
         Trace event_2{event, contracts};
         (*this)(event_2);
         download_.check(STATE);
@@ -374,7 +374,7 @@ void Rest::get_order_book(std::string_view const &symbol) {
 void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.order_book_ack([&]() {
     auto handle_success = [&](auto &body) {
-      auto order_book = json::OrderBook::create(body, decode_buffer_);
+      json::OrderBook order_book{body, decode_buffer_};
       Trace event_2{event, order_book};
       (*this)(event_2, symbol);
     };

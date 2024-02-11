@@ -24,7 +24,7 @@ TEST_CASE("json_message_subscribe_success", "[json_message]") {
                  R"(})"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] auto obj = json::Message::create(message, buffer);
+  [[maybe_unused]] json::Message obj{message, buffer};
 }
 
 TEST_CASE("json_message_book_ticker", "[json_message]") {
@@ -45,7 +45,7 @@ TEST_CASE("json_message_book_ticker", "[json_message]") {
                  R"(})"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] auto obj = json::Message::create(message, buffer);
+  [[maybe_unused]] json::Message obj{message, buffer};
 }
 
 TEST_CASE("json_message_tickers", "[json_message]") {
@@ -75,7 +75,7 @@ TEST_CASE("json_message_tickers", "[json_message]") {
                  R"(])"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] auto obj = json::Message::create(message, buffer);
+  [[maybe_unused]] json::Message obj{message, buffer};
 }
 
 TEST_CASE("json_message_trades", "[json_message]") {
@@ -96,5 +96,5 @@ TEST_CASE("json_message_trades", "[json_message]") {
                  R"(])"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] auto obj = json::Message::create(message, buffer);
+  [[maybe_unused]] json::Message obj{message, buffer};
 }

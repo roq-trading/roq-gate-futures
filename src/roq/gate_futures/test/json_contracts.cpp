@@ -97,7 +97,7 @@ TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
                  R"(})"
                  R"(])";
   std::vector<std::byte> buffer(8192);
-  auto obj = json::Contracts::create(message, buffer);
+  json::Contracts obj{message, buffer};
   auto &data = obj.data;
   REQUIRE(std::size(data) == 2);
 }
@@ -187,7 +187,7 @@ TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
                  R"(})"
                  R"(])";
   std::vector<std::byte> buffer(8192);
-  auto obj = json::Contracts::create(message, buffer);
+  json::Contracts obj{message, buffer};
   auto &data = obj.data;
   REQUIRE(std::size(data) == 2);
 }

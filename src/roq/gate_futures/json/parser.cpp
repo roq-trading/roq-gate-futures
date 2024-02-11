@@ -17,7 +17,7 @@ bool Parser::dispatch(
     std::string_view const &message,
     std::span<std::byte> const &buffer,
     TraceInfo const &trace_info) {
-  auto message_ = Message::create(message, buffer);
+  Message message_{message, buffer};
   switch (message_.event) {
     using enum Event::type_t;
     case UNDEFINED__:
@@ -26,7 +26,7 @@ bool Parser::dispatch(
       assert(false);
       break;
     case SUBSCRIBE: {
-      auto subscribe = Subscribe::create(message, buffer);
+      Subscribe subscribe{message, buffer};
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
@@ -39,24 +39,25 @@ bool Parser::dispatch(
           assert(false);
           break;
         case TICKERS: {
-          auto tickers = Tickers::create(message, buffer);
+          Tickers tickers{message, buffer};
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case TRADES: {
-          auto trades = Trades::create(message, buffer);
+          Trades trades{message, buffer};
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case BOOK_TICKER: {
-          auto book_ticker = BookTicker::create(message, buffer);
+          BookTicker book_ticker{message, buffer};
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
-        case ORDER_BOOK_UPDATE:
-          auto order_book_update = OrderBookUpdate::create(message, buffer);
+        case ORDER_BOOK_UPDATE: {
+          OrderBookUpdate order_book_update{message, buffer};
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
+        }
       }
       break;
   }

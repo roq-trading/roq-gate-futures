@@ -49,7 +49,7 @@ TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
                  R"(})"
                  R"(})"sv;
   std::vector<std::byte> buffer(8192);
-  auto obj = json::OrderBookUpdate::create(message, buffer);
+  json::OrderBookUpdate obj{message, buffer};
   CHECK(obj.time == 1643180626s);
   CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
   CHECK(obj.event == json::Event::UPDATE);
@@ -92,7 +92,7 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
                  R"(})"
                  R"(})"sv;
   std::vector<std::byte> buffer(8192);
-  auto obj = json::OrderBookUpdate::create(message, buffer);
+  json::OrderBookUpdate obj{message, buffer};
   CHECK(obj.time == 1643180627s);
   CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
   CHECK(obj.event == json::Event::UPDATE);

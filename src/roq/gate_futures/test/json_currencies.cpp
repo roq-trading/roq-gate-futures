@@ -31,7 +31,7 @@ TEST_CASE("json_currencies_item", "[json_currencies]") {
                  R"(})"
                  R"(])";
   std::vector<std::byte> buffer(8192);
-  auto obj = json::Currencies::create(message, buffer);
+  json::Currencies obj{message, buffer};
   auto &data = obj.data;
   REQUIRE(std::size(data) == 2);
 }

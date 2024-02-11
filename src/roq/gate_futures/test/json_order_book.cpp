@@ -43,7 +43,7 @@ TEST_CASE("json_order_book_simple", "[json_order_book]") {
                  R"("update":1643191515.446)"
                  R"(})"sv;
   std::vector<std::byte> buffer(8192);
-  auto obj = json::OrderBook::create(message, buffer);
+  json::OrderBook obj{message, buffer};
   CHECK(obj.current == 1643191515.447_a);
   REQUIRE(std::size(obj.asks) == 10);
   auto &a0 = obj.asks[0];
