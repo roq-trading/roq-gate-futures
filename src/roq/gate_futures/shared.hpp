@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <absl/container/flat_hash_map.h>
-
 #include <chrono>
 #include <string>
 #include <utility>
@@ -11,6 +9,8 @@
 
 #include "roq/api.hpp"
 #include "roq/server.hpp"
+
+#include "roq/utils/container.hpp"
 
 #include "roq/core/symbols.hpp"
 #include "roq/core/timer_queue.hpp"
@@ -66,7 +66,7 @@ struct Shared final {
     return trades;
   }
 
-  absl::flat_hash_map<Symbol, market::mbp::Sequencer> mbp_sequencer;
+  utils::unordered_map<std::string, market::mbp::Sequencer> mbp_sequencer;
 
  private:
   server::Dispatcher &dispatcher_;
