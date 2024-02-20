@@ -468,8 +468,8 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
             .exchange_time_utc = exchange_time_utc,
             .exchange_sequence = exchange_sequence,
             .sending_time_utc = {},
-            .price_decimals = {},
-            .quantity_decimals = {},
+            .price_precision = {},
+            .quantity_precision = {},
             .checksum = {},
         };
       };

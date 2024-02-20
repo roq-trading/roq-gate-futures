@@ -429,8 +429,8 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
           .exchange_time_utc = exchange_time_utc,
           .exchange_sequence = sequencer.last_sequence(),
           .sending_time_utc = {},
-          .price_decimals = {},
-          .quantity_decimals = {},
+          .price_precision = {},
+          .quantity_precision = {},
           .checksum = {},
       };
       auto apply_updates = [&](auto &market_by_price) { sequencer.apply(market_by_price, sequence, true); };
