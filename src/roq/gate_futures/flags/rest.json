@@ -8,75 +8,75 @@
       "type": "roq::io::web::URI",
       "validator": "roq::core::flags::URI",
       "default": "https://api.gateio.ws/api/v4",
-      "description": "REST end-point (URI)"
+      "description": "Exchange end-point"
     },
     {
       "name": "proxy",
       "type": "roq::io::web::URI",
       "validator": "roq::core::flags::URI",
-      "description": "proxy end-point (URI)"
+      "description": "Proxy end-point"
     },
     {
       "name": "ping_freq",
       "type": "std::chrono::nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "5s",
-      "description": "ping frequency"
+      "description": "Ping frequency"
     },
     {
       "name": "ping_path",
       "type": "std::string",
       "validator": "roq::flags::validators::Path",
       "default": "/",
-      "description": "URI path used for REST connection keep-alive messages"
+      "description": "Ping path"
     },
     {
       "name": "request_timeout",
       "type": "std::chrono::nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "30s",
-      "description": "request: timeout"
+      "description": "Request timeout"
     },
     {
       "name": "download_orders_page_size",
       "type": "uint32_t",
       "required": true,
       "default": 500,
-      "description": "page size used when downloading orders"
+      "description": "Page size used when downloading orders"
     },
     {
       "name": "download_orders_begin",
       "type": "std::chrono::nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "24h",
-      "description": "download orders since (now - begin)"
+      "description": "Download orders since (now - begin)"
     },
     {
       "name": "download_only_active_orders",
       "type": "bool",
       "default": false,
-      "description": "download only active orders?"
+      "description": "Download only active orders?"
     },
     {
       "name": "download_fills_page_size",
       "type": "uint32_t",
       "required": true,
       "default": 500,
-      "description": "page size used when downloading fills"
+      "description": "Page size used when downloading fills"
     },
     {
       "name": "download_fills_begin",
       "type": "std::chrono::nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "24h",
-      "description": "download fills since (now - begin)"
+      "description": "Download fills since (now - begin)"
     },
     {
       "name": "token_refresh_freq",
       "type": "std::chrono::nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "8h",
-      "description": "token refresh frequency"
+      "description": "Token refresh frequency"
     }
   ]
 }

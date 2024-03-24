@@ -65,8 +65,8 @@ auto create_connection(auto &handler, auto &settings, auto &context) {
       .request_timeout = {},
       .ping_frequency = settings.ws.ping_freq,
       // implementation
-      .decode_buffer_size = settings.common.decode_buffer_size,
-      .encode_buffer_size = settings.common.encode_buffer_size,
+      .decode_buffer_size = settings.misc.decode_buffer_size,
+      .encode_buffer_size = settings.misc.encode_buffer_size,
   };
   return web::socket::Client::create(handler, context, config, []() { return std::string(); });
 }
@@ -82,7 +82,7 @@ struct create_metrics final : public core::metrics::Factory {
 MarketData::MarketData(Handler &handler, io::Context &context, uint16_t stream_id, Shared &shared, size_t index)
     : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_)}, index_{index},
       connection_{create_connection(*this, shared.settings, context)},
-      decode_buffer_(shared.settings.common.decode_buffer_size),
+      decode_buffer_(shared.settings.misc.decode_buffer_size),
       counter_{
           .disconnect = create_metrics(shared.settings, name_, "disconnect"sv),
       },
@@ -199,8 +199,8 @@ void MarketData::subscribe(std::span<Symbol const> const &symbols) {
   subscribe(
       "futures.order_book_update"sv,
       symbols,
-      utils::safe_cast(shared_.settings.common.order_book_freq),
-      shared_.settings.common.order_book_depth);
+      utils::safe_cast(shared_.settings.misc.order_book_freq),
+      shared_.settings.misc.order_book_depth);
 }
 
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols) {

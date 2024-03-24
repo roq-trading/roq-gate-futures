@@ -64,8 +64,8 @@ auto create_connection(auto &handler, auto &settings, auto &context) {
       .ping_frequency = settings.rest.ping_freq,
       .ping_path = settings.rest.ping_path,
       // implementation
-      .decode_buffer_size = settings.common.decode_buffer_size,
-      .encode_buffer_size = settings.common.encode_buffer_size,
+      .decode_buffer_size = settings.misc.decode_buffer_size,
+      .encode_buffer_size = settings.misc.encode_buffer_size,
   };
   return web::rest::Client::create(handler, context, config);
 }
@@ -81,7 +81,7 @@ struct create_metrics final : public core::metrics::Factory {
 Rest::Rest(Handler &handler, io::Context &context, uint16_t stream_id, Shared &shared)
     : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_)},
       connection_{create_connection(*this, shared.settings, context)},
-      decode_buffer_(shared.settings.common.decode_buffer_size),
+      decode_buffer_(shared.settings.misc.decode_buffer_size),
       counter_{
           .disconnect = create_metrics(shared.settings, name_, "disconnect"sv),
       },
@@ -354,7 +354,7 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
 
 void Rest::get_order_book(std::string_view const &symbol) {
   profile_.order_book([&]() {
-    auto query = fmt::format("?contract={}&limit={}&with_id=true"sv, symbol, shared_.settings.common.order_book_depth);
+    auto query = fmt::format("?contract={}&limit={}&with_id=true"sv, symbol, shared_.settings.misc.order_book_depth);
     auto request = web::rest::Request{
         .method = web::http::Method::GET,
         .path = shared_.api.get_order_book,

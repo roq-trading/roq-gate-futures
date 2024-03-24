@@ -7,13 +7,13 @@
       "type": "std::string",
       "required": true,
       "default": "gate-futures",
-      "description": "exchange identifier (string)"
+      "description": "Exchange identifier"
     },
     {
       "name": "api",
       "type": "std::string",
       "default": "btc",
-      "description": "api (btc,usdt)"
+      "description": "API (:code:`btc` or :code:`usdt`)"
     }
   ]
 }

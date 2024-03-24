@@ -5,9 +5,6 @@
 roq-gate-futures
 ================
 
-.. important::
-   This gateway needs sponsorship to complete certain features.
-
 
 Links
 -----
@@ -16,16 +13,7 @@ Links
 * `Documentation <https://www.gate.io/api2>`__
 
 
-Purpose
--------
-
-* Maintain network connectivity with the Gate.io Futures exchange
-* Route exchange updates to connected clients
-* Route client requests to the relevant exchange accounts
-* Stream all messages to an event-log
-
-
-Overview
+Supports
 --------
 
 .. grid::  2
@@ -42,6 +30,8 @@ Overview
         - |checkmark|
       * - Options
         -
+      * - Combos
+        -
 
   .. grid-item-card::  Market Data
 
@@ -54,9 +44,9 @@ Overview
         -
       * - Top of Book
         - |checkmark|
-      * - Market by Price (L2)
+      * - Market by Price
         - |checkmark|
-      * - Market by Order (L3)
+      * - Market by Order
         -
       * - Trade Summary
         - |checkmark|
@@ -76,7 +66,7 @@ Overview
         - |checkmark|
       * - Cancel All
         - |checkmark|
-      * - Auto Cancellation
+      * - Auto-Cancel
         -
 
   .. grid-item-card::  Account Management
@@ -89,65 +79,56 @@ Overview
       * - Funds
         - |checkmark|
 
-* Data center located in: TBD
 
-
-Conda
------
+Installing
+----------
 
 * :ref:`Using Conda <tutorial-conda>`
 
-.. tab:: Install
+.. tab:: Stable
 
-  .. code-block:: bash
+  .. code-block:: shell
 
-    $ mamba install \
-      --channel https://roq-trading.com/conda/stable \
-      roq-gate-futures
+     $ mamba install \
+           --channel https://roq-trading.com/conda/stable \
+           roq-gate-futures
 
-.. tab:: Configure
+.. tab:: Unstable
 
-  .. code-block:: bash
+  .. code-block:: shell
 
-    $ cp $CONDA_PREFIX/share/roq-gate-futures/config.toml $CONFIG_FILE_PATH
-
-    # Then modify $CONFIG_FILE_PATH to match your specific configuration
-
-.. tab:: Run
-
-  .. code-block:: bash
-
-    $ roq-gate-futures \
-          --name "gate-futures" \
-          --config_file "$CONFIG_FILE_PATH" \
-          --client_listen_address "$UNIX_SOCKET_PATH" \
-          --service_listen_address "$TCP_LISTEN_PORT" \
-          --flagfile "$FLAG_FILE"
+     $ mamba install \
+           --channel https://roq-trading.com/conda/unstable \
+           roq-gate-futures
 
 
-Config
-------
+Using
+-----
 
-* :ref:`Common Config <gateway-config>`
+.. code-block:: shell
 
+   $ roq-gate-futures \
+         --name "gate-futures" \
+         --config_file $CONFIG_FILE_PATH \
+         --client_listen_address $UNIX_SOCKET_PATH \
+         --flagfile $ENVIRONMENT_FLAGFILE
+
+
+.. _roq-gate-futures-flags:
 
 Flags
 -----
 
 * :ref:`Using Flags <abseil-cpp>`
-* :ref:`Common Flags <gateway-flags>`
+* :ref:`Gateway Flags <gateway-flags>`
 
-.. code-block:: bash
+.. code-block:: shell
 
    $ roq-gate-futures --help
 
 .. tab:: Flags
 
    .. include:: flags/flags.rstinc
-
-.. tab:: Common
-
-   .. include:: flags/common.rstinc
 
 .. tab:: REST
 
@@ -157,30 +138,50 @@ Flags
 
    .. include:: flags/ws.rstinc
 
+.. tab:: Misc
+
+   .. include:: flags/misc.rstinc
+
 
 
 Environments
 ------------
 
-.. code-block:: bash
+.. tab:: Prod (USDT)
 
-  $ $CONDA_PREFIX/share/roq-gate-futures/flags
+   .. code-block:: shell
 
-BTC
-~~~
-
-.. tab:: Prod
-
-   .. include:: flags/prod/flags-btc.cfg
-     :code: ini
-
-USDT
-~~~~
-
-.. tab:: Prod
+      $ $CONDA_PREFIX/share/roq-gate-futures/flags/prod/flags-usdt.cfg
 
    .. include:: flags/prod/flags-usdt.cfg
-     :code: ini
+     :code: shell
+
+.. tab:: Prod (BTC)
+
+   .. code-block:: shell
+
+      $ $CONDA_PREFIX/share/roq-gate-futures/flags/prod/flags-btc.cfg
+
+   .. include:: flags/prod/flags-btc.cfg
+     :code: shell
+
+
+Configuration
+-------------
+
+* :ref:`Gateway Config <gateway-config>`
+
+.. code-block:: shell
+
+   $ $CONDA_PREFIX/share/roq-gate-futures/config.toml
+
+.. important::
+
+   The template will be replaced when the software is upgraded.
+   Make a copy and modify to your needs.
+
+.. include:: config.toml
+   :code: toml
 
 
 Market Data
