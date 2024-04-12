@@ -40,7 +40,7 @@ auto create_name(auto stream_id) {
   return fmt::format("{}:{}"sv, stream_id, NAME);
 }
 
-auto create_connection(auto &handler, auto &settings, auto &context, auto const &uri, auto const &query) {
+auto create_connection(auto &handler, auto &settings, auto &context, auto &uri, auto &query) {
   io::web::URI uri_{uri};
   auto config = web::socket::Client::Config{
       // connection
@@ -152,7 +152,7 @@ void DropCopy::operator()(web::socket::Client::Latency const &latency) {
   TraceInfo trace_info;
   auto external_latency = ExternalLatency{
       .stream_id = stream_id_,
-      .account = account_.get_name(),
+      .account = account_.name,
       .latency = latency.sample,
   };
   create_trace_and_dispatch(handler_, trace_info, external_latency);
@@ -172,7 +172,7 @@ void DropCopy::operator()(ConnectionStatus status) {
     TraceInfo trace_info;
     auto stream_status = StreamStatus{
         .stream_id = stream_id_,
-        .account = account_.get_name(),
+        .account = account_.name,
         .supports = SUPPORTS,
         .transport = Transport::TCP,
         .protocol = Protocol::WS,
@@ -197,15 +197,15 @@ uint32_t DropCopy::download(DropCopyState state) {
       break;
     case SUBSCRIBE:
       subscribe();
-      return {};
+      return 0;
     case DONE:
       (*this)(ConnectionStatus::READY);
       assert(!ready_);
       ready_ = true;
-      return {};
+      return 0;
   }
   assert(false);
-  return {};
+  return 0;
 }
 
 void DropCopy::subscribe() {
@@ -225,17 +225,18 @@ void DropCopy::subscribe(std::string_view const &topic) {
       R"(}})"sv,
       now.count(),
       topic);
-  log::debug("message={}"sv, message);
   (*connection_).send_text(message);
 }
 
 void DropCopy::parse(std::string_view const &message) {
   profile_.parse([&]() {
+    auto log_message = [&]() { log::warn(R"(message="{}")"sv, message); };
     try {
       TraceInfo trace_info;
-      json::Parser::dispatch(*this, message, decode_buffer_, trace_info);
+      if (!json::Parser::dispatch(*this, message, decode_buffer_, trace_info))
+        log_message();
     } catch (...) {
-      log::warn(R"(message="{}")"sv, message);
+      log_message();
       core::tools::UnhandledException::terminate();
     }
   });

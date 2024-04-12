@@ -10,8 +10,10 @@ namespace roq {
 namespace gate_futures {
 
 struct API final {
-  std::string_view get_contracts;
-  std::string_view get_order_book;
+  std::string_view spot_currencies;
+  std::string_view futures_contracts;
+  std::string_view futures_order_book;
+
   // factory
   static API create(Settings const &);
 };

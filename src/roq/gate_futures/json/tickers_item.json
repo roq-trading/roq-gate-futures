@@ -79,6 +79,10 @@
       "name": "volume_24_btc",
       "type": "double",
       "comment": "exchange typo ??? shouldn't it be 24h?"
+    },
+    {
+      "name": "price_type",
+      "type": "std::string_view"
     }
   ]
 }

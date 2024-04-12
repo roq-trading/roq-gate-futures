@@ -192,10 +192,10 @@ uint32_t Rest::download(RestState state) {
       return 1;
     case DONE:
       (*this)(ConnectionStatus::READY);
-      return {};
+      return 0;
   }
   assert(false);
-  return {};
+  return 0;
 }
 
 // currencies
@@ -204,7 +204,7 @@ void Rest::get_currencies() {
   profile_.currencies([&]() {
     auto request = web::rest::Request{
         .method = web::http::Method::GET,
-        .path = "/spot/currencies"sv,
+        .path = shared_.api.spot_currencies,
         .query = {},
         .accept = web::http::Accept::APPLICATION_JSON,
         .content_type = {},
@@ -217,7 +217,7 @@ void Rest::get_currencies() {
       Trace event{trace_info, response};
       get_currencies_ack(event, sequence);
     };
-    (*connection_)("currencies"sv, request, callback);
+    (*connection_)("spot-currencies"sv, request, callback);
   });
 }
 
@@ -253,7 +253,7 @@ void Rest::get_contracts() {
   profile_.contracts([&]() {
     auto request = web::rest::Request{
         .method = web::http::Method::GET,
-        .path = shared_.api.get_contracts,
+        .path = shared_.api.futures_contracts,
         .query = {},
         .accept = web::http::Accept::APPLICATION_JSON,
         .content_type = {},
@@ -266,7 +266,7 @@ void Rest::get_contracts() {
       Trace event{trace_info, response};
       get_contracts_ack(event, sequence);
     };
-    (*connection_)("contracts"sv, request, callback);
+    (*connection_)("futures-contracts"sv, request, callback);
   });
 }
 
@@ -300,7 +300,6 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
   for (size_t i = 0; i < std::size(contracts.data); ++i) {
     auto &item = contracts.data[i];
     log::info<2>("item={}"sv, item);
-    log::debug("item={}"sv, item);
     auto symbol = item.name;
     auto discard = shared_.discard_symbol(symbol);
     auto reference_data = ReferenceData{
@@ -357,7 +356,7 @@ void Rest::get_order_book(std::string_view const &symbol) {
     auto query = fmt::format("?contract={}&limit={}&with_id=true"sv, symbol, shared_.settings.misc.order_book_depth);
     auto request = web::rest::Request{
         .method = web::http::Method::GET,
-        .path = shared_.api.get_order_book,
+        .path = shared_.api.futures_order_book,
         .query = query,
         .accept = web::http::Accept::APPLICATION_JSON,
         .content_type = {},
@@ -370,7 +369,7 @@ void Rest::get_order_book(std::string_view const &symbol) {
       Trace event{trace_info, response};
       get_order_book_ack(event, symbol);
     };
-    (*connection_)("order_book"sv, request, callback);
+    (*connection_)("futures-order-book"sv, request, callback);
   });
 }
 
@@ -392,7 +391,7 @@ void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::stri
 void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view const &symbol) {
   auto &trace_info = event.trace_info;
   auto &order_book = event.value;
-  log::info<3>("trace_info={}, order_book={}"sv, trace_info, order_book);
+  log::info<3>("order_book={}"sv, order_book);
   auto sequence = order_book.id;
   auto &sequencer = shared_.mbp_sequencer[symbol];
   auto &mbp = shared_.get_mbp();
@@ -414,8 +413,8 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
   auto exchange_time_utc = std::chrono::nanoseconds{static_cast<int64_t>(order_book.update * 1.0e9)};
   try {
     auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence, auto retries, auto delay) {
-      log::debug(
-          R"(PUBLISH SNAPSHOT symbol="{}", sequence={}, retries={}, delay={})"sv,
+      log::info(
+          R"(DEBUG PUBLISH SNAPSHOT symbol="{}", sequence={}, retries={}, delay={})"sv,
           symbol,
           sequence,
           retries,
@@ -439,7 +438,7 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
       shared_(event, true, apply_updates);
     };
     auto request_snapshot = [&](auto retries) {
-      log::debug(R"(REQUEST symbol="{}" (retries={}))"sv, symbol, retries);
+      log::info(R"(DEBUG REQUEST symbol="{}" (retries={}))"sv, symbol, retries);
       if (shared_.settings.ws.mbp_request_max_retries && shared_.settings.ws.mbp_request_max_retries < retries) {
         log::fatal(R"(Unexpected: symbol="{}", retries={})"sv, symbol, retries);
       }
@@ -459,10 +458,7 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
 void Rest::check_request_queue(std::chrono::nanoseconds now) {
   shared_.depth_request_queue.dispatch(
       [&](auto now) { return shared_.rate_limiter.can_request(now); },
-      [&](auto &symbol) {
-        log::debug(R"(Requesting order book snapshot symbol="{}")"sv, symbol);
-        get_order_book(symbol);
-      },
+      [&](auto &symbol) { get_order_book(symbol); },
       now);
 }
 
@@ -471,7 +467,6 @@ void Rest::process_response(
     web::rest::Response const &response, SuccessHandler success_handler, ErrorHandler error_handler) {
   try {
     auto [status, category, body] = response.result();
-    log::debug(R"(status={}, category={}, body="{}")"sv, status, category, body);
     switch (category) {
       using enum web::http::Category;
       case SUCCESS:  // 2xx
