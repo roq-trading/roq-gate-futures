@@ -4,23 +4,25 @@
   "values": [
     {
       "name": "current",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "asks",
-      "type": "std::span<PriceSize const>"
+      "type": "PriceSize",
+      "array": "std/span"
     },
     {
       "name": "bids",
-      "type": "std::span<PriceSize const>"
+      "type": "PriceSize",
+      "array": "std/span"
     },
     {
       "name": "id",
-      "type": "uint64_t"
+      "type": "std/uint64"
     },
     {
       "name": "update",
-      "type": "double"
+      "type": "std/double"
     }
   ]
 }

@@ -4,52 +4,52 @@
   "values": [
     {
       "name": "request_limit",
-      "type": "uint32_t",
+      "type": "std/uint32",
       "default": "80",
       "description": "Request limit per interval"
     },
     {
       "name": "request_limit_interval",
-      "type": "std::chrono::nanoseconds",
+      "type": "std/nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "10s",
       "description": "Request limit monitor interval"
     },
     {
       "name": "self_trade_prevention",
-      "type": "std::string",
+      "type": "std/string",
       "default": "CN",
       "description": "Self-trade prevention: CN, CO, CB, DC"
     },
     {
       "name": "encode_buffer_size",
-      "type": "uint32_t",
+      "type": "std/uint32",
       "required": true,
       "default": 1048576,
       "description": "Encode buffer size"
     },
     {
       "name": "decode_buffer_size",
-      "type": "uint32_t",
+      "type": "std/uint32",
       "required": true,
       "default": 10485760,
       "description": "Decode buffer size"
     },
     {
       "name": "mbp_allow_price_inversion",
-      "type": "bool",
+      "type": "std/bool",
       "default": true,
       "description": "Allow price inversion?"
     },
     {
       "name": "order_book_depth",
-      "type": "uint32_t",
+      "type": "std/uint32",
       "default": 20,
       "description": "Order book depth"
     },
     {
       "name": "order_book_freq",
-      "type": "std::chrono::nanoseconds",
+      "type": "std/nanoseconds",
       "validator": "roq::flags::validators::TimePeriod",
       "default": "100ms",
       "description": "Order book frequency"

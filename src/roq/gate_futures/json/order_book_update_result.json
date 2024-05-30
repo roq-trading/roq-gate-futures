@@ -5,32 +5,34 @@
     {
       "raw": "t",
       "name": "timestamp",
-      "type": "std::chrono::milliseconds"
+      "type": "std/milliseconds"
     },
     {
       "raw": "s",
       "name": "symbol",
-      "type": "std::string_view"
+      "type": "std/string_view"
     },
     {
       "raw": "U",
       "name": "first_update_id",
-      "type": "uint64_t"
+      "type": "std/uint64"
     },
     {
       "raw": "u",
       "name": "last_update_id",
-      "type": "uint64_t"
+      "type": "std/uint64"
     },
     {
       "raw": "b",
       "name": "bids",
-      "type": "std::span<PriceSize const>"
+      "type": "PriceSize",
+      "array": "std/span"
     },
     {
       "raw": "a",
       "name": "asks",
-      "type": "std::span<PriceSize const>"
+      "type": "PriceSize",
+      "array": "std/span"
     }
   ]
 }

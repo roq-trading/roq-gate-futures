@@ -4,27 +4,27 @@
   "values": [
     {
       "name": "size",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "id",
-      "type": "int64_t"
+      "type": "std/int64"
     },
     {
       "name": "create_time",
-      "type": "std::chrono::seconds"
+      "type": "std/seconds"
     },
     {
       "name": "create_time_ms",
-      "type": "std::chrono::milliseconds"
+      "type": "std/milliseconds"
     },
     {
       "name": "price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "contract",
-      "type": "std::string_view"
+      "type": "std/string_view"
     }
   ]
 }

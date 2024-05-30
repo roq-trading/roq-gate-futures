@@ -5,12 +5,12 @@
     {
       "raw": "p",
       "name": "price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "raw": "s",
       "name": "size",
-      "type": "double"
+      "type": "std/double"
     }
   ]
 }

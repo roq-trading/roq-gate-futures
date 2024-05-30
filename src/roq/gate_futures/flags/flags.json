@@ -4,14 +4,14 @@
   "values": [
     {
       "name": "exchange",
-      "type": "std::string",
+      "type": "std/string",
       "required": true,
       "default": "gate-futures",
       "description": "Exchange identifier"
     },
     {
       "name": "api",
-      "type": "std::string",
+      "type": "std/string",
       "default": "btc",
       "description": "API (:code:`btc` or :code:`usdt`)"
     }

@@ -4,35 +4,35 @@
   "values": [
     {
       "name": "currency",
-      "type": "std::string_view"
+      "type": "std/string_view"
     },
     {
       "name": "delisted",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "withdraw_disabled",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "withdraw_delayed",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "deposit_disabled",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "trade_disabled",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "fixed_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "chain",
-      "type": "std::string_view"
+      "type": "std/string_view"
     }
   ]
 }

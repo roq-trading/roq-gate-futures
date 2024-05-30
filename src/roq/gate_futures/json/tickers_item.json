@@ -4,85 +4,85 @@
   "values": [
     {
       "name": "contract",
-      "type": "std::string_view"
+      "type": "std/string_view"
     },
     {
       "name": "last",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "change_percentage",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "funding_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "mark_price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "index_price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "total_size",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24h",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "quanto_base_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24h_usd",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24h_btc",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "funding_rate_indicative",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24h_quote",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24h_settle",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24h_base",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "low_24h",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "high_24h",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "volume_24_usd",
-      "type": "double",
+      "type": "std/double",
       "comment": "exchange typo ??? shouldn't it be 24h?"
     },
     {
       "name": "volume_24_btc",
-      "type": "double",
+      "type": "std/double",
       "comment": "exchange typo ??? shouldn't it be 24h?"
     },
     {
       "name": "price_type",
-      "type": "std::string_view"
+      "type": "std/string_view"
     }
   ]
 }

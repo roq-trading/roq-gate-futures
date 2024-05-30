@@ -4,59 +4,59 @@
   "values": [
     {
       "name": "funding_rate_indicative",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "mark_price_round",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "funding_offset",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "in_delisting",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "risk_limit_base",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "interest_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "index_price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "order_price_round",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "order_size_min",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "ref_rebate_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "name",
-      "type": "std::string_view"
+      "type": "std/string_view"
     },
     {
       "name": "ref_discount_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "order_price_deviate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "maintenance_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "mark_type",
@@ -64,7 +64,7 @@
     },
     {
       "name": "funding_interval",
-      "type": "int64_t"
+      "type": "std/int64"
     },
     {
       "name": "type",
@@ -72,112 +72,112 @@
     },
     {
       "name": "risk_limit_step",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "enable_bonus",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "leverage_min",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "funding_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "last_price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "mark_price",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "order_size_max",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "funding_next_apply",
-      "type": "std::chrono::seconds"
+      "type": "std/seconds"
     },
     {
       "name": "short_users",
-      "type": "int32_t"
+      "type": "std/int32"
     },
     {
       "name": "config_change_time",
-      "type": "std::chrono::seconds"
+      "type": "std/seconds"
     },
     {
       "name": "trade_size",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "position_size",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "long_users",
-      "type": "int32_t"
+      "type": "std/int32"
     },
     {
       "name": "quanto_multiplier",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "funding_impact_value",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "leverage_max",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "risk_limit_max",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "maker_fee_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "taker_fee_rate",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "orders_limit",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "trade_id",
-      "type": "int64_t"
+      "type": "std/int64"
     },
     {
       "name": "orderbook_id",
-      "type": "int64_t"
+      "type": "std/int64"
     },
     {
       "name": "enable_credit",
-      "type": "bool"
+      "type": "std/bool"
     },
     {
       "name": "create_time",
-      "type": "std::chrono::seconds",
+      "type": "std/seconds",
       "comment": "not sure if this is seconds or milliseconds"
     },
     {
       "name": "funding_cap_ratio",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "voucher_leverage",
-      "type": "double"
+      "type": "std/double"
     },
     {
       "name": "cross_leverage_default",
-      "type": "double"
+      "type": "std/double"
     }
   ]
 }

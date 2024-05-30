@@ -7,11 +7,11 @@
     },
     {
       "name": "time",
-      "type": "std::chrono::seconds"
+      "type": "std/seconds"
     },
     {
       "name": "time_ms",
-      "type": "std::chrono::milliseconds"
+      "type": "std/milliseconds"
     },
     {
       "name": "channel",
@@ -23,7 +23,8 @@
     },
     {
       "name": "result",
-      "type": "std::span<TickersItem const>"
+      "type": "TickersItem",
+      "array": "std/span"
     },
     {
       "name": "error"
