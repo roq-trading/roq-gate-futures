@@ -1,10 +1,10 @@
 {
-  "name": "Contracts",
+  "name": "roq/gate_futures/fix/Contracts",
   "type": "array",
   "values": [
     {
       "name": "data",
-      "type": "ContractsItem",
+      "type": "roq/gate_futures/json/ContractsItem",
       "array": "std/span"
     }
   ]

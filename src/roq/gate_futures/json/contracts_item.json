@@ -1,5 +1,5 @@
 {
-  "name": "ContractsItem",
+  "name": "roq/gate_futures/fix/ContractsItem",
   "type": "item",
   "values": [
     {
@@ -60,7 +60,7 @@
     },
     {
       "name": "mark_type",
-      "type": "MarkType"
+      "type": "roq/gate_futures/json/MarkType"
     },
     {
       "name": "funding_interval",
@@ -68,7 +68,7 @@
     },
     {
       "name": "type",
-      "type": "ContractType"
+      "type": "roq/gate_futures/json/ContractType"
     },
     {
       "name": "risk_limit_step",

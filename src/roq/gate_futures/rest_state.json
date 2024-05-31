@@ -1,5 +1,5 @@
 {
-  "name": "RestState",
+  "name": "roq/gate_futures/RestState",
   "type": "enum",
   "values": [
     {

@@ -1,10 +1,10 @@
 {
-  "name": "Currencies",
+  "name": "roq/gate_futures/fix/Currencies",
   "type": "array",
   "values": [
     {
       "name": "data",
-      "type": "CurrenciesItem",
+      "type": "roq/gate_futures/json/CurrenciesItem",
       "array": "std/span"
     }
   ]

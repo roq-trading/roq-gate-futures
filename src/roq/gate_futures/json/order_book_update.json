@@ -1,5 +1,5 @@
 {
-  "name": "OrderBookUpdate",
+  "name": "roq/gate_futures/fix/OrderBookUpdate",
   "type": "comp",
   "values": [
     {
@@ -15,15 +15,15 @@
     },
     {
       "name": "channel",
-      "type": "Channel"
+      "type": "roq/gate_futures/json/Channel"
     },
     {
       "name": "event",
-      "type": "Event"
+      "type": "roq/gate_futures/json/Event"
     },
     {
       "name": "result",
-      "type": "OrderBookUpdateResult"
+      "type": "roq/gate_futures/json/OrderBookUpdateResult"
     },
     {
       "name": "error"

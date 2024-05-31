@@ -1,5 +1,5 @@
 {
-  "name": "Event",
+  "name": "roq/gate_futures/fix/Event",
   "type": "enum",
   "values": [
     {

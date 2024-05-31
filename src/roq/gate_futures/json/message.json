@@ -1,5 +1,5 @@
 {
-  "name": "Message",
+  "name": "roq/gate_futures/fix/Message",
   "type": "comp",
   "values": [
     {
@@ -13,11 +13,11 @@
     },
     {
       "name": "channel",
-      "type": "Channel"
+      "type": "roq/gate_futures/json/Channel"
     },
     {
       "name": "event",
-      "type": "Event"
+      "type": "roq/gate_futures/json/Event"
     },
     {
       "name": "result"

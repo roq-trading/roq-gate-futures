@@ -1,5 +1,5 @@
 {
-  "name": "OrderEntryState",
+  "name": "roq/gate_futures/OrderEntryState",
   "type": "enum",
   "values": [
     {

@@ -1,5 +1,5 @@
 {
-  "name": "OrderBookUpdateResult",
+  "name": "roq/gate_futures/fix/OrderBookUpdateResult",
   "type": "comp",
   "values": [
     {
@@ -25,13 +25,13 @@
     {
       "raw": "b",
       "name": "bids",
-      "type": "PriceSize",
+      "type": "roq/gate_futures/json/PriceSize",
       "array": "std/span"
     },
     {
       "raw": "a",
       "name": "asks",
-      "type": "PriceSize",
+      "type": "roq/gate_futures/json/PriceSize",
       "array": "std/span"
     }
   ]

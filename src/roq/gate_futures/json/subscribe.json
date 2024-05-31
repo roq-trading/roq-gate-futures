@@ -1,5 +1,5 @@
 {
-  "name": "Subscribe",
+  "name": "roq/gate_futures/fix/Subscribe",
   "type": "comp",
   "values": [
     {
@@ -15,15 +15,15 @@
     },
     {
       "name": "channel",
-      "type": "Channel"
+      "type": "roq/gate_futures/json/Channel"
     },
     {
       "name": "event",
-      "type": "Event"
+      "type": "roq/gate_futures/json/Event"
     },
     {
       "name": "result",
-      "type": "SubscribeResult"
+      "type": "roq/gate_futures/json/SubscribeResult"
     },
     {
       "name": "error"

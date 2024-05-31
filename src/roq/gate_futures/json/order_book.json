@@ -1,5 +1,5 @@
 {
-  "name": "OrderBook",
+  "name": "roq/gate_futures/fix/OrderBook",
   "type": "comp",
   "values": [
     {
@@ -8,12 +8,12 @@
     },
     {
       "name": "asks",
-      "type": "PriceSize",
+      "type": "roq/gate_futures/json/PriceSize",
       "array": "std/span"
     },
     {
       "name": "bids",
-      "type": "PriceSize",
+      "type": "roq/gate_futures/json/PriceSize",
       "array": "std/span"
     },
     {
