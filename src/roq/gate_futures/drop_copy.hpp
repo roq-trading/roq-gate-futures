@@ -33,14 +33,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handl
     virtual void operator()(Trace<FundsUpdate> const &, bool is_last) = 0;
   };
 
-  DropCopy(
-      Handler &,
-      io::Context &,
-      uint16_t stream_id,
-      Account &,
-      Shared &,
-      std::string_view const &uri,
-      std::string_view const &query);
+  DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &, std::string_view const &uri, std::string_view const &query);
 
   DropCopy(DropCopy &&) = delete;
   DropCopy(DropCopy const &) = delete;

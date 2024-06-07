@@ -12,11 +12,7 @@ namespace roq {
 namespace gate_futures {
 namespace json {
 
-bool Parser::dispatch(
-    Handler &handler,
-    std::string_view const &message,
-    std::span<std::byte> const &buffer,
-    TraceInfo const &trace_info) {
+bool Parser::dispatch(Handler &handler, std::string_view const &message, std::span<std::byte> const &buffer, TraceInfo const &trace_info) {
   Message message_{message, buffer};
   switch (message_.event) {
     using enum Event::type_t;
