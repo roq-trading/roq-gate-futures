@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/fix/MarkType",
+  "name": "roq/gate_futures/json/MarkType",
   "type": "enum",
   "values": [
     {

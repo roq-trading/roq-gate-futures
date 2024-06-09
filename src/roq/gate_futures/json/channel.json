@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/fix/Channel",
+  "name": "roq/gate_futures/json/Channel",
   "type": "enum",
   "values": [
     {

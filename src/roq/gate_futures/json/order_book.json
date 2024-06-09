@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/fix/OrderBook",
+  "name": "roq/gate_futures/json/OrderBook",
   "type": "comp",
   "values": [
     {

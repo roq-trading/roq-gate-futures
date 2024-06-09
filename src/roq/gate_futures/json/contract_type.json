@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/fix/ContractType",
+  "name": "roq/gate_futures/json/ContractType",
   "type": "enum",
   "values": [
     {

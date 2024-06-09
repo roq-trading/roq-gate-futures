@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/fix/TickersItem",
+  "name": "roq/gate_futures/json/TickersItem",
   "type": "item",
   "values": [
     {
