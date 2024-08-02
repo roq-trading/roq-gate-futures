@@ -35,7 +35,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handl
 
   DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &, std::string_view const &uri, std::string_view const &query);
 
-  DropCopy(DropCopy &&) = delete;
+  DropCopy(DropCopy &&) = default;
   DropCopy(DropCopy const &) = delete;
 
   bool ready() const;
