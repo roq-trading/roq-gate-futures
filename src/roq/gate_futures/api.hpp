@@ -14,6 +14,11 @@ struct API final {
   std::string_view futures_contracts;
   std::string_view futures_order_book;
 
+  std::string_view accounts;
+  std::string_view positions;
+  std::string_view orders;
+  std::string_view trades;
+
   // factory
   static API create(Settings const &);
 };

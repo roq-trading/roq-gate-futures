@@ -28,6 +28,12 @@
     },
     {
       "name": "error"
+    },
+    {
+      "name": "conn_id"
+    },
+    {
+      "name": "trace_id"
     }
   ]
 }

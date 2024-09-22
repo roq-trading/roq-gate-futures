@@ -18,6 +18,11 @@
 
 #include "roq/server.hpp"
 
+#include "roq/gate_futures/json/accounts.hpp"
+#include "roq/gate_futures/json/orders.hpp"
+#include "roq/gate_futures/json/positions.hpp"
+#include "roq/gate_futures/json/trades2.hpp"
+
 #include "roq/gate_futures/account.hpp"
 #include "roq/gate_futures/order_entry_state.hpp"
 #include "roq/gate_futures/shared.hpp"
@@ -59,6 +64,32 @@ struct OrderEntry final : public web::rest::Client::Handler {
 
   uint32_t download(OrderEntryState state);
 
+  void get_accounts();
+  void get_accounts_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void operator()(Trace<json::Accounts> const &);
+
+  void get_positions();
+  void get_positions_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void operator()(Trace<json::Positions> const &);
+
+  void get_orders();
+  void get_orders_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void operator()(Trace<json::Orders> const &);
+
+  void get_trades();
+  void get_trades_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void operator()(Trace<json::Trades2> const &);
+
+  template <typename SuccessHandler, typename ErrorHandler>
+  void process_response(web::rest::Response const &, SuccessHandler, ErrorHandler);
+
+  template <typename... Args>
+  void operator()(Trace<server::oms::Response> const &, uint8_t user_id, uint64_t order_id, Args &&...);
+
+  void operator()(Trace<server::oms::OrderUpdate> const &, std::string_view const &client_order_id);
+
+  void waf_limit_violation();
+
  private:
   Handler &handler_;
   // config
@@ -73,8 +104,14 @@ struct OrderEntry final : public web::rest::Client::Handler {
     utils::metrics::Counter disconnect;
   } counter_;
   struct {
-    utils::metrics::Profile create_order, create_order_ack,  //
-        cancel_order, cancel_order_ack,                      //
+    utils::metrics::Profile  //
+        accounts,
+        accounts_ack,                    //
+        positions, positions_ack,        //
+        orders, orders_ack,              //
+        trades, trades_ack,              //
+        create_order, create_order_ack,  //
+        cancel_order, cancel_order_ack,  //
         cancel_all_orders, cancel_all_orders_ack;
   } profile_;
   struct {
@@ -82,6 +119,8 @@ struct OrderEntry final : public web::rest::Client::Handler {
   } latency_;
   // account
   Account &account_;
+  // shared
+  Shared &shared_;
   // state
   ConnectionStatus status_ = {};
   core::Download<OrderEntryState> download_;

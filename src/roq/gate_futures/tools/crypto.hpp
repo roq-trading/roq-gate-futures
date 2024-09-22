@@ -16,26 +16,25 @@ namespace gate_futures {
 namespace tools {
 
 struct Crypto final {
-  Crypto(std::string_view const &key, std::string_view const &secret, std::string_view const &passphrase);
+  Crypto(std::string_view const &key, std::string_view const &secret);
 
   Crypto(Crypto &&) = delete;
   Crypto(Crypto const &) = delete;
 
-  std::string create_headers_v1(
-      web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body, std::chrono::milliseconds now);
-
-  std::string create_headers_v2(
-      web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body, std::chrono::milliseconds now);
+  std::string create_headers(
+      web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body, std::chrono::seconds now);
 
  private:
-  using MAC = utils::mac::HMAC<utils::hash::SHA256>;
+  using Hash = utils::hash::SHA512;
+  using Signature = std::array<std::byte, Hash::DIGEST_LENGTH>;
+  using MAC = utils::mac::HMAC<utils::hash::SHA512>;
   using Digest = std::array<std::byte, MAC::DIGEST_LENGTH>;
 
   std::string const key_;
+  Hash hash_;
+  Signature signature_;
   MAC mac_;
   Digest digest_;
-  std::string const passphrase_;
-  std::string const signed_passphrase_;
 };
 
 }  // namespace tools

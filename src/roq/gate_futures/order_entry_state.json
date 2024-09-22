@@ -3,6 +3,18 @@
   "type": "enum",
   "values": [
     {
+      "name": "accounts"
+    },
+    {
+      "name": "positions"
+    },
+    {
+      "name": "orders"
+    },
+    {
+      "name": "trades"
+    },
+    {
       "name": "done"
     }
   ]

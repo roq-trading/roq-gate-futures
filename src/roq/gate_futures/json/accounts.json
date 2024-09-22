@@ -1,0 +1,106 @@
+{
+  "name": "roq/gate_futures/json/Accounts",
+  "type": "comp",
+  "values": [
+    {
+      "name": "total",
+      "type": "std/double"
+    },
+    {
+      "name": "unrealised_pnl",
+      "type": "std/double"
+    },
+    {
+      "name": "position_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "order_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "available",
+      "type": "std/double"
+    },
+    {
+      "name": "point",
+      "type": "std/double"
+    },
+    {
+      "name": "currency",
+      "type": "std/string_view"
+    },
+    {
+      "name": "in_dual_mode",
+      "type": "std/bool"
+    },
+    {
+      "name": "enable_credit",
+      "type": "std/bool"
+    },
+    {
+      "name": "position_initial_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "maintenance_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "bonus",
+      "type": "std/double"
+    },
+    {
+      "name": "enable_evolved_classic",
+      "type": "std/bool"
+    },
+    {
+      "name": "user",
+      "type": "std/int64"
+    },
+    {
+      "name": "update_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "update_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "margin_mode",
+      "type": "std/int32"
+    },
+    {
+      "name": "cross_initial_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_maintenance_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_order_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_unrealised_pnl",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_available",
+      "type": "std/double"
+    },
+    {
+      "name": "isolated_position_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "enable_new_dual_mode",
+      "type": "std/bool"
+    },
+    {
+      "name": "history",
+      "type": "roq/gate_futures/json/AccountsHistory"
+    }
+  ]
+}

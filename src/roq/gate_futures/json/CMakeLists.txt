@@ -5,6 +5,8 @@ set(SOURCES map.cpp parser.cpp utils.cpp)
 include(RoqAutogen)
 
 set(AUTOGEN_SCHEMAS
+    accounts_history.json
+    accounts.json
     book_ticker.json
     book_ticker_result.json
     channel.json
@@ -19,11 +21,17 @@ set(AUTOGEN_SCHEMAS
     order_book.json
     order_book_update.json
     order_book_update_result.json
+    orders_item.json
+    orders.json
+    positions_item.json
+    positions.json
     price_size.json
     subscribe.json
     subscribe_result.json
     tickers_item.json
     tickers.json
+    trades2_item.json
+    trades2.json
     trades_item.json
     trades.json)
 
@@ -55,4 +63,4 @@ add_library(${TARGET_NAME} OBJECT ${SOURCES} ${AUTOGEN_SOURCES})
 
 add_dependencies(${TARGET_NAME} autogen-json-headers)
 
-target_link_libraries(${TARGET_NAME} roq-core::roq-core roq-utils::roq-utils roq-logging::roq-logging fmt::fmt)
+target_link_libraries(${TARGET_NAME} PRIVATE roq-core::roq-core roq-utils::roq-utils roq-logging::roq-logging fmt::fmt)

@@ -1,0 +1,98 @@
+{
+  "name": "roq/gate_futures/json/OrdersItem",
+  "type": "item",
+  "values": [
+    {
+      "name": "id",
+      "type": "std/int64"
+    },
+    {
+      "name": "user",
+      "type": "std/int64"
+    },
+    {
+      "name": "contract",
+      "type": "std/string_view"
+    },
+    {
+      "name": "create_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "size",
+      "type": "std/int32"
+    },
+    {
+      "name": "iceberg",
+      "type": "std/int32"
+    },
+    {
+      "name": "left",
+      "type": "std/int32"
+    },
+    {
+      "name": "price",
+      "type": "std/double"
+    },
+    {
+      "name": "fill_price",
+      "type": "std/double"
+    },
+    {
+      "name": "mkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "tkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "tif",
+      "type": "std/string_view"
+    },
+    {
+      "name": "refu",
+      "type": "std/int32"
+    },
+    {
+      "name": "is_reduce_only",
+      "type": "std/bool"
+    },
+    {
+      "name": "is_close",
+      "type": "std/bool"
+    },
+    {
+      "name": "is_liq",
+      "type": "std/bool"
+    },
+    {
+      "name": "text",
+      "type": "std/string_view"
+    },
+    {
+      "name": "status",
+      "type": "std/string_view"
+    },
+    {
+      "name": "finish_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "finish_as",
+      "type": "std/string_view"
+    },
+    {
+      "name": "stdp_id",
+      "type": "std/int32"
+    },
+    {
+      "name": "stp_act",
+      "type": "std/string_view"
+    },
+    {
+      "name": "amend_text",
+      "type": "std/string_view"
+    }
+  ]
+}

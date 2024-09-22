@@ -1,5 +1,7 @@
 !!! THIS FILE HAS BEEN AUTO-GENERATED !!!
 roq-gate-futures-json
+accounts_history.hpp
+accounts.hpp
 book_ticker.hpp
 book_ticker_result.hpp
 channel.hpp
@@ -14,13 +16,21 @@ message.hpp
 order_book.hpp
 order_book_update.hpp
 order_book_update_result.hpp
+orders_item.hpp
+orders.hpp
+positions_item.hpp
+positions.hpp
 price_size.hpp
 subscribe.hpp
 subscribe_result.hpp
 tickers_item.hpp
 tickers.hpp
+trades2_item.hpp
+trades2.hpp
 trades_item.hpp
 trades.hpp
+accounts_history.cpp
+accounts.cpp
 book_ticker.cpp
 book_ticker_result.cpp
 channel.cpp
@@ -35,10 +45,16 @@ message.cpp
 order_book.cpp
 order_book_update.cpp
 order_book_update_result.cpp
+orders_item.cpp
+orders.cpp
+positions_item.cpp
+positions.cpp
 price_size.cpp
 subscribe.cpp
 subscribe_result.cpp
 tickers_item.cpp
 tickers.cpp
+trades2_item.cpp
+trades2.cpp
 trades_item.cpp
 trades.cpp

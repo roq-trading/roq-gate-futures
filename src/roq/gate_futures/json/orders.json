@@ -1,0 +1,11 @@
+{
+  "name": "roq/gate_futures/json/Orders",
+  "type": "array",
+  "values": [
+    {
+      "name": "data",
+      "type": "roq/gate_futures/json/OrdersItem",
+      "array": "std/span"
+    }
+  ]
+}
