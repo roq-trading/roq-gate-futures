@@ -116,6 +116,75 @@ void DropCopy::operator()(metrics::Writer &writer) {
       .write(latency_.heartbeat, metrics::Type::LATENCY);
 }
 
+uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id) {
+  /*
+  auto &create_order = event.value;
+  auto request_id_2 = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto const channel = "futures.order_place"sv;
+  auto const event_2 = "api"sv;
+  auto message = fmt::format(
+      R"({{)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{{)"
+      R"("req_id":"{}",)"
+      R"("req_param":{{)"
+      R"("contract":"{}",)"
+      R"("size":{},)"
+      R"("iceberg":0,)"
+      R"("price":"{}",)"
+      R"("close":false,)"
+      R"("reduce_only":false,)"  // XXX
+      R"("tif":"GTC",)"          // XXX
+      R"("text":"t-{}",)"        // XXX
+      R"(}})"
+      R"(}})"
+      R"(}})"sv,
+      request_id_2,
+      now.count(),
+      channel,
+      event_2,
+      request_id_2,
+      order.symbol,
+      Decimal{create_order.quantity, order.quantity_precision.precision},
+      Decimal{create_order.price, order.price_precision.precision}),
+      request_id);
+  // XXX stp_act
+  log::debug(R"(message="{}")"sv, message);
+  (*connection_).send_text(message);
+  */
+  return stream_id_;
+}
+/*
+contract  string  true  Futures contract
+size  int64 true  Order size. Specify positive number to make a bid, and negative number to ask
+iceberg int64 true  Display size for iceberg order. 0 for non-iceberg. Note that you will have to pay the taker fee for the hidden size
+price string  false Order price. 0 for market order with tif set as `ioc
+close bool  false Set as true to close the position, with size set to 0
+reduce_only bool  false Set as true to be reduce-only order
+tif string  false Time in force
+text  string  false User defined information. If not empty, must follow the rules below:
+auto_size string  false Set side to close dual-mode position. close_long closes the long side; while close_short the short one. Note size also needs to be set
+to 0 stp_act string  false Self-Trading Prevention Action
+*/
+
+uint16_t DropCopy::operator()(
+    Event<ModifyOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id) {
+  return stream_id_;
+}
+
+uint16_t DropCopy::operator()(
+    Event<CancelOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id) {
+  return stream_id_;
+}
+
+uint16_t DropCopy::operator()(Event<CancelAllOrders> const &, std::string_view const &request_id) {
+  return stream_id_;
+}
+
 void DropCopy::operator()(web::socket::Client::Connected const &) {
 }
 
@@ -290,6 +359,7 @@ void DropCopy::subscribe(std::string_view const &channel, std::string_view const
 }
 
 void DropCopy::parse(std::string_view const &message) {
+  log::debug(R"(message="{}")"sv, message);
   profile_.parse([&]() {
     auto log_message = [&]() { log::warn(R"(message="{}")"sv, message); };
     try {

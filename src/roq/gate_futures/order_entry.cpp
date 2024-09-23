@@ -15,6 +15,7 @@
 
 #include "roq/server/oms/exceptions.hpp"
 
+#include "roq/gate_futures/json/map.hpp"
 #include "roq/gate_futures/json/utils.hpp"
 
 using namespace std::literals;
@@ -334,6 +335,28 @@ void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[ma
 void OrderEntry::operator()(Trace<json::Positions> const &event) {
   auto &[trace_info, positions] = event;
   log::info<2>("positions={}"sv, positions);
+  for (auto &item : positions.data) {
+    log::info<2>("item={}"sv, item);
+    if (shared_.discard_symbol(item.contract))
+      continue;
+    auto long_quantity = std::max<double>(0.0, item.size);
+    auto short_quantity = std::max<double>(0.0, -item.size);
+    auto position_update = PositionUpdate{
+        .stream_id = stream_id_,
+        .account = account_.name,
+        .exchange = shared_.settings.exchange,
+        .symbol = item.contract,
+        .margin_mode = {},  // ???
+        .external_account = {},
+        .long_quantity = long_quantity,
+        .short_quantity = short_quantity,
+        .update_type = UpdateType::SNAPSHOT,
+        .exchange_time_utc = item.update_time,
+        .sending_time_utc = item.update_time,
+    };
+    log::debug("position_update={}"sv, position_update);
+    create_trace_and_dispatch(handler_, trace_info, position_update, true);
+  }
 }
 
 void OrderEntry::get_orders() {
@@ -382,6 +405,58 @@ void OrderEntry::get_orders_ack(Trace<web::rest::Response> const &event, [[maybe
 void OrderEntry::operator()(Trace<json::Orders> const &event) {
   auto &[trace_info, orders] = event;
   log::info<2>("orders={}"sv, orders);
+  for (auto &item : orders.data) {
+    log::info<2>("item={}"sv, item);
+    auto cl_ord_id = [&]() -> std::string_view {
+      if (!item.text.starts_with("t-"sv))
+        return {};
+      return item.text.substr(2);
+    }();
+    if (std::empty(cl_ord_id)) {
+      log::warn("*** EXTERNAL ORDER ***"sv);
+      continue;
+    }
+    auto external_order_id = fmt::format("{}"sv, item.id);
+    auto side = item.size < 0 ? Side::SELL : Side::BUY;
+    auto quantity = static_cast<double>(std::abs(item.size));
+    auto remaining_quantity = static_cast<double>(std::abs(item.left));
+    auto traded_quantity = quantity - remaining_quantity;  // XXX ???
+    auto order_update = server::oms::OrderUpdate{
+        .account = account_.name,
+        .exchange = shared_.settings.exchange,
+        .symbol = item.contract,
+        .side = side,
+        .position_effect = {},
+        .margin_mode = {},
+        .max_show_quantity = NaN,
+        .order_type = OrderType::LIMIT,
+        .time_in_force = json::Map{item.tif},
+        .execution_instructions = {},
+        .create_time_utc = item.create_time,
+        .update_time_utc = item.update_time,
+        .external_account = {},
+        .external_order_id = external_order_id,
+        .client_order_id = {},
+        .order_status = json::Map{item.status},
+        .quantity = quantity,
+        .price = item.price,
+        .stop_price = NaN,
+        .remaining_quantity = remaining_quantity,
+        .traded_quantity = traded_quantity,
+        .average_traded_price = item.fill_price,  // ???
+        .last_traded_quantity = NaN,
+        .last_traded_price = NaN,
+        .last_liquidity = {},
+        .routing_id = {},
+        .max_request_version = {},
+        .max_response_version = {},
+        .max_accepted_version = {},
+        .update_type = UpdateType::SNAPSHOT,
+        .sending_time_utc = item.update_time,
+    };
+    Trace event_2{trace_info, order_update};
+    (*this)(event_2, cl_ord_id);
+  }
 }
 
 void OrderEntry::get_trades() {

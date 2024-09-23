@@ -23,6 +23,7 @@ set(AUTOGEN_SCHEMAS
     order_book_update_result.json
     orders_item.json
     orders.json
+    order_status.json
     positions_item.json
     positions.json
     price_size.json
@@ -31,6 +32,7 @@ set(AUTOGEN_SCHEMAS
     subscribe_result.json
     tickers_item.json
     tickers.json
+    tif.json
     trade_error.json
     trade_header.json
     trade_login_data.json

@@ -4,7 +4,7 @@
   "values": [
     {
       "name": "id",
-      "type": "std/int64"
+      "type": "std/int64_t"
     },
     {
       "name": "user",
@@ -16,11 +16,15 @@
     },
     {
       "name": "create_time",
-      "type": "std/seconds"
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "update_time",
+      "type": "std/milliseconds"
     },
     {
       "name": "size",
-      "type": "std/int32"
+      "type": "std/int64"
     },
     {
       "name": "iceberg",
@@ -28,7 +32,7 @@
     },
     {
       "name": "left",
-      "type": "std/int32"
+      "type": "std/int64"
     },
     {
       "name": "price",
@@ -48,7 +52,11 @@
     },
     {
       "name": "tif",
-      "type": "std/string_view"
+      "type": "roq/gate_futures/json/TIF"
+    },
+    {
+      "name": "refr",
+      "type": "std/double"
     },
     {
       "name": "refu",
@@ -72,7 +80,7 @@
     },
     {
       "name": "status",
-      "type": "std/string_view"
+      "type": "roq/gate_futures/json/OrderStatus"
     },
     {
       "name": "finish_time",
@@ -84,7 +92,7 @@
     },
     {
       "name": "stdp_id",
-      "type": "std/int32"
+      "type": "std/int64"
     },
     {
       "name": "stp_act",
@@ -93,6 +101,26 @@
     {
       "name": "amend_text",
       "type": "std/string_view"
+    },
+    {
+      "name": "biz_info",
+      "type": "std/string_view"
+    },
+    {
+      "name": "stp_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "update_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "pnl",
+      "type": "std/double"
+    },
+    {
+      "name": "pnl_margin",
+      "type": "std/double"
     }
   ]
 }

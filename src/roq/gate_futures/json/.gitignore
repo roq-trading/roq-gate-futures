@@ -18,6 +18,7 @@ order_book_update.hpp
 order_book_update_result.hpp
 orders_item.hpp
 orders.hpp
+order_status.hpp
 positions_item.hpp
 positions.hpp
 price_size.hpp
@@ -26,6 +27,7 @@ subscribe.hpp
 subscribe_result.hpp
 tickers_item.hpp
 tickers.hpp
+tif.hpp
 trade_error.hpp
 trade_header.hpp
 trade_login_data.hpp
@@ -55,6 +57,7 @@ order_book_update.cpp
 order_book_update_result.cpp
 orders_item.cpp
 orders.cpp
+order_status.cpp
 positions_item.cpp
 positions.cpp
 price_size.cpp
@@ -63,6 +66,7 @@ subscribe.cpp
 subscribe_result.cpp
 tickers_item.cpp
 tickers.cpp
+tif.cpp
 trade_error.cpp
 trade_header.cpp
 trade_login_data.cpp

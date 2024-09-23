@@ -12,7 +12,7 @@
     },
     {
       "name": "size",
-      "type": "std/int32"
+      "type": "std/int64"
     },
     {
       "name": "leverage",
@@ -92,7 +92,7 @@
     },
     {
       "name": "pending_orders",
-      "type": "std/double"
+      "type": "std/int32"
     },
     {
       "name": "close_order"
@@ -103,10 +103,30 @@
     },
     {
       "name": "update_time",
-      "type": "std/seconds"
+      "type": "std/milliseconds"
     },
     {
       "name": "cross_leverage_limit",
+      "type": "std/double"
+    },
+    {
+      "name": "update_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "initial_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "maintenance_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "open_time",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "trade_max_size",
       "type": "std/double"
     }
   ]

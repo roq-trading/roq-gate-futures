@@ -6,6 +6,9 @@
 
 #include "roq/api.hpp"
 
+#include "roq/gate_futures/json/order_status.hpp"
+#include "roq/gate_futures/json/tif.hpp"
+
 namespace roq {
 namespace gate_futures {
 namespace json {

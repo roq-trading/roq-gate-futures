@@ -45,6 +45,12 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
 
   void operator()(metrics::Writer &);
 
+  uint16_t operator()(Event<CreateOrder> const &, server::oms::Order const &, std::string_view const &request_id);
+  uint16_t operator()(Event<ModifyOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id);
+  uint16_t operator()(Event<CancelOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id);
+
+  uint16_t operator()(Event<CancelAllOrders> const &, std::string_view const &request_id);
+
  protected:
   void operator()(web::socket::Client::Connected const &) override;
   void operator()(web::socket::Client::Disconnected const &) override;
