@@ -21,19 +21,19 @@
 #include "roq/gate_futures/drop_copy_state.hpp"
 #include "roq/gate_futures/shared.hpp"
 
-#include "roq/gate_futures/json/parser.hpp"
+#include "roq/gate_futures/json/trade_parser.hpp"
 
 namespace roq {
 namespace gate_futures {
 
-struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handler {
+struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::Handler {
   struct Handler {
     virtual void operator()(Trace<StreamStatus> const &) = 0;
     virtual void operator()(Trace<ExternalLatency> const &) = 0;
     virtual void operator()(Trace<FundsUpdate> const &, bool is_last) = 0;
   };
 
-  DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &, std::string_view const &uri, std::string_view const &query);
+  DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &);
 
   DropCopy(DropCopy const &) = delete;
 
@@ -54,20 +54,23 @@ struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handl
   void operator()(web::socket::Client::Text const &) override;
   void operator()(web::socket::Client::Binary const &) override;
 
-  void operator()(Trace<json::Subscribe> const &) override;
-  void operator()(Trace<json::Tickers> const &) override;
-  void operator()(Trace<json::Trades> const &) override;
-  void operator()(Trace<json::BookTicker> const &) override;
-  void operator()(Trace<json::OrderBookUpdate> const &) override;
+  void operator()(Trace<json::TradeLogin> const &) override;
 
  private:
   void operator()(ConnectionStatus);
 
   uint32_t download(DropCopyState);
 
+  void login();
+
   void subscribe();
 
-  void subscribe(std::string_view const &topic);
+  void subscribe_balances();
+  void subscribe_positions();
+  void subscribe_orders();
+  void subscribe_trades();
+
+  void subscribe(std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
 
   void parse(std::string_view const &message);
 
@@ -94,12 +97,14 @@ struct DropCopy final : public web::socket::Client::Handler, json::Parser::Handl
   Account &account_;
   Shared &shared_;
   // state
-  bool welcome_ = false;
+  uint32_t request_id_ = {};
   bool ready_ = false;
   ConnectionStatus status_ = {};
   core::Download<DropCopyState> download_;
   std::chrono::nanoseconds logon_timeout_ = {};
   std::chrono::nanoseconds next_ping_ = {};
+  // ...
+  int64_t user_id_ = {};
 };
 
 }  // namespace gate_futures

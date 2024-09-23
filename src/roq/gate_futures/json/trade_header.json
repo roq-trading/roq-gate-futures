@@ -1,0 +1,26 @@
+{
+  "name": "roq/gate_futures/json/TradeHeader",
+  "type": "comp",
+  "values": [
+    {
+      "name": "response_time",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "status",
+      "type": "std/int32"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/json/Event"
+    },
+    {
+      "name": "client_id",
+      "type": "std/string_view"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 set(TARGET_NAME ${PROJECT_NAME}-json)
 
-set(SOURCES map.cpp parser.cpp utils.cpp)
+set(SOURCES map.cpp parser.cpp trade_parser.cpp utils.cpp)
 
 include(RoqAutogen)
 
@@ -26,10 +26,18 @@ set(AUTOGEN_SCHEMAS
     positions_item.json
     positions.json
     price_size.json
+    status.json
     subscribe.json
     subscribe_result.json
     tickers_item.json
     tickers.json
+    trade_error.json
+    trade_header.json
+    trade_login_data.json
+    trade_login_data_result.json
+    trade_login.json
+    trade_message.json
+    trade_result.json
     trades2_item.json
     trades2.json
     trades_item.json

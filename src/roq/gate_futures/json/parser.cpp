@@ -54,7 +54,15 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
         }
+        case LOGIN:
+        case BALANCES:
+        case POSITIONS:
+        case ORDERS:
+        case USERTRADES:
+          log::fatal("Unexpected"sv);
       }
+      break;
+    case API:
       break;
   }
   return false;

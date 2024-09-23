@@ -4,8 +4,6 @@
 
 #include <fmt/format.h>
 
-#include "roq/logging.hpp"
-
 #include "roq/utils/codec/hex.hpp"
 
 using namespace std::literals;
@@ -40,7 +38,6 @@ std::string Crypto::create_headers(
   std::string signature_1;
   utils::codec::Hex::encode(signature_1, tmp_1);
   auto tmp = fmt::format("{}\n{}{}\n{}\n{}\n{}"sv, method, PREFIX, path, query_2, signature_1, timestamp.count());
-  log::debug("{}"sv, tmp);
   mac_.clear();
   mac_.update(tmp);
   auto digest = mac_.final(digest_);
@@ -53,8 +50,17 @@ std::string Crypto::create_headers(
       key_,
       timestamp.count(),
       signature_2);
-  log::debug("{}"sv, result);
   return result;
+}
+
+std::string Crypto::create_signature(std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp) {
+  auto tmp = fmt::format("api\n{}\n{}\n{}"sv, channel, req_param, timestamp.count());
+  mac_.clear();
+  mac_.update(tmp);
+  auto digest = mac_.final(digest_);
+  std::string signature_2;
+  utils::codec::Hex::encode(signature_2, digest);
+  return signature_2;
 }
 
 }  // namespace tools

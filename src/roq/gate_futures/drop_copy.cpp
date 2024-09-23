@@ -40,12 +40,12 @@ auto create_name(auto stream_id) {
   return fmt::format("{}:{}"sv, stream_id, NAME);
 }
 
-auto create_connection(auto &handler, auto &settings, auto &context, auto &uri, auto &query) {
-  io::web::URI uri_{uri};
+auto create_connection(auto &handler, auto &settings, auto &context) {
+  auto uri = settings.ws.uri;
   auto config = web::socket::Client::Config{
       // connection
       .interface = {},
-      .uris = {&uri_, 1},
+      .uris = {&uri, 1},
       .host = {},
       .validate_certificate = settings.net.tls_validate_certificate,
       // connection manager
@@ -55,7 +55,7 @@ auto create_connection(auto &handler, auto &settings, auto &context, auto &uri, 
       // proxy
       .proxy = {},
       // http
-      .query = query,
+      .query = {},
       .user_agent = ROQ_PACKAGE_NAME,
       .request_timeout = {},
       .ping_frequency = settings.ws.ping_freq,
@@ -73,9 +73,8 @@ struct create_metrics final : public utils::metrics::Factory {
 
 // === IMPLEMENTATION ===
 
-DropCopy::DropCopy(
-    Handler &handler, io::Context &context, uint16_t stream_id, Account &account, Shared &shared, std::string_view const &uri, std::string_view const &query)
-    : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_)}, connection_{create_connection(*this, shared.settings, context, uri, query)},
+DropCopy::DropCopy(Handler &handler, io::Context &context, uint16_t stream_id, Account &account, Shared &shared)
+    : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_)}, connection_{create_connection(*this, shared.settings, context)},
       decode_buffer_(shared.settings.misc.decode_buffer_size),
       counter_{
           .disconnect = create_metrics(shared.settings, name_, "disconnect"sv),
@@ -118,9 +117,6 @@ void DropCopy::operator()(metrics::Writer &writer) {
 }
 
 void DropCopy::operator()(web::socket::Client::Connected const &) {
-  assert(logon_timeout_.count() == 0);
-  auto now = clock::get_system();
-  logon_timeout_ = now + shared_.settings.ws.request_timeout;
 }
 
 void DropCopy::operator()(web::socket::Client::Disconnected const &) {
@@ -128,13 +124,13 @@ void DropCopy::operator()(web::socket::Client::Disconnected const &) {
   ready_ = false;
   (*this)(ConnectionStatus::DISCONNECTED);
   download_.reset();
-  welcome_ = false;
   logon_timeout_ = {};
   next_ping_ = {};
 }
 
 void DropCopy::operator()(web::socket::Client::Ready const &) {
-  // note! wait for welcome
+  download_.begin();
+  // (*this)(ConnectionStatus::CONNECTED);
 }
 
 void DropCopy::operator()(web::socket::Client::Close const &) {
@@ -187,6 +183,9 @@ uint32_t DropCopy::download(DropCopyState state) {
     case UNDEFINED:
       assert(false);
       break;
+    case LOGIN:
+      login();
+      return 1;
     case SUBSCRIBE:
       subscribe();
       return 0;
@@ -200,23 +199,93 @@ uint32_t DropCopy::download(DropCopyState state) {
   return 0;
 }
 
-void DropCopy::subscribe() {
-  subscribe("/account/balance"sv);
-  subscribe("/spotMarket/tradeOrders"sv);
-}
-
-void DropCopy::subscribe(std::string_view const &topic) {
-  auto now = clock::get_system();
+void DropCopy::login() {
+  auto request_id = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto const channel = "futures.login"sv;
+  auto const event = ""sv;
+  std::string signature = account_.create_signature(channel, event, now);
   auto message = fmt::format(
       R"({{)"
-      R"("id":"{}",)"
-      R"("type":"subscribe",)"
-      R"("privateChannel":true,)"
-      R"("topic":"{}",)"
-      R"("response":true)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{{)"
+      R"("req_id":"{}",)"
+      R"("timestamp":"{}",)"
+      R"("api_key":"{}",)"
+      R"("signature":"{}")"
+      R"(}})"
       R"(}})"sv,
+      request_id,
       now.count(),
-      topic);
+      channel,
+      std::empty(event) ? "api"sv : event,
+      request_id,
+      now.count(),
+      account_.get_key(),
+      signature);
+  log::debug(R"(message="{}")"sv, message);
+  (*connection_).send_text(message);
+}
+
+void DropCopy::subscribe() {
+  subscribe_balances();
+  subscribe_positions();
+  subscribe_orders();
+  subscribe_trades();
+}
+
+void DropCopy::subscribe_balances() {
+  assert(user_id_);
+  auto payload = fmt::format(R"(["{}"])"sv, user_id_);
+  subscribe("futures.balances"sv, "subscribe"sv, payload);
+}
+
+void DropCopy::subscribe_positions() {
+  assert(user_id_);
+  auto payload = fmt::format(R"(["{}","!all"])"sv, user_id_);
+  subscribe("futures.positions"sv, "subscribe"sv, payload);
+}
+
+void DropCopy::subscribe_orders() {
+  assert(user_id_);
+  auto payload = fmt::format(R"(["{}","!all"])"sv, user_id_);
+  subscribe("futures.orders"sv, "subscribe"sv, payload);
+}
+
+void DropCopy::subscribe_trades() {
+  assert(user_id_);
+  auto payload = fmt::format(R"(["{}","!all"])"sv, user_id_);
+  subscribe("futures.usertrades"sv, "subscribe"sv, payload);
+}
+
+void DropCopy::subscribe(std::string_view const &channel, std::string_view const &event, std::string_view const &payload) {
+  auto request_id = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  std::string signature = account_.create_signature(channel, event, now);
+  auto message = fmt::format(
+      R"({{)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{},)"
+      R"("auth":{{)"  // <<== from here it's different from login
+      R"("method":"api",)"
+      R"("KEY":"{}",)"
+      R"("SIGN":"{}")"
+      R"(}})"
+      R"(}})"sv,
+      request_id,
+      now.count(),
+      channel,
+      event,
+      payload,
+      account_.get_key(),
+      signature);
+  log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
 }
 
@@ -225,8 +294,10 @@ void DropCopy::parse(std::string_view const &message) {
     auto log_message = [&]() { log::warn(R"(message="{}")"sv, message); };
     try {
       TraceInfo trace_info;
-      if (!json::Parser::dispatch(*this, message, decode_buffer_, trace_info))
+      if (!json::TradeParser::dispatch(*this, message, decode_buffer_, trace_info)) {
         log_message();
+        log::fatal("HERE"sv);
+      }
     } catch (...) {
       log_message();
       core::tools::UnhandledException::terminate();
@@ -234,24 +305,14 @@ void DropCopy::parse(std::string_view const &message) {
   });
 }
 
-void DropCopy::operator()(Trace<json::Subscribe> const &) {
-  log::fatal("Unexpected"sv);
-}
-
-void DropCopy::operator()(Trace<json::Tickers> const &) {
-  log::fatal("Unexpected"sv);
-}
-
-void DropCopy::operator()(Trace<json::Trades> const &) {
-  log::fatal("Unexpected"sv);
-}
-
-void DropCopy::operator()(Trace<json::BookTicker> const &) {
-  log::fatal("Unexpected"sv);
-}
-
-void DropCopy::operator()(Trace<json::OrderBookUpdate> const &) {
-  log::fatal("Unexpected"sv);
+void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
+  auto &[trace_info, login] = event;
+  log::info<5>("login={}"sv, login);
+  if (login.data.result.uid <= 0)
+    log::fatal("Unexpected: user_id must be positive (login={})"sv, login);
+  user_id_ = login.data.result.uid;
+  auto const STATE = DropCopyState::LOGIN;
+  download_.check_relaxed(STATE);
 }
 
 }  // namespace gate_futures

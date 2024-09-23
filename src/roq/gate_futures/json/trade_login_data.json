@@ -1,0 +1,10 @@
+{
+  "name": "roq/gate_futures/json/TradeLoginData",
+  "type": "comp",
+  "values": [
+    {
+      "name": "result",
+      "type": "roq/gate_futures/json/TradeLoginDataResult"
+    }
+  ]
+}

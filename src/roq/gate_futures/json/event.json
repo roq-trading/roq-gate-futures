@@ -7,6 +7,9 @@
     },
     {
       "name": "update"
+    },
+    {
+      "name": "api"
     }
   ]
 }

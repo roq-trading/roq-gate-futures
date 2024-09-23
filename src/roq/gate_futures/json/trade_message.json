@@ -1,0 +1,69 @@
+{
+  "name": "roq/gate_futures/json/TradeMessage",
+  "type": "comp",
+  "values": [
+    {
+      "name": "request_id",
+      "type": "std/string_view",
+      "comment": "login"
+    },
+    {
+      "name": "header",
+      "type": "roq/gate_futures/json/TradeHeader",
+      "comment": "login"
+    },
+    {
+      "name": "data",
+      "comment": "login"
+    },
+    {
+      "name": "id",
+      "type": "std/int64",
+      "comment": "!login"
+    },
+    {
+      "name": "time",
+      "type": "std/seconds",
+      "comment": "!login"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds",
+      "comment": "!login"
+    },
+    {
+      "name": "conn_id",
+      "type": "std/string_view",
+      "comment": "!login"
+    },
+    {
+      "name": "trace_id",
+      "type": "std/string_view",
+      "comment": "!login"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/json/Channel",
+      "comment": "!login"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/json/Event",
+      "comment": "!login"
+    },
+    {
+      "name": "payload",
+      "comment": "!login"
+    },
+    {
+      "name": "result",
+      "type": "roq/gate_futures/json/TradeResult",
+      "comment": "!login"
+    },
+    {
+      "name": "error",
+      "type": "roq/gate_futures/json/TradeError",
+      "comment": "!login"
+    }
+  ]
+}

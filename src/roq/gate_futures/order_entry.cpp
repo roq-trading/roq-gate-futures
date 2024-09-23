@@ -437,7 +437,7 @@ void OrderEntry::operator()(Trace<json::Trades2> const &event) {
 template <typename SuccessHandler, typename ErrorHandler>
 void OrderEntry::process_response(web::rest::Response const &response, SuccessHandler success_handler, ErrorHandler error_handler) {
   try {
-    log::info("DEBUG response={}"sv, response);
+    log::debug("response={}"sv, response);
     auto [status, category, body] = response.result();
     switch (category) {
       using enum web::http::Category;

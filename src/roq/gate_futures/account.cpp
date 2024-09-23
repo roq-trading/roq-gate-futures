@@ -19,5 +19,9 @@ std::string Account::create_headers(web::http::Method method, std::string_view c
   return crypto_.create_headers(method, path, query, body, now);
 }
 
+std::string Account::create_signature(std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp) {
+  return crypto_.create_signature(channel, req_param, timestamp);
+}
+
 }  // namespace gate_futures
 }  // namespace roq

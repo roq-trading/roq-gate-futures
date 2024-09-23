@@ -1,0 +1,14 @@
+{
+  "name": "roq/gate_futures/json/TradeError",
+  "type": "comp",
+  "values": [
+    {
+      "name": "code",
+      "type": "std/int32_t"
+    },
+    {
+      "name": "message",
+      "type": "std/string_view"
+    }
+  ]
+}

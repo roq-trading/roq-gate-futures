@@ -1,0 +1,12 @@
+{
+  "name": "roq/gate_futures/json/Status",
+  "type": "enum",
+  "values": [
+    {
+      "name": "success"
+    },
+    {
+      "name": "fail"
+    }
+  ]
+}
