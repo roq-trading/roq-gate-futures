@@ -19,6 +19,10 @@
       "type": "std/milliseconds"
     },
     {
+      "name": "create_time_ms",
+      "type": "std/milliseconds"
+    },
+    {
       "name": "update_time",
       "type": "std/milliseconds"
     },
@@ -84,7 +88,11 @@
     },
     {
       "name": "finish_time",
-      "type": "std/seconds"
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "finish_time_ms",
+      "type": "std/milliseconds"
     },
     {
       "name": "finish_as",
@@ -120,6 +128,14 @@
     },
     {
       "name": "pnl_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "stop_loss_price",
+      "type": "std/double"
+    },
+    {
+      "name": "stop_profit_price",
       "type": "std/double"
     }
   ]

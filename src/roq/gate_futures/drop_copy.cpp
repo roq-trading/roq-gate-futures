@@ -385,5 +385,20 @@ void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
   download_.check_relaxed(STATE);
 }
 
+void DropCopy::operator()(Trace<json::TradeSubscribe> const &) {
+}
+
+void DropCopy::operator()(Trace<json::TradeBalances> const &) {
+}
+
+void DropCopy::operator()(Trace<json::TradePositions> const &) {
+}
+
+void DropCopy::operator()(Trace<json::TradeOrders> const &) {
+}
+
+void DropCopy::operator()(Trace<json::TradeTrades> const &) {
+}
+
 }  // namespace gate_futures
 }  // namespace roq

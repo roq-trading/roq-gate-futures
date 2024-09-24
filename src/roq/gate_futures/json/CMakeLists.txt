@@ -33,17 +33,22 @@ set(AUTOGEN_SCHEMAS
     tickers_item.json
     tickers.json
     tif.json
+    trade_balances.json
     trade_error.json
     trade_header.json
     trade_login_data.json
     trade_login_data_result.json
     trade_login.json
     trade_message.json
-    trade_result.json
+    trade_orders.json
+    trade_positions.json
     trades2_item.json
     trades2.json
     trades_item.json
-    trades.json)
+    trades.json
+    trade_subscribe.json
+    trade_subscribe_result.json
+    trade_trades.json)
 
 roq_autogen_hpp(
   OUTPUT

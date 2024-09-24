@@ -39,6 +39,11 @@ TEST_CASE("json_login_update_2", "[json_login]") {
       auto &login = event.value;
       CHECK(login.header.status == 200);
     }
+    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
+    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;

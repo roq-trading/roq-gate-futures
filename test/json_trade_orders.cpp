@@ -91,10 +91,21 @@ TEST_CASE("json_orders_update_2", "[json_orders]") {
                  R"("time_ms":1727094610077)"
                  R"(})"sv;
   struct MyHandler final : public json::TradeParser::Handler {
+    bool found = false;
+
    protected:
     void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
+    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrders> const &) override {
+      found = true;
+      // auto &orders = event.data;
+    }
+    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(handler.found == true);
 }

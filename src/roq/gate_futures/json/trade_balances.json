@@ -1,0 +1,40 @@
+{
+  "name": "roq/gate_futures/json/TradeBalances",
+  "type": "comp",
+  "values": [
+    {
+      "name": "time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "conn_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "trace_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/json/Event"
+    },
+    {
+      "name": "payload"
+    },
+    {
+      "name": "result"
+    },
+    {
+      "name": "error",
+      "type": "roq/gate_futures/json/TradeError"
+    }
+  ]
+}

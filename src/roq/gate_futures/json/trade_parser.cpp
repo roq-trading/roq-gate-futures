@@ -55,17 +55,55 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           case BALANCES:
           case POSITIONS:
           case ORDERS:
-          case USERTRADES:
+          case USERTRADES: {
+            TradeSubscribe subscribe{message, buffer};
+            create_trace_and_dispatch(handler, trace_info, subscribe);
+            return true;
+            /*
             if (message_2.result.status == Status::SUCCESS) {
               return true;
             } else {
               log::fatal(R"(Unexpected: message="{}")"sv, message);
             }
-            break;
+            */
+          }
         }
         break;
       case UPDATE:
-        log::fatal(R"(NOT IMPLEMENTED: message="{}")"sv, message);
+        switch (message_2.channel) {
+          using enum Channel::type_t;
+          case UNDEFINED__:
+            break;
+          case UNKNOWN__:
+            assert(false);
+            break;
+          case TICKERS:
+          case TRADES:
+          case BOOK_TICKER:
+          case ORDER_BOOK_UPDATE:
+          case LOGIN:
+            log::fatal("Unexpected"sv);
+          case BALANCES: {
+            TradeBalances balances{message, buffer};
+            create_trace_and_dispatch(handler, trace_info, balances);
+            return true;
+          }
+          case POSITIONS: {
+            TradePositions positions{message, buffer};
+            create_trace_and_dispatch(handler, trace_info, positions);
+            return true;
+          }
+          case ORDERS: {
+            TradeOrders orders{message, buffer};
+            create_trace_and_dispatch(handler, trace_info, orders);
+            return true;
+          }
+          case USERTRADES: {
+            TradeTrades trades{message, buffer};
+            create_trace_and_dispatch(handler, trace_info, trades);
+            return true;
+          }
+        }
         break;
       case API:
         log::fatal("Unexpected"sv);

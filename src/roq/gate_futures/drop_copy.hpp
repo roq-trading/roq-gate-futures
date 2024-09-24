@@ -62,6 +62,13 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
 
   void operator()(Trace<json::TradeLogin> const &) override;
 
+  void operator()(Trace<json::TradeSubscribe> const &) override;
+
+  void operator()(Trace<json::TradeBalances> const &) override;
+  void operator()(Trace<json::TradePositions> const &) override;
+  void operator()(Trace<json::TradeOrders> const &) override;
+  void operator()(Trace<json::TradeTrades> const &) override;
+
  private:
   void operator()(ConnectionStatus);
 

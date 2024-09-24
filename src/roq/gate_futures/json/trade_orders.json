@@ -1,0 +1,27 @@
+{
+  "name": "roq/gate_futures/json/TradeOrders",
+  "type": "comp",
+  "values": [
+    {
+      "name": "time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/json/Event"
+    },
+    {
+      "name": "result",
+      "type": "roq/gate_futures/json/OrdersItem",
+      "array": "std/span"
+    }
+  ]
+}
