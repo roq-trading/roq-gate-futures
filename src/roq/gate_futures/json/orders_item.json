@@ -96,7 +96,7 @@
     },
     {
       "name": "finish_as",
-      "type": "std/string_view"
+      "type": "roq/gate_futures/json/FinishAs"
     },
     {
       "name": "stdp_id",

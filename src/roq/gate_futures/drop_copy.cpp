@@ -145,7 +145,7 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
       R"("price":"{}",)"
       R"("close":false,)"
       R"("reduce_only":false,)"  // XXX
-      R"("tif":"GTC",)"          // XXX
+      R"("tif":"gtc",)"          // XXX
       R"("text":"t-{}")"         // XXX
       R"(}})"
       R"(}})"
@@ -483,17 +483,25 @@ void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
   auto &[trace_info, orders] = event;
   for (auto &item : orders.result) {
     log::info<2>("item={}"sv, item);
-    auto cl_ord_id = [&]() -> std::string_view {
+    auto client_order_id = [&]() -> std::string_view {
       if (!item.text.starts_with("t-"sv))
         return {};
       return item.text.substr(2);
     }();
-    if (std::empty(cl_ord_id)) {
+    if (std::empty(client_order_id)) {
       log::warn("*** EXTERNAL ORDER ***"sv);
       continue;
     }
     auto external_order_id = fmt::format("{}"sv, item.id);
     auto side = item.size < 0 ? Side::SELL : Side::BUY;
+    auto order_status = [&]() -> OrderStatus {
+      OrderStatus result = json::Map{item.finish_as};
+      if (result != OrderStatus{})
+        return result;
+      if (item.status == json::OrderStatus::OPEN)
+        return OrderStatus::WORKING;
+      log::fatal("Unexpected: item={}"sv, item);
+    }();
     auto quantity = static_cast<double>(std::abs(item.size));
     auto remaining_quantity = static_cast<double>(std::abs(item.left));
     auto traded_quantity = quantity - remaining_quantity;  // XXX ???
@@ -512,8 +520,8 @@ void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
         .update_time_utc = item.update_time,
         .external_account = {},
         .external_order_id = external_order_id,
-        .client_order_id = {},
-        .order_status = json::Map{item.status},
+        .client_order_id = client_order_id,
+        .order_status = order_status,
         .quantity = quantity,
         .price = item.price,
         .stop_price = NaN,
@@ -530,11 +538,11 @@ void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
         .update_type = UpdateType::INCREMENTAL,
         .sending_time_utc = item.update_time,
     };
-    if (shared_.update_order(cl_ord_id, stream_id_, trace_info, order_update, [&]([[maybe_unused]] auto &order) {
+    if (shared_.update_order(client_order_id, stream_id_, trace_info, order_update, [&]([[maybe_unused]] auto &order) {
           // no fills here
         })) {
     } else {
-      log::warn<1>(R"(*** EXTERNAL ORDER *** (id={}, cl_ord_id="{}"))"sv, item.id, cl_ord_id);
+      log::warn<1>(R"(*** EXTERNAL ORDER *** (id={}, client_order_id="{}"))"sv, item.id, client_order_id);
     }
   }
 }

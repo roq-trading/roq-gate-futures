@@ -63,6 +63,10 @@
       "name": "error",
       "type": "roq/gate_futures/json/TradeError",
       "comment": "!login"
+    },
+    {
+      "name": "ack",
+      "type": "std/bool"
     }
   ]
 }

@@ -1,0 +1,41 @@
+{
+  "name": "roq/gate_futures/json/FinishAs",
+  "type": "enum",
+  "values": [
+    {
+      "name": "filled"
+    },
+    {
+      "name": "cancelled"
+    },
+    {
+      "name": "liquidated"
+    },
+    {
+      "name": "ioc"
+    },
+    {
+      "name": "auto_deleveraged"
+    },
+    {
+      "name": "reduce_only"
+    },
+    {
+      "name": "position_close"
+    },
+    {
+      "name": "stp"
+    },
+    {
+      "raw": "_new",
+      "name": "new"
+    },
+    {
+      "raw": "_update",
+      "name": "update"
+    },
+    {
+      "name": "reduce_out"
+    }
+  ]
+}

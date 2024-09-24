@@ -58,28 +58,55 @@ static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::FOK}}) == roq::TimeI
 // static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::POC}}) == roq::TimeInForce::POC);
 static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::IOC}}) == roq::TimeInForce::IOC);
 
-// OrderStatus ==> roq::OrderStatus
+// FinishAs ==> roq::OrderStatus
 
 template <>
 template <>
-constexpr Helper<OrderStatus>::operator roq::OrderStatus() {
+constexpr Helper<FinishAs>::operator roq::OrderStatus() {
   switch (std::get<0>(args_)) {
-    using enum json::OrderStatus::type_t;
+    using enum json::FinishAs::type_t;
     case UNDEFINED__:
       return {};
     case UNKNOWN__:
       break;
-    case OPEN:
+    case FILLED:
+      return roq::OrderStatus::COMPLETED;
+    case CANCELLED:
+      return roq::OrderStatus::CANCELED;
+    case LIQUIDATED:
+      return roq::OrderStatus::CANCELED;
+    case IOC:
+      return roq::OrderStatus::COMPLETED;  // XXX ???
+    case AUTO_DELEVERAGED:
+      return roq::OrderStatus::CANCELED;  // XXX ???
+    case REDUCE_ONLY:
+      return roq::OrderStatus::CANCELED;
+    case POSITION_CLOSE:
+      return roq::OrderStatus::CANCELED;
+    case STP:
+      return roq::OrderStatus::CANCELED;
+    case NEW:
       return roq::OrderStatus::WORKING;
-    case FINISHED:
-      return roq::OrderStatus::COMPLETED;  // XXX canceled?
+    case UPDATE:
+      return roq::OrderStatus::WORKING;
+    case REDUCE_OUT:
+      return roq::OrderStatus::WORKING;  // XXX ???
   }
   roq::log::fatal("Unexpected"sv);
 }
 
-static_assert(static_cast<roq::OrderStatus>(Helper{OrderStatus{OrderStatus::UNDEFINED__}}) == roq::OrderStatus::UNDEFINED);
-static_assert(static_cast<roq::OrderStatus>(Helper{OrderStatus{OrderStatus::OPEN}}) == roq::OrderStatus::WORKING);
-static_assert(static_cast<roq::OrderStatus>(Helper{OrderStatus{OrderStatus::FINISHED}}) == roq::OrderStatus::COMPLETED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::UNDEFINED__}}) == roq::OrderStatus::UNDEFINED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::FILLED}}) == roq::OrderStatus::COMPLETED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::CANCELLED}}) == roq::OrderStatus::CANCELED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::LIQUIDATED}}) == roq::OrderStatus::CANCELED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::IOC}}) == roq::OrderStatus::COMPLETED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::AUTO_DELEVERAGED}}) == roq::OrderStatus::CANCELED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::REDUCE_ONLY}}) == roq::OrderStatus::CANCELED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::POSITION_CLOSE}}) == roq::OrderStatus::CANCELED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::STP}}) == roq::OrderStatus::CANCELED);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::NEW}}) == roq::OrderStatus::WORKING);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::UPDATE}}) == roq::OrderStatus::WORKING);
+static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::REDUCE_OUT}}) == roq::OrderStatus::WORKING);
 
 // Role ==> roq::Liquidity
 
@@ -119,7 +146,7 @@ Map<TIF>::operator roq::TimeInForce() {
 
 template <>
 template <>
-Map<OrderStatus>::operator roq::OrderStatus() {
+Map<FinishAs>::operator roq::OrderStatus() {
   return Helper{args_};
 }
 

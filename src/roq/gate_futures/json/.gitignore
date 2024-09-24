@@ -11,6 +11,7 @@ contract_type.hpp
 currencies_item.hpp
 currencies.hpp
 event.hpp
+finish_as.hpp
 mark_type.hpp
 message.hpp
 order_book.hpp
@@ -56,6 +57,7 @@ contract_type.cpp
 currencies_item.cpp
 currencies.cpp
 event.cpp
+finish_as.cpp
 mark_type.cpp
 message.cpp
 order_book.cpp
