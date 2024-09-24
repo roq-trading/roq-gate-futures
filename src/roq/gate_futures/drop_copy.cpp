@@ -146,7 +146,7 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
       R"("close":false,)"
       R"("reduce_only":false,)"  // XXX
       R"("tif":"GTC",)"          // XXX
-      R"("text":"t-{}",)"        // XXX
+      R"("text":"t-{}")"         // XXX
       R"(}})"
       R"(}})"
       R"(}})"sv,
@@ -166,19 +166,104 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
 }
 
 uint16_t DropCopy::operator()(
-    Event<ModifyOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
+    Event<ModifyOrder> const &event,
+    server::oms::Order const &order,
+    std::string_view const &request_id,
+    [[maybe_unused]] std::string_view const &previous_request_id) {
+  auto &modify_order = event.value;
+  auto request_id_2 = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto const channel = "futures.order_amend"sv;
+  auto const event_2 = "api"sv;
+  auto message = fmt::format(
+      R"({{)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{{)"
+      R"("req_id":"{}",)"
+      R"("req_param":{{)"
+      R"("order_id":"t-{}",)"  // XXX
+      R"("size":{},)"
+      R"("price":"{}",)"
+      R"("amend_text":"{}")"
+      R"(}})"
+      R"(}})"
+      R"(}})"sv,
+      request_id_2,
+      now.count(),
+      channel,
+      event_2,
+      request_id,
+      order.client_order_id,
+      Decimal{modify_order.quantity, order.quantity_precision.precision},
+      Decimal{modify_order.price, order.price_precision.precision},
+      request_id);
+  log::debug(R"(message="{}")"sv, message);
+  (*connection_).send_text(message);
   return stream_id_;
 }
 
 uint16_t DropCopy::operator()(
-    Event<CancelOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
+    Event<CancelOrder> const &,
+    server::oms::Order const &order,
+    std::string_view const &request_id,
+    [[maybe_unused]] std::string_view const &previous_request_id) {
+  auto request_id_2 = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto const channel = "futures.order_cancel"sv;
+  auto const event_2 = "api"sv;
+  auto message = fmt::format(
+      R"({{)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{{)"
+      R"("req_id":"{}",)"
+      R"("req_param":{{)"
+      R"("order_id":"t-{}")"  // XXX
+      R"(}})"
+      R"(}})"
+      R"(}})"sv,
+      request_id_2,
+      now.count(),
+      channel,
+      event_2,
+      request_id,
+      order.client_order_id);
+  log::debug(R"(message="{}")"sv, message);
+  (*connection_).send_text(message);
   return stream_id_;
 }
 
 uint16_t DropCopy::operator()(Event<CancelAllOrders> const &, std::string_view const &request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
+  auto request_id_2 = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto const channel = "futures.order_cancel_cp"sv;
+  auto const event_2 = "api"sv;
+  auto message = fmt::format(
+      R"({{)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{{)"
+      R"("req_id":"{}",)"
+      R"("req_param":{{)"
+      R"("contract":"SOL_USDT")"  // XXX
+      R"(}})"
+      R"(}})"
+      R"(}})"sv,
+      request_id_2,
+      now.count(),
+      channel,
+      event_2,
+      request_id);
+  // XXX side ?
+  log::debug(R"(message="{}")"sv, message);
+  (*connection_).send_text(message);
   return stream_id_;
 }
 

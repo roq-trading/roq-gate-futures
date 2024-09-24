@@ -46,6 +46,26 @@
       "raw": "futures.usertrades",
       "name": "usertrades",
       "comment": "order management"
+    },
+    {
+      "raw": "futures.order_place",
+      "name": "order_place",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_amend",
+      "name": "order_amend",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_cancel",
+      "name": "order_cancel",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_cancel_cp",
+      "name": "order_cancel_cp",
+      "comment": "order management"
     }
   ]
 }

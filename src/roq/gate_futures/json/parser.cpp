@@ -59,6 +59,10 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
         case POSITIONS:
         case ORDERS:
         case USERTRADES:
+        case ORDER_PLACE:
+        case ORDER_AMEND:
+        case ORDER_CANCEL:
+        case ORDER_CANCEL_CP:
           log::fatal("Unexpected"sv);
       }
       break;

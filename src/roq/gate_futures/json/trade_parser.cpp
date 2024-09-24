@@ -22,14 +22,41 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
     log::fatal(R"(Unexpected: message="{}")"sv, message);
   }
   auto &header = message_2.header;
-  if (header.status) {  // login has "header")
-    if (header.channel == Channel::LOGIN && header.event == Event::API && header.status == 200) {
-      TradeLogin login{message, buffer};
-      create_trace_and_dispatch(handler, trace_info, login);
-      return true;
-    } else {
-      log::fatal(R"(Unexpected: message="{}")"sv, message);
+  if (header.status) {  // api has "header"
+    assert(header.event == Event::API);
+    switch (header.channel) {
+      using enum Channel::type_t;
+      case UNDEFINED__:
+        break;
+      case UNKNOWN__:
+        assert(false);
+        break;
+      case TICKERS:
+      case TRADES:
+      case BOOK_TICKER:
+      case ORDER_BOOK_UPDATE:
+        break;
+      case LOGIN:
+        if (header.status == 200) {
+          TradeLogin login{message, buffer};
+          create_trace_and_dispatch(handler, trace_info, login);
+          return true;
+        }
+        break;
+      case BALANCES:
+      case POSITIONS:
+      case ORDERS:
+      case USERTRADES:
+        log::fatal("Unexpected"sv);
+        break;
+      case ORDER_PLACE:
+      case ORDER_AMEND:
+      case ORDER_CANCEL:
+      case ORDER_CANCEL_CP:
+        // XXX TODO
+        return true;
     }
+    log::fatal("Unexpected"sv);
   } else {  // subscribe or update do not have "header"
     switch (message_2.event) {
       using enum Event::type_t;
@@ -61,6 +88,12 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
             create_trace_and_dispatch(handler, trace_info, subscribe);
             return true;
           }
+          case ORDER_PLACE:
+          case ORDER_AMEND:
+          case ORDER_CANCEL:
+          case ORDER_CANCEL_CP:
+            log::fatal("Unexpected"sv);
+            break;
         }
         break;
       case UPDATE:
@@ -98,10 +131,17 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
             create_trace_and_dispatch(handler, trace_info, trades);
             return true;
           }
+          case ORDER_PLACE:
+          case ORDER_AMEND:
+          case ORDER_CANCEL:
+          case ORDER_CANCEL_CP:
+            log::fatal("Unexpected"sv);
+            break;
         }
         break;
       case API:
         log::fatal("Unexpected"sv);
+        break;
     }
   }
   return false;
