@@ -98,9 +98,10 @@ TEST_CASE("json_orders_update_2", "[json_orders]") {
     void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
     void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
     void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrders> const &) override {
+    void operator()(Trace<json::TradeOrders> const &event) override {
       found = true;
-      // auto &orders = event.data;
+      auto &result = event.value.result;
+      CHECK(std::size(result) == 1);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
   } handler;

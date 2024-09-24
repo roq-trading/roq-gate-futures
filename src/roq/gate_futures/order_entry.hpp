@@ -21,7 +21,7 @@
 #include "roq/gate_futures/json/accounts.hpp"
 #include "roq/gate_futures/json/orders.hpp"
 #include "roq/gate_futures/json/positions.hpp"
-#include "roq/gate_futures/json/trades2.hpp"
+#include "roq/gate_futures/json/user_trades.hpp"
 
 #include "roq/gate_futures/account.hpp"
 #include "roq/gate_futures/order_entry_state.hpp"
@@ -80,7 +80,7 @@ struct OrderEntry final : public web::rest::Client::Handler {
 
   void get_trades();
   void get_trades_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::Trades2> const &);
+  void operator()(Trace<json::UserTrades> const &);
 
   template <typename SuccessHandler, typename ErrorHandler>
   void process_response(web::rest::Response const &, SuccessHandler, ErrorHandler);

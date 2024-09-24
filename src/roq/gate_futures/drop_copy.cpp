@@ -4,6 +4,7 @@
 
 #include "roq/mask.hpp"
 
+#include "roq/utils/safe_cast.hpp"
 #include "roq/utils/update.hpp"
 
 #include "roq/utils/metrics/factory.hpp"
@@ -14,6 +15,9 @@
 
 #include "roq/core/json/buffer.hpp"
 
+#include "roq/server/oms/exceptions.hpp"
+
+#include "roq/gate_futures/json/map.hpp"
 #include "roq/gate_futures/json/utils.hpp"
 
 using namespace std::literals;
@@ -27,8 +31,12 @@ namespace {
 auto const NAME = "ex"sv;
 
 auto const SUPPORTS = Mask{
+    SupportType::CREATE_ORDER,
+    SupportType::CANCEL_ORDER,
+    SupportType::ORDER_ACK,
     SupportType::ORDER,
     SupportType::TRADE,
+    SupportType::POSITION,
     SupportType::FUNDS,
 };
 }  // namespace
@@ -117,7 +125,6 @@ void DropCopy::operator()(metrics::Writer &writer) {
 }
 
 uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id) {
-  /*
   auto &create_order = event.value;
   auto request_id_2 = ++request_id_;
   auto now = clock::get_realtime<std::chrono::seconds>();
@@ -150,38 +157,28 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
       request_id_2,
       order.symbol,
       Decimal{create_order.quantity, order.quantity_precision.precision},
-      Decimal{create_order.price, order.price_precision.precision}),
+      Decimal{create_order.price, order.price_precision.precision},
       request_id);
-  // XXX stp_act
+  // XXX stp_act ?
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
-  */
   return stream_id_;
 }
-/*
-contract  string  true  Futures contract
-size  int64 true  Order size. Specify positive number to make a bid, and negative number to ask
-iceberg int64 true  Display size for iceberg order. 0 for non-iceberg. Note that you will have to pay the taker fee for the hidden size
-price string  false Order price. 0 for market order with tif set as `ioc
-close bool  false Set as true to close the position, with size set to 0
-reduce_only bool  false Set as true to be reduce-only order
-tif string  false Time in force
-text  string  false User defined information. If not empty, must follow the rules below:
-auto_size string  false Set side to close dual-mode position. close_long closes the long side; while close_short the short one. Note size also needs to be set
-to 0 stp_act string  false Self-Trading Prevention Action
-*/
 
 uint16_t DropCopy::operator()(
     Event<ModifyOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id) {
+  throw server::oms::NotSupported{"not supported"sv};
   return stream_id_;
 }
 
 uint16_t DropCopy::operator()(
     Event<CancelOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id) {
+  throw server::oms::NotSupported{"not supported"sv};
   return stream_id_;
 }
 
 uint16_t DropCopy::operator()(Event<CancelAllOrders> const &, std::string_view const &request_id) {
+  throw server::oms::NotSupported{"not supported"sv};
   return stream_id_;
 }
 
@@ -385,7 +382,10 @@ void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
   download_.check_relaxed(STATE);
 }
 
-void DropCopy::operator()(Trace<json::TradeSubscribe> const &) {
+void DropCopy::operator()(Trace<json::TradeSubscribe> const &event) {
+  auto &subscribe = event.value;
+  if (subscribe.result.status != json::Status::SUCCESS)
+    log::fatal("subscribe={}"sv, subscribe);
 }
 
 void DropCopy::operator()(Trace<json::TradeBalances> const &) {
@@ -394,10 +394,115 @@ void DropCopy::operator()(Trace<json::TradeBalances> const &) {
 void DropCopy::operator()(Trace<json::TradePositions> const &) {
 }
 
-void DropCopy::operator()(Trace<json::TradeOrders> const &) {
+void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
+  auto &[trace_info, orders] = event;
+  for (auto &item : orders.result) {
+    log::info<2>("item={}"sv, item);
+    auto cl_ord_id = [&]() -> std::string_view {
+      if (!item.text.starts_with("t-"sv))
+        return {};
+      return item.text.substr(2);
+    }();
+    if (std::empty(cl_ord_id)) {
+      log::warn("*** EXTERNAL ORDER ***"sv);
+      continue;
+    }
+    auto external_order_id = fmt::format("{}"sv, item.id);
+    auto side = item.size < 0 ? Side::SELL : Side::BUY;
+    auto quantity = static_cast<double>(std::abs(item.size));
+    auto remaining_quantity = static_cast<double>(std::abs(item.left));
+    auto traded_quantity = quantity - remaining_quantity;  // XXX ???
+    auto order_update = server::oms::OrderUpdate{
+        .account = account_.name,
+        .exchange = shared_.settings.exchange,
+        .symbol = item.contract,
+        .side = side,
+        .position_effect = {},
+        .margin_mode = {},
+        .max_show_quantity = NaN,
+        .order_type = OrderType::LIMIT,
+        .time_in_force = json::Map{item.tif},
+        .execution_instructions = {},
+        .create_time_utc = item.create_time,
+        .update_time_utc = item.update_time,
+        .external_account = {},
+        .external_order_id = external_order_id,
+        .client_order_id = {},
+        .order_status = json::Map{item.status},
+        .quantity = quantity,
+        .price = item.price,
+        .stop_price = NaN,
+        .remaining_quantity = remaining_quantity,
+        .traded_quantity = traded_quantity,
+        .average_traded_price = item.fill_price,  // ???
+        .last_traded_quantity = NaN,
+        .last_traded_price = NaN,
+        .last_liquidity = {},
+        .routing_id = {},
+        .max_request_version = {},
+        .max_response_version = {},
+        .max_accepted_version = {},
+        .update_type = UpdateType::INCREMENTAL,
+        .sending_time_utc = item.update_time,
+    };
+    if (shared_.update_order(cl_ord_id, stream_id_, trace_info, order_update, [&]([[maybe_unused]] auto &order) {
+          // no fills here
+        })) {
+    } else {
+      log::warn<1>(R"(*** EXTERNAL ORDER *** (id={}, cl_ord_id="{}"))"sv, item.id, cl_ord_id);
+    }
+  }
 }
 
-void DropCopy::operator()(Trace<json::TradeTrades> const &) {
+void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
+  auto &[trace_info, trades] = event;
+  for (auto &item : trades.result) {
+    log::info<2>("item={}"sv, item);
+    auto cl_ord_id = [&]() -> std::string_view {
+      if (!item.text.starts_with("t-"sv))
+        return {};
+      return item.text.substr(2);
+    }();
+    if (std::empty(cl_ord_id)) {
+      log::warn("*** EXTERNAL ORDER ***"sv);
+      continue;
+    }
+    auto external_order_id = fmt::format("{}"sv, item.id);
+    auto side = item.size < 0 ? Side::SELL : Side::BUY;
+    auto quantity = static_cast<double>(std::abs(item.size));
+    auto fill = Fill{
+        .exchange_time_utc = item.create_time_ms,
+        .external_trade_id = item.id,  // note!
+        .quantity = quantity,
+        .price = item.price,
+        .liquidity = json::Map{item.role},
+        .quote_quantity = NaN,
+        .commission_quantity = item.fee,  // XXX ???
+        .commission_currency = {},
+    };
+    auto trade_update = TradeUpdate{
+        .stream_id = stream_id_,
+        .account = account_.name,
+        .order_id = {},
+        .exchange = shared_.settings.exchange,
+        .symbol = item.contract,
+        .side = side,
+        .position_effect = {},
+        .margin_mode = {},
+        .create_time_utc = utils::safe_cast(item.create_time_ms),
+        .update_time_utc = utils::safe_cast(item.create_time_ms),
+        .external_account = {},
+        .external_order_id = external_order_id,
+        .client_order_id = {},
+        .fills = {&fill, 1},
+        .routing_id = {},
+        .update_type = UpdateType::SNAPSHOT,
+        .sending_time_utc = item.create_time_ms,
+        .user = {},
+        .strategy_id = {},
+    };
+    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE, cl_ord_id);
+  }
 }
 
 }  // namespace gate_futures

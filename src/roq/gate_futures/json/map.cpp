@@ -81,6 +81,29 @@ static_assert(static_cast<roq::OrderStatus>(Helper{OrderStatus{OrderStatus::UNDE
 static_assert(static_cast<roq::OrderStatus>(Helper{OrderStatus{OrderStatus::OPEN}}) == roq::OrderStatus::WORKING);
 static_assert(static_cast<roq::OrderStatus>(Helper{OrderStatus{OrderStatus::FINISHED}}) == roq::OrderStatus::COMPLETED);
 
+// Role ==> roq::Liquidity
+
+template <>
+template <>
+constexpr Helper<Role>::operator roq::Liquidity() {
+  switch (std::get<0>(args_)) {
+    using enum json::Role::type_t;
+    case UNDEFINED__:
+      return {};
+    case UNKNOWN__:
+      break;
+    case MAKER:
+      return roq::Liquidity::MAKER;
+    case TAKER:
+      return roq::Liquidity::TAKER;
+  }
+  roq::log::fatal("Unexpected"sv);
+}
+
+static_assert(static_cast<roq::Liquidity>(Helper{Role{Role::UNDEFINED__}}) == roq::Liquidity::UNDEFINED);
+static_assert(static_cast<roq::Liquidity>(Helper{Role{Role::MAKER}}) == roq::Liquidity::MAKER);
+static_assert(static_cast<roq::Liquidity>(Helper{Role{Role::TAKER}}) == roq::Liquidity::TAKER);
+
 // roq ==>
 }  // namespace
 
@@ -97,6 +120,12 @@ Map<TIF>::operator roq::TimeInForce() {
 template <>
 template <>
 Map<OrderStatus>::operator roq::OrderStatus() {
+  return Helper{args_};
+}
+
+template <>
+template <>
+Map<Role>::operator roq::Liquidity() {
   return Helper{args_};
 }
 

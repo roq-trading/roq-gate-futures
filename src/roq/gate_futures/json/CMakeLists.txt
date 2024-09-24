@@ -27,6 +27,7 @@ set(AUTOGEN_SCHEMAS
     positions_item.json
     positions.json
     price_size.json
+    role.json
     status.json
     subscribe.json
     subscribe_result.json
@@ -42,13 +43,13 @@ set(AUTOGEN_SCHEMAS
     trade_message.json
     trade_orders.json
     trade_positions.json
-    trades2_item.json
-    trades2.json
     trades_item.json
     trades.json
     trade_subscribe.json
     trade_subscribe_result.json
-    trade_trades.json)
+    trade_trades.json
+    user_trades_item.json
+    user_trades.json)
 
 roq_autogen_hpp(
   OUTPUT

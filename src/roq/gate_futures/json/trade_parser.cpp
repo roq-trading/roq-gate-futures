@@ -52,6 +52,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           case ORDER_BOOK_UPDATE:
           case LOGIN:
             log::fatal("Unexpected"sv);
+            break;
           case BALANCES:
           case POSITIONS:
           case ORDERS:
@@ -59,13 +60,6 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
             TradeSubscribe subscribe{message, buffer};
             create_trace_and_dispatch(handler, trace_info, subscribe);
             return true;
-            /*
-            if (message_2.result.status == Status::SUCCESS) {
-              return true;
-            } else {
-              log::fatal(R"(Unexpected: message="{}")"sv, message);
-            }
-            */
           }
         }
         break;
@@ -83,6 +77,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           case ORDER_BOOK_UPDATE:
           case LOGIN:
             log::fatal("Unexpected"sv);
+            break;
           case BALANCES: {
             TradeBalances balances{message, buffer};
             create_trace_and_dispatch(handler, trace_info, balances);

@@ -148,26 +148,26 @@ void Gateway::ensure_symbol_slices(size_t size) {
 
 uint16_t Gateway::operator()(Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id) {
   assert(!std::empty(event.value.account));
-  return get_order_entry(event.value.account)(event, order, request_id);
+  return get_drop_copy(event.value.account)(event, order, request_id);
 }
 
 uint16_t Gateway::operator()(
     Event<ModifyOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
   assert(!std::empty(event.value.account));
   assert(event.value.account == order.account);
-  return get_order_entry(event.value.account)(event, order, request_id, previous_request_id);
+  return get_drop_copy(event.value.account)(event, order, request_id, previous_request_id);
 }
 
 uint16_t Gateway::operator()(
     Event<CancelOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
   assert(!std::empty(event.value.account));
   assert(event.value.account == order.account);
-  return get_order_entry(event.value.account)(event, order, request_id, previous_request_id);
+  return get_drop_copy(event.value.account)(event, order, request_id, previous_request_id);
 }
 
 uint16_t Gateway::operator()(Event<CancelAllOrders> const &event, std::string_view const &request_id) {
   assert(!std::empty(event.value.account));
-  return get_order_entry(event.value.account)(event, request_id);
+  return get_drop_copy(event.value.account)(event, request_id);
 }
 
 void Gateway::operator()(metrics::Writer &writer) {
@@ -184,6 +184,13 @@ void Gateway::dispatch(Args &&...args) {
     helper(*item);
   for (auto &item : market_data_)
     helper(*item);
+}
+
+DropCopy &Gateway::get_drop_copy(std::string_view const &account) {
+  auto iter = drop_copy_.find(account);
+  if (iter != std::end(drop_copy_))
+    return *(*iter).second;
+  throw RuntimeError{R"(Unknown account="{}")"sv, account};
 }
 
 OrderEntry &Gateway::get_order_entry(std::string_view const &account) {

@@ -15,6 +15,7 @@ set(SOURCES
     json_trade_login.cpp
     json_trade_orders.cpp
     json_trade_subscribe.cpp
+    json_trade_trades.cpp
     main.cpp)
 
 roq_gitignore(OUTPUT .gitignore SOURCES ${TARGET_NAME})

@@ -29,9 +29,9 @@ namespace {
 auto const NAME = "om"sv;
 
 auto const SUPPORTS = Mask{
-    SupportType::CREATE_ORDER,
-    SupportType::CANCEL_ORDER,
-    SupportType::ORDER_ACK,
+    SupportType::ORDER,
+    SupportType::TRADE,
+    SupportType::POSITION,
     SupportType::FUNDS,
 };
 }  // namespace
@@ -488,7 +488,7 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
   auto constexpr const STATE = OrderEntryState::TRADES;
   profile_.trades_ack([&]() {
     auto handle_success = [&](auto &body) {
-      json::Trades2 trades{body, decode_buffer_};
+      json::UserTrades trades{body, decode_buffer_};
       Trace event_2{event, trades};
       (*this)(event_2);
       download_.check_relaxed(STATE);
@@ -502,9 +502,56 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
   });
 }
 
-void OrderEntry::operator()(Trace<json::Trades2> const &event) {
+void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
   auto &[trace_info, trades] = event;
   log::info<2>("trades={}"sv, trades);
+  for (auto &item : trades.data) {
+    log::info<2>("item={}"sv, item);
+    auto cl_ord_id = [&]() -> std::string_view {
+      if (!item.text.starts_with("t-"sv))
+        return {};
+      return item.text.substr(2);
+    }();
+    if (std::empty(cl_ord_id)) {
+      log::warn("*** EXTERNAL ORDER ***"sv);
+      continue;
+    }
+    auto external_order_id = fmt::format("{}"sv, item.order_id);
+    auto side = item.size < 0 ? Side::SELL : Side::BUY;
+    auto quantity = static_cast<double>(std::abs(item.size));
+    auto fill = Fill{
+        .exchange_time_utc = item.create_time_ms,
+        .external_trade_id = item.trade_id,  // note!
+        .quantity = quantity,
+        .price = item.price,
+        .liquidity = json::Map{item.role},
+        .quote_quantity = NaN,
+        .commission_quantity = item.fee,  // XXX ???
+        .commission_currency = {},
+    };
+    auto trade_update = TradeUpdate{
+        .stream_id = stream_id_,
+        .account = account_.name,
+        .order_id = {},
+        .exchange = shared_.settings.exchange,
+        .symbol = item.contract,
+        .side = side,
+        .position_effect = {},
+        .margin_mode = {},
+        .create_time_utc = utils::safe_cast(item.create_time_ms),
+        .update_time_utc = utils::safe_cast(item.create_time_ms),
+        .external_account = {},
+        .external_order_id = external_order_id,
+        .client_order_id = {},
+        .fills = {&fill, 1},
+        .routing_id = {},
+        .update_type = UpdateType::SNAPSHOT,
+        .sending_time_utc = item.create_time_ms,
+        .user = {},
+        .strategy_id = {},
+    };
+    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE, cl_ord_id);
+  }
 }
 
 // helpers
