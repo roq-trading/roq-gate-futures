@@ -44,71 +44,15 @@ TEST_CASE("json_trades", "[json_trades]") {
                  R"(})"
                  R"(])"sv;
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::UserTrades obj{message, buffer};
+  json::UserTrades trades{message, buffer};
+  REQUIRE(std::size(trades.data) == 2);
+  auto &result_0 = trades.data[0];
+  CHECK(result_0.create_time == 1714215684362700us);
+  auto &result_1 = trades.data[1];
+  CHECK(result_1.create_time == 1714215674274100us);
 }
 
 TEST_CASE("json_trades_update_1", "[json_trades]") {
-  auto message = R"({)"
-                 R"("channel":"futures.usertrades",)"
-                 R"("event":"update",)"
-                 R"("result":[{)"
-                 R"("price":"0.3397",)"
-                 R"("text":"web",)"
-                 R"("fee":"-0.0254775",)"
-                 R"("create_time":1714215684.3627,)"
-                 R"("point_fee":"0",)"
-                 R"("trade_id":"10668304",)"
-                 R"("contract":"BLZ_USDT",)"
-                 R"("role":"maker",)"
-                 R"("order_id":"460776906546",)"
-                 R"("size":50,)"
-                 R"("biz_info":"-",)"
-                 R"("amend_text":"-")"
-                 R"(},{)"
-                 R"("price":"0.3399",)"
-                 R"("text":"web",)"
-                 R"("fee":"-0.00866745",)"
-                 R"("create_time":1714215674.2741,)"
-                 R"("point_fee":"0",)"
-                 R"("trade_id":"10668303",)"
-                 R"("contract":"BLZ_USDT",)"
-                 R"("role":"maker",)"
-                 R"("order_id":"460776972807",)"
-                 R"("size":17,)"
-                 R"("biz_info":"-",)"
-                 R"("amend_text":"-")"
-                 R"(})"
-                 R"(],)"
-                 R"("time":1727094610,)"
-                 R"("time_ms":1727094610077)"
-                 R"(})"sv;
-  struct MyHandler final : public json::TradeParser::Handler {
-    bool found = false;
-
-   protected:
-    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
-    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeTrades> const &event) override {
-      found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 2);
-    }
-    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
-  } handler;
-  std::vector<std::byte> buffer(8192);
-  TraceInfo trace_info;
-  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
-  CHECK(handler.found == true);
-}
-
-TEST_CASE("json_trades_update_2", "[json_trades]") {
   auto message = R"({)"
                  R"("channel":"futures.usertrades",)"
                  R"("event":"update",)"
@@ -143,8 +87,13 @@ TEST_CASE("json_trades_update_2", "[json_trades]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &trades = event.value;
+      CHECK(trades.time == 1727168891s);
+      CHECK(trades.time_ms == 1727168891630ms);
+      REQUIRE(std::size(trades.result) == 1);
+      auto &result_0 = trades.result[0];
+      CHECK(result_0.create_time == 1727168891s);
+      CHECK(result_0.create_time_ms == 1727168891629ms);
     }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
@@ -159,7 +108,7 @@ TEST_CASE("json_trades_update_2", "[json_trades]") {
 }
 
 // open 1
-TEST_CASE("json_trades_update_3", "[json_trades]") {
+TEST_CASE("json_trades_update_2", "[json_trades]") {
   auto message = R"({)"
                  R"("channel":"futures.usertrades",)"
                  R"("event":"update",)"
@@ -194,8 +143,13 @@ TEST_CASE("json_trades_update_3", "[json_trades]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &trades = event.value;
+      CHECK(trades.time == 1727169120s);
+      CHECK(trades.time_ms == 1727169120015ms);
+      REQUIRE(std::size(trades.result) == 1);
+      auto &result_0 = trades.result[0];
+      CHECK(result_0.create_time == 1727169120s);
+      CHECK(result_0.create_time_ms == 1727169120012ms);
     }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
@@ -210,7 +164,7 @@ TEST_CASE("json_trades_update_3", "[json_trades]") {
 }
 
 // close 1
-TEST_CASE("json_trades_update_4", "[json_trades]") {
+TEST_CASE("json_trades_update_3", "[json_trades]") {
   auto message = R"({)"
                  R"("channel":"futures.usertrades",)"
                  R"("event":"update",)"
@@ -245,8 +199,13 @@ TEST_CASE("json_trades_update_4", "[json_trades]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &trades = event.value;
+      CHECK(trades.time == 1727169518s);
+      CHECK(trades.time_ms == 1727169518414ms);
+      REQUIRE(std::size(trades.result) == 1);
+      auto &result_0 = trades.result[0];
+      CHECK(result_0.create_time == 1727169518s);
+      CHECK(result_0.create_time_ms == 1727169518413ms);
     }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }

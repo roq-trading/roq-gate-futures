@@ -43,7 +43,7 @@ inline void update(std::chrono::milliseconds &result, core::json::Value const &v
           [&](core::json::Null const &) { result = std::chrono::milliseconds{}; },
           [](bool) { throw std::bad_cast{}; },
           [&](int64_t value) { result = std::chrono::milliseconds{value}; },
-          [&](double value) { result = std::chrono::milliseconds{static_cast<int64_t>(value * 1000000.0)}; },
+          [&](double value) { result = std::chrono::milliseconds{static_cast<int64_t>(value * 1.0e3)}; },
           [&](std::string_view const &value) {
             result = utils::charconv::from_chars<std::remove_reference<decltype(result)>::type>(value, utils::charconv::Format::DATETIME);
           },
@@ -60,10 +60,10 @@ inline void update(std::chrono::microseconds &result, core::json::Value const &v
           [&](core::json::Null const &) { result = std::chrono::microseconds{}; },
           [](bool) { throw std::bad_cast{}; },
           [&](int64_t value) { result = std::chrono::microseconds{value}; },
-          [&](double value) { result = std::chrono::microseconds{static_cast<int64_t>(value * 1000000.0)}; },
+          [&](double value) { result = std::chrono::microseconds{static_cast<int64_t>(value * 1.0e6)}; },
           [&](std::string_view const &value) {
             auto tmp = utils::charconv::from_chars<double>(value);
-            result = std::chrono::microseconds{static_cast<int64_t>(tmp * 1000000.0)};
+            result = std::chrono::microseconds{static_cast<int64_t>(tmp * 1.0e6)};
           },
           [](core::json::Object const &) { throw std::bad_cast{}; },
           [](core::json::Array const &) { throw std::bad_cast{}; },

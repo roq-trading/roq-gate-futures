@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_positions_update", "[json_positions]") {
+TEST_CASE("json_positions", "[json_positions]") {
   auto message = R"([)"
                  R"({)"
                  R"("value":"0",)"
@@ -50,5 +50,8 @@ TEST_CASE("json_positions_update", "[json_positions]") {
                  R"(})"
                  R"(])"sv;
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Positions obj{message, buffer};
+  json::Positions positions{message, buffer};
+  REQUIRE(std::size(positions.data) == 1);
+  auto &result_0 = positions.data[0];
+  CHECK(result_0.update_time == 1727084914s);
 }

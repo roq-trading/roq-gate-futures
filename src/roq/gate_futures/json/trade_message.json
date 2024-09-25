@@ -23,12 +23,10 @@
     },
     {
       "name": "time",
-      "type": "std/seconds",
       "comment": "!login"
     },
     {
       "name": "time_ms",
-      "type": "std/milliseconds",
       "comment": "!login"
     },
     {

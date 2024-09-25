@@ -16,7 +16,7 @@
     },
     {
       "name": "create_time",
-      "type": "std/milliseconds"
+      "type": "std/seconds"
     },
     {
       "name": "create_time_ms",
@@ -88,7 +88,7 @@
     },
     {
       "name": "finish_time",
-      "type": "std/milliseconds"
+      "type": "std/seconds"
     },
     {
       "name": "finish_time_ms",

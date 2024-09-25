@@ -20,7 +20,7 @@
     },
     {
       "name": "result",
-      "type": "roq/gate_futures/json/UserTradesItem",
+      "type": "roq/gate_futures/json/TradeTradesResultItem",
       "array": "std/span"
     }
   ]

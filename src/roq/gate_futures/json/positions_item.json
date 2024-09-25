@@ -103,7 +103,7 @@
     },
     {
       "name": "update_time",
-      "type": "std/milliseconds"
+      "type": "std/seconds"
     },
     {
       "name": "cross_leverage_limit",
@@ -123,7 +123,7 @@
     },
     {
       "name": "open_time",
-      "type": "std/milliseconds"
+      "type": "std/seconds"
     },
     {
       "name": "trade_max_size",
@@ -131,7 +131,7 @@
     },
     {
       "name": "time",
-      "type": "std/milliseconds"
+      "type": "std/seconds"
     },
     {
       "name": "time_ms",

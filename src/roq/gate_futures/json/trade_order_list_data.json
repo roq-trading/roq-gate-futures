@@ -4,7 +4,7 @@
   "values": [
     {
       "name": "result",
-      "type": "roq/gate_futures/json/OrdersItem",
+      "type": "roq/gate_futures/json/TradeOrderListDataResultItem",
       "array": "std/span"
     }
   ]

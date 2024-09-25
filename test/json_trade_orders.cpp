@@ -63,8 +63,16 @@ TEST_CASE("json_orders_update_1", "[json_orders]") {
     void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrders> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &orders = event.value;
+      CHECK(orders.time == 1727094610s);
+      CHECK(orders.time_ms == 1727094610077ms);
+      REQUIRE(std::size(orders.result) == 1);
+      auto &result_0 = orders.result[0];
+      CHECK(result_0.create_time == 1727084914s);
+      CHECK(result_0.create_time_ms == 1727084914383ms);
+      CHECK(result_0.finish_time == 1727094610s);
+      CHECK(result_0.finish_time_ms == 1727094610074ms);
+      CHECK(result_0.update_time == 1727094610074ms);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
@@ -130,8 +138,16 @@ TEST_CASE("json_orders_update_2", "[json_orders]") {
     void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrders> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &orders = event.value;
+      CHECK(orders.time == 1727164365s);
+      CHECK(orders.time_ms == 1727164365252ms);
+      REQUIRE(std::size(orders.result) == 1);
+      auto &result_0 = orders.result[0];
+      CHECK(result_0.create_time == 1727164283s);
+      CHECK(result_0.create_time_ms == 1727164283948ms);
+      CHECK(result_0.finish_time == 1727164365s);
+      CHECK(result_0.finish_time_ms == 1727164365250ms);
+      CHECK(result_0.update_time == 1727164365250ms);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
@@ -198,8 +214,16 @@ TEST_CASE("json_orders_update_3", "[json_orders]") {
     void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrders> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &orders = event.value;
+      CHECK(orders.time == 1727165696s);
+      CHECK(orders.time_ms == 1727165696936ms);
+      REQUIRE(std::size(orders.result) == 1);
+      auto &result_0 = orders.result[0];
+      CHECK(result_0.create_time == 1727165696s);
+      CHECK(result_0.create_time_ms == 1727165696934ms);
+      CHECK(result_0.finish_time == 1727165696s);
+      CHECK(result_0.finish_time_ms == 1727165696934ms);
+      CHECK(result_0.update_time == 1727165696934ms);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
@@ -266,8 +290,16 @@ TEST_CASE("json_orders_update_4", "[json_orders]") {
     void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrders> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &orders = event.value;
+      CHECK(orders.time == 1727169518s);
+      CHECK(orders.time_ms == 1727169518417ms);
+      REQUIRE(std::size(orders.result) == 1);
+      auto &result_0 = orders.result[0];
+      CHECK(result_0.create_time == 1727169518s);
+      CHECK(result_0.create_time_ms == 1727169518087ms);
+      CHECK(result_0.finish_time == 1727169518s);
+      CHECK(result_0.finish_time_ms == 1727169518413ms);
+      CHECK(result_0.update_time == 1727169518413ms);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }

@@ -46,8 +46,9 @@ trade_order_cancel_cp.hpp
 trade_order_cancel_data.hpp
 trade_order_cancel_data_result.hpp
 trade_order_cancel.hpp
-trade_order_list.hpp
 trade_order_list_data.hpp
+trade_order_list_data_result_item.hpp
+trade_order_list.hpp
 trade_order_place_data_errs.hpp
 trade_order_place_data.hpp
 trade_order_place_data_result.hpp
@@ -59,6 +60,7 @@ trades.hpp
 trade_subscribe.hpp
 trade_subscribe_result.hpp
 trade_trades.hpp
+trade_trades_result_item.hpp
 user_trades_item.hpp
 user_trades.hpp
 accounts_history.cpp
@@ -107,8 +109,9 @@ trade_order_cancel_cp.cpp
 trade_order_cancel_data.cpp
 trade_order_cancel_data_result.cpp
 trade_order_cancel.cpp
-trade_order_list.cpp
 trade_order_list_data.cpp
+trade_order_list_data_result_item.cpp
+trade_order_list.cpp
 trade_order_place_data_errs.cpp
 trade_order_place_data.cpp
 trade_order_place_data_result.cpp
@@ -120,5 +123,6 @@ trades.cpp
 trade_subscribe.cpp
 trade_subscribe_result.cpp
 trade_trades.cpp
+trade_trades_result_item.cpp
 user_trades_item.cpp
 user_trades.cpp

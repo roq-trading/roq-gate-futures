@@ -60,7 +60,7 @@
     },
     {
       "name": "update_time",
-      "type": "std/seconds"
+      "type": "std/nanoseconds"
     },
     {
       "name": "update_id",

@@ -8,7 +8,7 @@
     },
     {
       "name": "data",
-      "type": "roq/gate_futures/json/TradeOrderPlaceData"
+      "type": "roq/gate_futures/json/TradeOrderAmendData"
     },
     {
       "name": "request_id",

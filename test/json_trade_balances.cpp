@@ -39,8 +39,13 @@ TEST_CASE("json_balances_update_1", "[json_balances]") {
     void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
     void operator()(Trace<json::TradeBalances> const &event) override {
       found = true;
-      auto &result = event.value.result;
-      CHECK(std::size(result) == 1);
+      auto &positions = event.value;
+      CHECK(positions.time == 1727169518s);
+      CHECK(positions.time_ms == 1727169518435ms);
+      REQUIRE(std::size(positions.result) == 1);
+      auto &result_0 = positions.result[0];
+      CHECK(result_0.time == 1727169518s);
+      CHECK(result_0.time_ms == 1727169518413ms);
     }
     void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }

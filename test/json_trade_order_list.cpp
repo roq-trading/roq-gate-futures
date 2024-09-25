@@ -40,7 +40,11 @@ TEST_CASE("json_trade_order_list_1", "[json_trade_order_list]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderList> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderList> const &event) override {
+      found = true;
+      auto &order_list = event.value;
+      CHECK(order_list.header.response_time == 1727250838664ms);
+    }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -93,7 +97,14 @@ TEST_CASE("json_trade_order_list_2", "[json_trade_order_list]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderList> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderList> const &event) override {
+      found = true;
+      auto &order_list = event.value;
+      CHECK(order_list.header.response_time == 1727251141654ms);
+      auto &result_0 = order_list.data.result[0];
+      CHECK(result_0.create_time == 1727251125952ms);
+      CHECK(result_0.update_time == 1727251125952ms);
+    }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;

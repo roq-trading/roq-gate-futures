@@ -8,7 +8,7 @@
     },
     {
       "name": "time",
-      "type": "std/milliseconds"
+      "type": "std/seconds"
     },
     {
       "name": "time_ms",

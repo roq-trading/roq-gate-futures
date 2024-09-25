@@ -56,7 +56,14 @@ TEST_CASE("json_order_cancel_success_1", "[json_order_cancel]") {
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderCancel> const &event) override {
+      found = true;
+      auto &order_cancel = event.value;
+      CHECK(order_cancel.header.response_time == 1727228915694ms);
+      CHECK(order_cancel.data.result.create_time == 1727228909079ms);
+      CHECK(order_cancel.data.result.finish_time == 1727228915694ms);
+      CHECK(order_cancel.data.result.update_time == 1727228915694ms);
+    }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
@@ -96,7 +103,14 @@ TEST_CASE("json_order_cancel_error_1", "[json_order_cancel]") {
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderCancel> const &event) override {
+      found = true;
+      auto &order_cancel = event.value;
+      CHECK(order_cancel.header.response_time == 1727166448270ms);
+      CHECK(order_cancel.data.result.create_time == 0ms);
+      CHECK(order_cancel.data.result.finish_time == 0ms);
+      CHECK(order_cancel.data.result.update_time == 0ms);
+    }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
@@ -135,7 +149,14 @@ TEST_CASE("json_order_cancel_error_2", "[json_order_cancel]") {
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderCancel> const &event) override {
+      found = true;
+      auto &order_cancel = event.value;
+      CHECK(order_cancel.header.response_time == 1727231274435ms);
+      CHECK(order_cancel.data.result.create_time == 0ms);
+      CHECK(order_cancel.data.result.finish_time == 0ms);
+      CHECK(order_cancel.data.result.update_time == 0ms);
+    }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;

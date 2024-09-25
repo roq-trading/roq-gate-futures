@@ -53,7 +53,13 @@ TEST_CASE("json_order_amend_success_1", "[json_order_amend]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderAmend> const &event) override {
+      found = true;
+      auto &order_amend = event.value;
+      CHECK(order_amend.header.response_time == 1727230008594ms);
+      CHECK(order_amend.data.result.create_time == 1727229980658ms);
+      CHECK(order_amend.data.result.update_time == 1727230008594ms);
+    }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
@@ -92,7 +98,13 @@ TEST_CASE("json_order_amend_error_1", "[json_order_amend]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderAmend> const &event) override {
+      found = true;
+      auto &order_amend = event.value;
+      CHECK(order_amend.header.response_time == 1727230686049ms);
+      CHECK(order_amend.data.result.create_time == 0ms);
+      CHECK(order_amend.data.result.update_time == 0ms);
+    }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
