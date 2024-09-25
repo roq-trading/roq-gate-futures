@@ -12,10 +12,14 @@ set(SOURCES
     json_positions.cpp
     json_subscribe.cpp
     json_tickers.cpp
+    json_trade_balances.cpp
     json_trade_login.cpp
+    json_trade_order_amend.cpp
+    json_trade_order_cancel_cp.cpp
     json_trade_order_cancel.cpp
     json_trade_order_place.cpp
     json_trade_orders.cpp
+    json_trade_positions.cpp
     json_trade_subscribe.cpp
     json_trade_trades.cpp
     main.cpp)

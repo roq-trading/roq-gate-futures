@@ -1,0 +1,14 @@
+{
+  "name": "roq/gate_futures/json/TradeOrderPlaceDataErrs",
+  "type": "comp",
+  "values": [
+    {
+      "name": "label",
+      "type": "std/string_view"
+    },
+    {
+      "name": "message",
+      "type": "std/string_view"
+    }
+  ]
+}

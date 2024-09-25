@@ -49,12 +49,26 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
       case USERTRADES:
         log::fatal("Unexpected"sv);
         break;
-      case ORDER_PLACE:
-      case ORDER_AMEND:
-      case ORDER_CANCEL:
-      case ORDER_CANCEL_CP:
-        // XXX TODO
+      case ORDER_PLACE: {
+        TradeOrderPlace order_place{message, buffer};
+        create_trace_and_dispatch(handler, trace_info, order_place);
         return true;
+      }
+      case ORDER_AMEND: {
+        TradeOrderAmend order_amend{message, buffer};
+        create_trace_and_dispatch(handler, trace_info, order_amend);
+        return true;
+      }
+      case ORDER_CANCEL: {
+        TradeOrderCancel order_cancel{message, buffer};
+        create_trace_and_dispatch(handler, trace_info, order_cancel);
+        return true;
+      }
+      case ORDER_CANCEL_CP: {
+        TradeOrderCancelCP order_cancel_cp{message, buffer};
+        create_trace_and_dispatch(handler, trace_info, order_cancel_cp);
+        return true;
+      }
     }
     log::fatal("Unexpected"sv);
   } else {  // subscribe or update do not have "header"

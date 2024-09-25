@@ -59,6 +59,10 @@
     {
       "name": "amend_text",
       "type": "std/string_view"
+    },
+    {
+      "name": "close_size",
+      "type": "std/double"
     }
   ]
 }

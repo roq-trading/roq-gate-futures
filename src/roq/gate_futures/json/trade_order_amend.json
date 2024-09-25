@@ -1,0 +1,22 @@
+{
+  "name": "roq/gate_futures/json/TradeOrderAmend",
+  "type": "comp",
+  "values": [
+    {
+      "name": "header",
+      "type": "roq/gate_futures/json/TradeHeader"
+    },
+    {
+      "name": "data",
+      "type": "roq/gate_futures/json/TradeOrderPlaceData"
+    },
+    {
+      "name": "request_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "ack",
+      "type": "std/bool"
+    }
+  ]
+}

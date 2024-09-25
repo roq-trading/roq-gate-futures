@@ -11,14 +11,6 @@
       "type": "std/milliseconds"
     },
     {
-      "name": "conn_id",
-      "type": "std/string_view"
-    },
-    {
-      "name": "trace_id",
-      "type": "std/string_view"
-    },
-    {
       "name": "channel",
       "type": "roq/gate_futures/json/Channel"
     },
@@ -27,14 +19,9 @@
       "type": "roq/gate_futures/json/Event"
     },
     {
-      "name": "payload"
-    },
-    {
-      "name": "result"
-    },
-    {
-      "name": "error",
-      "type": "roq/gate_futures/json/TradeError"
+      "name": "result",
+      "type": "roq/gate_futures/json/BalancesItem",
+      "array": "std/span"
     }
   ]
 }

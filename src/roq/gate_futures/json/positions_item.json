@@ -128,6 +128,14 @@
     {
       "name": "trade_max_size",
       "type": "std/double"
+    },
+    {
+      "name": "time",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds"
     }
   ]
 }

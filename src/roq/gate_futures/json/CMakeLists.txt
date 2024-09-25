@@ -7,6 +7,7 @@ include(RoqAutogen)
 set(AUTOGEN_SCHEMAS
     accounts_history.json
     accounts.json
+    balances_item.json
     book_ticker.json
     book_ticker_result.json
     channel.json
@@ -42,6 +43,19 @@ set(AUTOGEN_SCHEMAS
     trade_login_data_result.json
     trade_login.json
     trade_message.json
+    trade_order_amend_data.json
+    trade_order_amend_data_result.json
+    trade_order_amend.json
+    trade_order_cancel_cp_data.json
+    trade_order_cancel_cp_data_result.json
+    trade_order_cancel_cp.json
+    trade_order_cancel_data.json
+    trade_order_cancel_data_result.json
+    trade_order_cancel.json
+    trade_order_place_data_errs.json
+    trade_order_place_data.json
+    trade_order_place_data_result.json
+    trade_order_place.json
     trade_orders.json
     trade_positions.json
     trades_item.json

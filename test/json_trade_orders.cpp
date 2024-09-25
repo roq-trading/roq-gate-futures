@@ -104,6 +104,10 @@ TEST_CASE("json_orders_update_1", "[json_orders]") {
       CHECK(std::size(result) == 1);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -166,6 +170,10 @@ TEST_CASE("json_orders_update_2", "[json_orders]") {
       CHECK(std::size(result) == 1);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -229,6 +237,77 @@ TEST_CASE("json_orders_update_3", "[json_orders]") {
       CHECK(std::size(result) == 1);
     }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
+  } handler;
+  std::vector<std::byte> buffer(8192);
+  TraceInfo trace_info;
+  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(handler.found == true);
+}
+
+// sell 1
+TEST_CASE("json_orders_update_4", "[json_orders]") {
+  auto message = R"({)"
+                 R"("channel":"futures.orders",)"
+                 R"("event":"update",)"
+                 R"("result":[{)"
+                 R"("amend_text":"-",)"
+                 R"("biz_info":"-",)"
+                 R"("contract":"SOL_USDT",)"
+                 R"("create_time":1727169518,)"
+                 R"("create_time_ms":1727169518087,)"
+                 R"("fill_price":147.6,)"
+                 R"("finish_as":"filled",)"
+                 R"("finish_time":1727169518,)"
+                 R"("finish_time_ms":1727169518413,)"
+                 R"("iceberg":0,)"
+                 R"("id":533324294866,)"
+                 R"("is_close":false,)"
+                 R"("is_liq":false,)"
+                 R"("is_reduce_only":false,)"
+                 R"("left":0,)"
+                 R"("mkfr":-0.00005,)"
+                 R"("price":147.6,)"
+                 R"("refr":0,)"
+                 R"("refu":0,)"
+                 R"("size":-1,)"
+                 R"("status":"finished",)"
+                 R"("stop_loss_price":"",)"
+                 R"("stop_profit_price":"",)"
+                 R"("stp_act":"-",)"
+                 R"("stp_id":"0",)"
+                 R"("text":"t-KAICtn9Y5BkCAQAAAAAA",)"
+                 R"("tif":"gtc",)"
+                 R"("tkfr":0.00015,)"
+                 R"("update_id":2,)"
+                 R"("update_time":1727169518413,)"
+                 R"("user":"15564602")"
+                 R"(})"
+                 R"(],)"
+                 R"("time":1727169518,)"
+                 R"("time_ms":1727169518417)"
+                 R"(})"sv;
+  struct MyHandler final : public json::TradeParser::Handler {
+    bool found = false;
+
+   protected:
+    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
+    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrders> const &event) override {
+      found = true;
+      auto &result = event.value.result;
+      CHECK(std::size(result) == 1);
+    }
+    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;

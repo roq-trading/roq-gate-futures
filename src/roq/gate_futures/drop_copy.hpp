@@ -31,6 +31,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
     virtual void operator()(Trace<StreamStatus> const &) = 0;
     virtual void operator()(Trace<ExternalLatency> const &) = 0;
     virtual void operator()(Trace<TradeUpdate> const &, bool is_last, uint8_t user_id, std::string_view const &request_id) = 0;
+    virtual void operator()(Trace<PositionUpdate> const &, bool is_last) = 0;
     virtual void operator()(Trace<FundsUpdate> const &, bool is_last) = 0;
   };
 
@@ -70,6 +71,11 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   void operator()(Trace<json::TradeOrders> const &) override;
   void operator()(Trace<json::TradeTrades> const &) override;
 
+  void operator()(Trace<json::TradeOrderPlace> const &) override;
+  void operator()(Trace<json::TradeOrderAmend> const &) override;
+  void operator()(Trace<json::TradeOrderCancel> const &) override;
+  void operator()(Trace<json::TradeOrderCancelCP> const &) override;
+
  private:
   void operator()(ConnectionStatus);
 
@@ -87,6 +93,8 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   void subscribe(std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
 
   void parse(std::string_view const &message);
+
+  void operator()(Trace<server::oms::Response> const &, std::string_view const &request_or_exchange_id);
 
  private:
   Handler &handler_;
