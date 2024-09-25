@@ -19,7 +19,6 @@
 #include "roq/server.hpp"
 
 #include "roq/gate_futures/json/accounts.hpp"
-#include "roq/gate_futures/json/orders.hpp"
 #include "roq/gate_futures/json/positions.hpp"
 #include "roq/gate_futures/json/user_trades.hpp"
 
@@ -51,12 +50,6 @@ struct OrderEntry final : public web::rest::Client::Handler {
 
   void operator()(metrics::Writer &);
 
-  uint16_t operator()(Event<CreateOrder> const &, server::oms::Order const &, std::string_view const &request_id);
-  uint16_t operator()(Event<ModifyOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id);
-  uint16_t operator()(Event<CancelOrder> const &, server::oms::Order const &, std::string_view const &request_id, std::string_view const &previous_request_id);
-
-  uint16_t operator()(Event<CancelAllOrders> const &, std::string_view const &request_id);
-
  protected:
   void operator()(Trace<web::rest::Client::Connected> const &) override;
   void operator()(Trace<web::rest::Client::Disconnected> const &) override;
@@ -73,10 +66,6 @@ struct OrderEntry final : public web::rest::Client::Handler {
   void get_positions();
   void get_positions_ack(Trace<web::rest::Response> const &, uint32_t sequence);
   void operator()(Trace<json::Positions> const &);
-
-  void get_orders();
-  void get_orders_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::Orders> const &);
 
   void get_trades();
   void get_trades_ack(Trace<web::rest::Response> const &, uint32_t sequence);
@@ -108,13 +97,9 @@ struct OrderEntry final : public web::rest::Client::Handler {
   struct {
     utils::metrics::Profile  //
         accounts,
-        accounts_ack,                    //
-        positions, positions_ack,        //
-        orders, orders_ack,              //
-        trades, trades_ack,              //
-        create_order, create_order_ack,  //
-        cancel_order, cancel_order_ack,  //
-        cancel_all_orders, cancel_all_orders_ack;
+        accounts_ack,              //
+        positions, positions_ack,  //
+        trades, trades_ack;
   } profile_;
   struct {
     utils::metrics::Latency ping;

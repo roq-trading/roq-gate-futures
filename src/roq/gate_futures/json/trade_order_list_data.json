@@ -1,9 +1,9 @@
 {
-  "name": "roq/gate_futures/json/Orders",
-  "type": "array",
+  "name": "roq/gate_futures/json/TradeOrderListData",
+  "type": "comp",
   "values": [
     {
-      "name": "data",
+      "name": "result",
       "type": "roq/gate_futures/json/OrdersItem",
       "array": "std/span"
     }

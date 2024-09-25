@@ -100,6 +100,7 @@ TEST_CASE("json_trades_update_1", "[json_trades]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -149,6 +150,7 @@ TEST_CASE("json_trades_update_2", "[json_trades]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -199,6 +201,7 @@ TEST_CASE("json_trades_update_3", "[json_trades]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -249,6 +252,7 @@ TEST_CASE("json_trades_update_4", "[json_trades]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;

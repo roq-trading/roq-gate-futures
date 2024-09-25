@@ -9,6 +9,9 @@
       "name": "subscribe"
     },
     {
+      "name": "orders"
+    },
+    {
       "name": "done"
     }
   ]

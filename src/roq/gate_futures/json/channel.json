@@ -66,6 +66,11 @@
       "raw": "futures.order_cancel_cp",
       "name": "order_cancel_cp",
       "comment": "order management"
+    },
+    {
+      "raw": "futures.order_list",
+      "name": "order_list",
+      "comment": "order management"
     }
   ]
 }

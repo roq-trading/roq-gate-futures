@@ -29,7 +29,6 @@ namespace {
 auto const NAME = "om"sv;
 
 auto const SUPPORTS = Mask{
-    SupportType::ORDER,
     SupportType::TRADE,
     SupportType::POSITION,
     SupportType::FUNDS,
@@ -91,16 +90,8 @@ OrderEntry::OrderEntry(Handler &handler, io::Context &context, uint16_t stream_i
           .accounts_ack = create_metrics(shared.settings, name_, "accounts_ack"sv),
           .positions = create_metrics(shared.settings, name_, "positions"sv),
           .positions_ack = create_metrics(shared.settings, name_, "positions_ack"sv),
-          .orders = create_metrics(shared.settings, name_, "orders"sv),
-          .orders_ack = create_metrics(shared.settings, name_, "orders_ack"sv),
           .trades = create_metrics(shared.settings, name_, "trades"sv),
           .trades_ack = create_metrics(shared.settings, name_, "trades_ack"sv),
-          .create_order = create_metrics(shared.settings, name_, "create_order"sv),
-          .create_order_ack = create_metrics(shared.settings, name_, "create_order_ack"sv),
-          .cancel_order = create_metrics(shared.settings, name_, "cancel_order"sv),
-          .cancel_order_ack = create_metrics(shared.settings, name_, "cancel_order_ack"sv),
-          .cancel_all_orders = create_metrics(shared.settings, name_, "cancel_all_orders"sv),
-          .cancel_all_orders_ack = create_metrics(shared.settings, name_, "cancel_all_orders_ack"sv),
       },
       latency_{
           .ping = create_metrics(shared.settings, name_, "ping"sv),
@@ -130,42 +121,10 @@ void OrderEntry::operator()(metrics::Writer &writer) {
       .write(profile_.accounts_ack, metrics::Type::PROFILE)
       .write(profile_.positions, metrics::Type::PROFILE)
       .write(profile_.positions_ack, metrics::Type::PROFILE)
-      .write(profile_.orders, metrics::Type::PROFILE)
-      .write(profile_.orders_ack, metrics::Type::PROFILE)
       .write(profile_.trades, metrics::Type::PROFILE)
       .write(profile_.trades_ack, metrics::Type::PROFILE)
-      .write(profile_.create_order, metrics::Type::PROFILE)
-      .write(profile_.create_order_ack, metrics::Type::PROFILE)
-      .write(profile_.cancel_order, metrics::Type::PROFILE)
-      .write(profile_.cancel_order_ack, metrics::Type::PROFILE)
-      .write(profile_.cancel_all_orders, metrics::Type::PROFILE)
-      .write(profile_.cancel_all_orders_ack, metrics::Type::PROFILE)
       // latency
       .write(latency_.ping, metrics::Type::LATENCY);
-}
-
-uint16_t OrderEntry::operator()(Event<CreateOrder> const &, server::oms::Order const &, [[maybe_unused]] std::string_view const &request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
-}
-
-uint16_t OrderEntry::operator()(
-    Event<ModifyOrder> const &,
-    server::oms::Order const &,
-    [[maybe_unused]] std::string_view const &request_id,
-    [[maybe_unused]] std::string_view const &previous_request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
-}
-
-uint16_t OrderEntry::operator()(
-    [[maybe_unused]] Event<CancelOrder> const &,
-    [[maybe_unused]] server::oms::Order const &,
-    [[maybe_unused]] std::string_view const &request_id,
-    [[maybe_unused]] std::string_view const &previous_request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
-}
-
-uint16_t OrderEntry::operator()(Event<CancelAllOrders> const &, [[maybe_unused]] std::string_view const &request_id) {
-  throw server::oms::NotSupported{"not supported"sv};
 }
 
 void OrderEntry::operator()(Trace<web::rest::Client::Connected> const &) {
@@ -228,9 +187,6 @@ uint32_t OrderEntry::download(OrderEntryState state) {
       return 1;
     case POSITIONS:
       get_positions();
-      return 1;
-    case ORDERS:
-      get_orders();
       return 1;
     case TRADES:
       get_trades();
@@ -356,114 +312,6 @@ void OrderEntry::operator()(Trace<json::Positions> const &event) {
     };
     log::debug("position_update={}"sv, position_update);
     create_trace_and_dispatch(handler_, trace_info, position_update, true);
-  }
-}
-
-void OrderEntry::get_orders() {
-  profile_.orders([&]() {
-    auto method = web::http::Method::GET;
-    auto path = shared_.api.orders;
-    auto query = "?status=open"sv;
-    auto headers = account_.create_headers(method, path, query, {});
-    auto request = web::rest::Request{
-        .method = method,
-        .path = path,
-        .query = query,
-        .accept = web::http::Accept::APPLICATION_JSON,
-        .content_type = {},
-        .headers = headers,
-        .body = {},
-        .quality_of_service = {},
-    };
-    auto callback = [this, sequence = download_.sequence()]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_orders_ack(event, sequence);
-    };
-    (*connection_)("orders"sv, request, callback);
-  });
-}
-
-void OrderEntry::get_orders_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto constexpr const STATE = OrderEntryState::ORDERS;
-  profile_.orders_ack([&]() {
-    auto handle_success = [&](auto &body) {
-      json::Orders orders{body, decode_buffer_};
-      Trace event_2{event, orders};
-      (*this)(event_2);
-      download_.check_relaxed(STATE);
-    };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading())
-        download_.retry(STATE);
-    };
-    process_response(event, handle_success, handle_error);
-  });
-}
-
-void OrderEntry::operator()(Trace<json::Orders> const &event) {
-  auto &[trace_info, orders] = event;
-  log::info<2>("orders={}"sv, orders);
-  for (auto &item : orders.data) {
-    log::info<2>("item={}"sv, item);
-    auto client_order_id = [&]() -> std::string_view {
-      if (!item.text.starts_with("t-"sv))
-        return {};
-      return item.text.substr(2);
-    }();
-    if (std::empty(client_order_id)) {
-      log::warn("*** EXTERNAL ORDER ***"sv);
-      continue;
-    }
-    auto external_order_id = fmt::format("{}"sv, item.id);
-    auto side = item.size < 0 ? Side::SELL : Side::BUY;
-    auto order_status = [&]() -> OrderStatus {
-      OrderStatus result = json::Map{item.finish_as};
-      if (result != OrderStatus{})
-        return result;
-      if (item.status == json::OrderStatus::OPEN)
-        return OrderStatus::WORKING;
-      log::fatal("Unexpected: item={}"sv, item);
-    }();
-    auto quantity = static_cast<double>(std::abs(item.size));
-    auto remaining_quantity = static_cast<double>(std::abs(item.left));
-    auto traded_quantity = quantity - remaining_quantity;  // XXX ???
-    auto order_update = server::oms::OrderUpdate{
-        .account = account_.name,
-        .exchange = shared_.settings.exchange,
-        .symbol = item.contract,
-        .side = side,
-        .position_effect = {},
-        .margin_mode = {},
-        .max_show_quantity = NaN,
-        .order_type = OrderType::LIMIT,
-        .time_in_force = json::Map{item.tif},
-        .execution_instructions = {},
-        .create_time_utc = item.create_time,
-        .update_time_utc = item.update_time,
-        .external_account = {},
-        .external_order_id = external_order_id,
-        .client_order_id = client_order_id,
-        .order_status = order_status,
-        .quantity = quantity,
-        .price = item.price,
-        .stop_price = NaN,
-        .remaining_quantity = remaining_quantity,
-        .traded_quantity = traded_quantity,
-        .average_traded_price = item.fill_price,  // ???
-        .last_traded_quantity = NaN,
-        .last_traded_price = NaN,
-        .last_liquidity = {},
-        .routing_id = {},
-        .max_request_version = {},
-        .max_response_version = {},
-        .max_accepted_version = {},
-        .update_type = UpdateType::SNAPSHOT,
-        .sending_time_utc = item.update_time,
-    };
-    Trace event_2{trace_info, order_update};
-    (*this)(event_2, client_order_id);
   }
 }
 

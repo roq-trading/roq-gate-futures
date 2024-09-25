@@ -413,6 +413,9 @@ uint32_t DropCopy::download(DropCopyState state) {
     case SUBSCRIBE:
       subscribe();
       return 0;
+    case ORDERS:
+      get_orders();
+      return 0;
     case DONE:
       (*this)(ConnectionStatus::READY);
       assert(!ready_);
@@ -511,6 +514,35 @@ void DropCopy::subscribe(std::string_view const &channel, std::string_view const
       signature);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
+}
+
+void DropCopy::get_orders() {
+  auto request_id = ++request_id_;
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto const channel = "futures.order_list"sv;
+  auto const event = "api"sv;
+  auto message = fmt::format(
+      R"({{)"
+      R"("id":{},)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"{}",)"
+      R"("payload":{{)"
+      R"("req_id":"{}",)"
+      R"("req_param":{{)"
+      R"("status":"open")"
+      R"(}})"
+      R"(}})"
+      R"(}})"sv,
+      request_id,
+      now.count(),
+      channel,
+      event,
+      request_id);
+  log::debug(R"(message="{}")"sv, message);
+  (*connection_).send_text(message);
+  // auto const STATE = DropCopyState::ORDERS;
+  // download_.check_relaxed(STATE);
 }
 
 void DropCopy::parse(std::string_view const &message) {
@@ -842,11 +874,73 @@ void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
 void DropCopy::operator()(Trace<json::TradeOrderCancelCP> const &) {
 }
 
-void DropCopy::operator()(Trace<server::oms::Response> const &event, std::string_view const &request_or_exchange_id) {
+void DropCopy::operator()(Trace<json::TradeOrderList> const &event) {
+  auto &[trace_info, order_list] = event;
+  log::info<2>("order_list={}"sv, order_list);
+  for (auto &item : order_list.data.result) {
+    log::info<2>("item={}"sv, item);
+    auto client_order_id = get_client_order_id(item.text);
+    if (std::empty(client_order_id)) {
+      log::warn("*** EXTERNAL ORDER ***"sv);
+      continue;
+    }
+    auto external_order_id = fmt::format("{}"sv, item.id);
+    auto side = item.size < 0 ? Side::SELL : Side::BUY;
+    auto order_status = get_order_status(item.finish_as, item.status);
+    auto quantity = static_cast<double>(std::abs(item.size));
+    auto remaining_quantity = static_cast<double>(std::abs(item.left));
+    auto traded_quantity = quantity - remaining_quantity;  // XXX ???
+    auto order_update = server::oms::OrderUpdate{
+        .account = account_.name,
+        .exchange = shared_.settings.exchange,
+        .symbol = item.contract,
+        .side = side,
+        .position_effect = {},
+        .margin_mode = {},
+        .max_show_quantity = NaN,
+        .order_type = OrderType::LIMIT,
+        .time_in_force = json::Map{item.tif},
+        .execution_instructions = {},
+        .create_time_utc = item.create_time,
+        .update_time_utc = item.update_time,
+        .external_account = {},
+        .external_order_id = external_order_id,
+        .client_order_id = client_order_id,
+        .order_status = order_status,
+        .quantity = quantity,
+        .price = item.price,
+        .stop_price = NaN,
+        .remaining_quantity = remaining_quantity,
+        .traded_quantity = traded_quantity,
+        .average_traded_price = item.fill_price,  // ???
+        .last_traded_quantity = NaN,
+        .last_traded_price = NaN,
+        .last_liquidity = {},
+        .routing_id = {},
+        .max_request_version = {},
+        .max_response_version = {},
+        .max_accepted_version = {},
+        .update_type = UpdateType::SNAPSHOT,
+        .sending_time_utc = item.update_time,
+    };
+    Trace event_2{trace_info, order_update};
+    (*this)(event_2, client_order_id);
+  }
+}
+
+void DropCopy::operator()(Trace<server::oms::Response> const &event, std::string_view const &client_order_id) {
   auto &[trace_info, response] = event;
-  if (shared_.update_order(request_or_exchange_id, stream_id_, trace_info, response, []([[maybe_unused]] auto &order) {})) {
+  if (shared_.update_order(client_order_id, stream_id_, trace_info, response, []([[maybe_unused]] auto &order) {})) {
   } else {
-    log::warn(R"(Did not find order: request_or_exchange_id="{}")"sv, request_or_exchange_id);
+    log::warn(R"(Did not find order: client_order_id="{}")"sv, client_order_id);
+  }
+}
+
+void DropCopy::operator()(Trace<server::oms::OrderUpdate> const &event, std::string_view const &client_order_id) {
+  auto &[trace_info, order_update] = event;
+  if (shared_.update_order(client_order_id, stream_id_, trace_info, order_update, [&]([[maybe_unused]] auto &order) {})) {
+  } else {
+    log::warn("*** EXTERNAL ORDER ***"sv);
   }
 }
 

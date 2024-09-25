@@ -61,6 +61,7 @@ TEST_CASE("json_positions_update_1", "[json_positions]") {
     void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;

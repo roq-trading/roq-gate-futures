@@ -17,6 +17,7 @@ set(SOURCES
     json_trade_order_amend.cpp
     json_trade_order_cancel_cp.cpp
     json_trade_order_cancel.cpp
+    json_trade_order_list.cpp
     json_trade_order_place.cpp
     json_trade_orders.cpp
     json_trade_positions.cpp

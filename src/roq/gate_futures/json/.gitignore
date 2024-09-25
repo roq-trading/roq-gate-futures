@@ -19,7 +19,6 @@ order_book.hpp
 order_book_update.hpp
 order_book_update_result.hpp
 orders_item.hpp
-orders.hpp
 order_status.hpp
 positions_item.hpp
 positions.hpp
@@ -47,6 +46,8 @@ trade_order_cancel_cp.hpp
 trade_order_cancel_data.hpp
 trade_order_cancel_data_result.hpp
 trade_order_cancel.hpp
+trade_order_list.hpp
+trade_order_list_data.hpp
 trade_order_place_data_errs.hpp
 trade_order_place_data.hpp
 trade_order_place_data_result.hpp
@@ -79,7 +80,6 @@ order_book.cpp
 order_book_update.cpp
 order_book_update_result.cpp
 orders_item.cpp
-orders.cpp
 order_status.cpp
 positions_item.cpp
 positions.cpp
@@ -107,6 +107,8 @@ trade_order_cancel_cp.cpp
 trade_order_cancel_data.cpp
 trade_order_cancel_data_result.cpp
 trade_order_cancel.cpp
+trade_order_list.cpp
+trade_order_list_data.cpp
 trade_order_place_data_errs.cpp
 trade_order_place_data.cpp
 trade_order_place_data_result.cpp

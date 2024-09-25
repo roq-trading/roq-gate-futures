@@ -12,35 +12,19 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_order_amend_success_1", "[json_order_amend]") {
+TEST_CASE("json_trade_order_list_1", "[json_trade_order_list]") {
   auto message = R"({)"
                  R"("header":{)"
-                 R"("response_time":"1727230008594",)"
+                 R"("response_time":"1727250838664",)"
                  R"("status":"200",)"
-                 R"("channel":"futures.order_amend",)"
+                 R"("channel":"futures.order_list",)"
                  R"("event":"api",)"
-                 R"("client_id":"94.228.147.34-0xc1e848a780")"
+                 R"("client_id":"94.228.147.34-0xc1224a3900")"
                  R"(},)"
                  R"("data":{)"
-                 R"("result":{)"
-                 R"("text":"t-9QIC4ZGRSxsCAQAAAAAA",)"
-                 R"("price":"101",)"
-                 R"("biz_info":"-",)"
-                 R"("tif":"gtc",)"
-                 R"("amend_text":"9QIC4ZGRSxsCAQAAAAAA",)"
-                 R"("status":"open",)"
-                 R"("contract":"SOL_USDT",)"
-                 R"("stp_act":"-",)"
-                 R"("fill_price":"0",)"
-                 R"("id":533626886800,)"
-                 R"("create_time":1727229980.658,)"
-                 R"("size":1,)"
-                 R"("update_time":1727230008.594,)"
-                 R"("left":1,)"
-                 R"("user":15564602)"
-                 R"(})"
+                 R"("result":[])"
                  R"(},)"
-                 R"("request_id":"9gIC4ZGRSxsCAgAAAAAA")"
+                 R"("request_id":"6")"
                  R"(})"sv;
   struct MyHandler final : public json::TradeParser::Handler {
     bool found = false;
@@ -53,10 +37,10 @@ TEST_CASE("json_order_amend_success_1", "[json_order_amend]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { found = true; }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
@@ -64,22 +48,36 @@ TEST_CASE("json_order_amend_success_1", "[json_order_amend]") {
   CHECK(handler.found == true);
 }
 
-TEST_CASE("json_order_amend_error_1", "[json_order_amend]") {
+TEST_CASE("json_trade_order_list_2", "[json_trade_order_list]") {
   auto message = R"({)"
                  R"("header":{)"
-                 R"("response_time":"1727230686049",)"
-                 R"("status":"405",)"
-                 R"("channel":"futures.order_amend",)"
+                 R"("response_time":"1727251141654",)"
+                 R"("status":"200",)"
+                 R"("channel":"futures.order_list",)"
                  R"("event":"api",)"
-                 R"("client_id":"94.228.147.34-0xc1bb4c0140")"
+                 R"("client_id":"94.228.147.34-0xc0e3620b40")"
                  R"(},)"
                  R"("data":{)"
-                 R"("errs":{)"
-                 R"("label":"",)"
-                 R"("message":"405 Method Not Allowed, ")"
+                 R"("result":[{)"
+                 R"("text":"t-KAICitvsyhsCAQAAAAAA",)"
+                 R"("price":"100",)"
+                 R"("biz_info":"-",)"
+                 R"("tif":"gtc",)"
+                 R"("amend_text":"-",)"
+                 R"("status":"open",)"
+                 R"("contract":"SOL_USDT",)"
+                 R"("stp_act":"-",)"
+                 R"("fill_price":"0",)"
+                 R"("id":533716470457,)"
+                 R"("create_time":1727251125.952,)"
+                 R"("size":1,)"
+                 R"("update_time":1727251125.952,)"
+                 R"("left":1,)"
+                 R"("user":15564602)"
                  R"(})"
+                 R"(])"
                  R"(},)"
-                 R"("request_id":"gQICc_oFURsCAgAAAAAA")"
+                 R"("request_id":"6")"
                  R"(})"sv;
   struct MyHandler final : public json::TradeParser::Handler {
     bool found = false;
@@ -92,10 +90,10 @@ TEST_CASE("json_order_amend_error_1", "[json_order_amend]") {
     void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
     void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { found = true; }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderList> const &) override { found = true; }
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;

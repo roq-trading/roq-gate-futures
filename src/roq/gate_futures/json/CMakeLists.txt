@@ -24,7 +24,6 @@ set(AUTOGEN_SCHEMAS
     order_book_update.json
     order_book_update_result.json
     orders_item.json
-    orders.json
     order_status.json
     positions_item.json
     positions.json
@@ -52,6 +51,8 @@ set(AUTOGEN_SCHEMAS
     trade_order_cancel_data.json
     trade_order_cancel_data_result.json
     trade_order_cancel.json
+    trade_order_list.json
+    trade_order_list_data.json
     trade_order_place_data_errs.json
     trade_order_place_data.json
     trade_order_place_data_result.json

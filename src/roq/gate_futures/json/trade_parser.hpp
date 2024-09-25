@@ -20,6 +20,8 @@
 #include "roq/gate_futures/json/trade_order_cancel_cp.hpp"
 #include "roq/gate_futures/json/trade_order_place.hpp"
 
+#include "roq/gate_futures/json/trade_order_list.hpp"
+
 namespace roq {
 namespace gate_futures {
 namespace json {
@@ -39,6 +41,8 @@ struct TradeParser final {
     virtual void operator()(Trace<json::TradeOrderAmend> const &) = 0;
     virtual void operator()(Trace<json::TradeOrderCancel> const &) = 0;
     virtual void operator()(Trace<json::TradeOrderCancelCP> const &) = 0;
+    //
+    virtual void operator()(Trace<json::TradeOrderList> const &) = 0;
   };
 
   static bool dispatch(Handler &, std::string_view const &message, std::span<std::byte> const &, TraceInfo const &);

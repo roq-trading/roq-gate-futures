@@ -76,6 +76,8 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   void operator()(Trace<json::TradeOrderCancel> const &) override;
   void operator()(Trace<json::TradeOrderCancelCP> const &) override;
 
+  void operator()(Trace<json::TradeOrderList> const &) override;
+
  private:
   void operator()(ConnectionStatus);
 
@@ -92,9 +94,12 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
 
   void subscribe(std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
 
+  void get_orders();
+
   void parse(std::string_view const &message);
 
-  void operator()(Trace<server::oms::Response> const &, std::string_view const &request_or_exchange_id);
+  void operator()(Trace<server::oms::Response> const &, std::string_view const &client_order_id);
+  void operator()(Trace<server::oms::OrderUpdate> const &, std::string_view const &client_order_id);
 
  private:
   Handler &handler_;
