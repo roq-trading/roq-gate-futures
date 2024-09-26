@@ -11,10 +11,6 @@
       "type": "std/microseconds"
     },
     {
-      "name": "create_time_ms",
-      "type": "std/milliseconds"
-    },
-    {
       "name": "id",
       "type": "std/string_view",
       "comment": "WS"

@@ -13,45 +13,6 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_trades", "[json_trades]") {
-  auto message = R"([)"
-                 R"({)"
-                 R"("price":"0.3397",)"
-                 R"("text":"web",)"
-                 R"("fee":"-0.0254775",)"
-                 R"("create_time":1714215684.3627,)"
-                 R"("point_fee":"0",)"
-                 R"("trade_id":"10668304",)"
-                 R"("contract":"BLZ_USDT",)"
-                 R"("role":"maker",)"
-                 R"("order_id":"460776906546",)"
-                 R"("size":50,)"
-                 R"("biz_info":"-",)"
-                 R"("amend_text":"-")"
-                 R"(},{)"
-                 R"("price":"0.3399",)"
-                 R"("text":"web",)"
-                 R"("fee":"-0.00866745",)"
-                 R"("create_time":1714215674.2741,)"
-                 R"("point_fee":"0",)"
-                 R"("trade_id":"10668303",)"
-                 R"("contract":"BLZ_USDT",)"
-                 R"("role":"maker",)"
-                 R"("order_id":"460776972807",)"
-                 R"("size":17,)"
-                 R"("biz_info":"-",)"
-                 R"("amend_text":"-")"
-                 R"(})"
-                 R"(])"sv;
-  std::vector<std::byte> buffer(8192);
-  json::UserTrades trades{message, buffer};
-  REQUIRE(std::size(trades.data) == 2);
-  auto &result_0 = trades.data[0];
-  CHECK(result_0.create_time == 1714215684362700us);
-  auto &result_1 = trades.data[1];
-  CHECK(result_1.create_time == 1714215674274100us);
-}
-
 TEST_CASE("json_trades_update_1", "[json_trades]") {
   auto message = R"({)"
                  R"("channel":"futures.usertrades",)"

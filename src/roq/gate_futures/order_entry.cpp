@@ -75,6 +75,20 @@ auto create_connection(auto &handler, auto &settings, auto &context) {
 struct create_metrics final : public utils::metrics::Factory {
   create_metrics(auto &settings, auto &group, auto const &function) : utils::metrics::Factory{settings.app.name, group, function} {}
 };
+
+auto get_download_trades_lookback(auto const &settings, auto download_trades_is_first) {
+  if (download_trades_is_first) {
+    if (settings.download.trades_lookback_on_restart.count())
+      return settings.download.trades_lookback_on_restart;
+  }
+  return settings.download.trades_lookback;
+}
+
+std::string_view get_client_order_id(auto &text) {
+  if (!text.starts_with("t-"sv))
+    return {};
+  return text.substr(2);
+}
 }  // namespace
 
 // === IMPLEMENTATION ===
@@ -295,6 +309,13 @@ void OrderEntry::operator()(Trace<json::Positions> const &event) {
     log::info<2>("item={}"sv, item);
     if (shared_.discard_symbol(item.contract))
       continue;
+    auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
+      assert(item.update_time.count() != 0);
+      return item.update_time;
+    }();
+    auto margin_mode = [&]() -> MarginMode {
+      return {};  // XXX TODO item.mode ???
+    }();
     auto long_quantity = std::max<double>(0.0, item.size);
     auto short_quantity = std::max<double>(0.0, -item.size);
     auto position_update = PositionUpdate{
@@ -302,13 +323,13 @@ void OrderEntry::operator()(Trace<json::Positions> const &event) {
         .account = account_.name,
         .exchange = shared_.settings.exchange,
         .symbol = item.contract,
-        .margin_mode = {},  // ???
+        .margin_mode = margin_mode,
         .external_account = {},
         .long_quantity = long_quantity,
         .short_quantity = short_quantity,
         .update_type = UpdateType::SNAPSHOT,
-        .exchange_time_utc = item.update_time,
-        .sending_time_utc = item.update_time,
+        .exchange_time_utc = exchange_time_utc,
+        .sending_time_utc = {},
     };
     log::debug("position_update={}"sv, position_update);
     create_trace_and_dispatch(handler_, trace_info, position_update, true);
@@ -317,9 +338,13 @@ void OrderEntry::operator()(Trace<json::Positions> const &event) {
 
 void OrderEntry::get_trades() {
   profile_.trades([&]() {
+    auto now = clock::get_realtime<std::chrono::milliseconds>();
+    auto lookback = get_download_trades_lookback(shared_.settings, download_trades_is_first_);
+    log::info<1>("Download trades: lookback={}"sv, lookback);
+    auto from = std::chrono::duration_cast<std::chrono::seconds>(now - lookback);
     auto method = web::http::Method::GET;
     auto path = shared_.api.trades;
-    auto query = "?from=1514764800"sv;  // XXX FIXME probably seconds?
+    auto query = fmt::format("?from={}"sv, from.count());
     auto headers = account_.create_headers(method, path, query, {});
     auto request = web::rest::Request{
         .method = method,
@@ -347,6 +372,7 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
       json::UserTrades trades{body, decode_buffer_};
       Trace event_2{event, trades};
       (*this)(event_2);
+      download_trades_is_first_ = false;
       download_.check_relaxed(STATE);
     };
     auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
@@ -363,26 +389,23 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
   log::info<2>("trades={}"sv, trades);
   for (auto &item : trades.data) {
     log::info<2>("item={}"sv, item);
-    auto cl_ord_id = [&]() -> std::string_view {
-      if (!item.text.starts_with("t-"sv))
-        return {};
-      return item.text.substr(2);
-    }();
-    if (std::empty(cl_ord_id)) {
+    auto client_order_id = get_client_order_id(item.text);
+    if (std::empty(client_order_id)) {
       log::warn("*** EXTERNAL ORDER ***"sv);
       continue;
     }
+    auto exchange_time_utc = [&]() -> std::chrono::nanoseconds { return item.create_time; }();
     auto external_order_id = fmt::format("{}"sv, item.order_id);
     auto side = item.size < 0 ? Side::SELL : Side::BUY;
     auto quantity = static_cast<double>(std::abs(item.size));
     auto fill = Fill{
-        .exchange_time_utc = item.create_time_ms,
-        .external_trade_id = item.trade_id,  // note!
+        .exchange_time_utc = exchange_time_utc,
+        .external_trade_id = item.trade_id,
         .quantity = quantity,
         .price = item.price,
         .liquidity = json::Map{item.role},
         .quote_quantity = NaN,
-        .commission_quantity = item.fee,  // XXX ???
+        .commission_quantity = item.fee,  // ???
         .commission_currency = {},
     };
     auto trade_update = TradeUpdate{
@@ -394,19 +417,19 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
         .side = side,
         .position_effect = {},
         .margin_mode = {},
-        .create_time_utc = utils::safe_cast(item.create_time_ms),
-        .update_time_utc = utils::safe_cast(item.create_time_ms),
+        .create_time_utc = exchange_time_utc,
+        .update_time_utc = exchange_time_utc,
         .external_account = {},
         .external_order_id = external_order_id,
-        .client_order_id = {},
+        .client_order_id = client_order_id,
         .fills = {&fill, 1},
         .routing_id = {},
         .update_type = UpdateType::SNAPSHOT,
-        .sending_time_utc = item.create_time_ms,
+        .sending_time_utc = {},
         .user = {},
         .strategy_id = {},
     };
-    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE, cl_ord_id);
+    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE, client_order_id);
   }
 }
 

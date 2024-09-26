@@ -111,6 +111,7 @@ struct OrderEntry final : public web::rest::Client::Handler {
   // state
   ConnectionStatus status_ = {};
   core::Download<OrderEntryState> download_;
+  bool download_trades_is_first_ = true;
 };
 
 }  // namespace gate_futures

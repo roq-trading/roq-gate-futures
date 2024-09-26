@@ -98,7 +98,8 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
 
   void parse(std::string_view const &message);
 
-  void dispatch_order_update(TraceInfo const &, auto const &value, UpdateType);
+  template <typename T>
+  void dispatch_order_update(TraceInfo const &, T const &value, UpdateType);
 
   void operator()(Trace<server::oms::Response> const &, std::string_view const &client_order_id);
   void operator()(Trace<server::oms::OrderUpdate> const &, std::string_view const &client_order_id);

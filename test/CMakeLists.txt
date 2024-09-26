@@ -23,6 +23,7 @@ set(SOURCES
     json_trade_positions.cpp
     json_trade_subscribe.cpp
     json_trade_trades.cpp
+    json_user_trades.cpp
     json_utils.cpp
     main.cpp)
 

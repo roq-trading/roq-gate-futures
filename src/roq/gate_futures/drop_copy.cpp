@@ -415,7 +415,7 @@ uint32_t DropCopy::download(DropCopyState state) {
       return 0;
     case ORDERS:
       get_orders();
-      return 0;
+      return 1;
     case DONE:
       (*this)(ConnectionStatus::READY);
       assert(!ready_);
@@ -541,8 +541,6 @@ void DropCopy::get_orders() {
       request_id);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
-  // auto const STATE = DropCopyState::ORDERS;
-  // download_.check_relaxed(STATE);
 }
 
 void DropCopy::parse(std::string_view const &message) {
@@ -602,6 +600,13 @@ void DropCopy::operator()(Trace<json::TradePositions> const &event) {
   for (auto &item : positions.result) {
     if (shared_.discard_symbol(item.contract))
       continue;
+    auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
+      assert(item.time_ms.count() != 0);
+      return item.time_ms;
+    }();
+    auto margin_mode = [&]() -> MarginMode {
+      return {};  // XXX TODO item.mode ???
+    }();
     auto long_quantity = std::max<double>(0.0, item.size);
     auto short_quantity = std::max<double>(0.0, -item.size);
     auto position_update = PositionUpdate{
@@ -609,12 +614,12 @@ void DropCopy::operator()(Trace<json::TradePositions> const &event) {
         .account = account_.name,
         .exchange = shared_.settings.exchange,
         .symbol = item.contract,
-        .margin_mode = {},  // XXX ???
+        .margin_mode = margin_mode,
         .external_account = {},
         .long_quantity = long_quantity,
         .short_quantity = short_quantity,
         .update_type = UpdateType::INCREMENTAL,
-        .exchange_time_utc = item.update_time,
+        .exchange_time_utc = exchange_time_utc,
         .sending_time_utc = positions.time_ms,
     };
     log::debug("position_update={}"sv, position_update);
@@ -634,26 +639,26 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
   auto &[trace_info, trades] = event;
   for (auto &item : trades.result) {
     log::info<2>("item={}"sv, item);
-    auto cl_ord_id = [&]() -> std::string_view {
-      if (!item.text.starts_with("t-"sv))
-        return {};
-      return item.text.substr(2);
-    }();
-    if (std::empty(cl_ord_id)) {
+    auto client_order_id = get_client_order_id(item.text);
+    if (std::empty(client_order_id)) {
       log::warn("*** EXTERNAL ORDER ***"sv);
       continue;
     }
-    auto external_order_id = fmt::format("{}"sv, item.id);
+    auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
+      assert(item.create_time_ms.count() != 0);
+      return item.create_time_ms;
+    }();
+    auto external_order_id = fmt::format("{}"sv, item.order_id);
     auto side = item.size < 0 ? Side::SELL : Side::BUY;
     auto quantity = static_cast<double>(std::abs(item.size));
     auto fill = Fill{
-        .exchange_time_utc = item.create_time_ms,
-        .external_trade_id = item.id,  // note!
+        .exchange_time_utc = exchange_time_utc,
+        .external_trade_id = item.id,
         .quantity = quantity,
         .price = item.price,
         .liquidity = json::Map{item.role},
         .quote_quantity = NaN,
-        .commission_quantity = item.fee,  // XXX ???
+        .commission_quantity = item.fee,  // ???
         .commission_currency = {},
     };
     auto trade_update = TradeUpdate{
@@ -665,36 +670,38 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
         .side = side,
         .position_effect = {},
         .margin_mode = {},
-        .create_time_utc = utils::safe_cast(item.create_time_ms),
-        .update_time_utc = utils::safe_cast(item.create_time_ms),
+        .create_time_utc = exchange_time_utc,
+        .update_time_utc = exchange_time_utc,
         .external_account = {},
         .external_order_id = external_order_id,
-        .client_order_id = {},
+        .client_order_id = client_order_id,
         .fills = {&fill, 1},
         .routing_id = {},
         .update_type = UpdateType::INCREMENTAL,  // ???
-        .sending_time_utc = item.create_time_ms,
+        .sending_time_utc = trades.time_ms,
         .user = {},
         .strategy_id = {},
     };
-    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE, cl_ord_id);
+    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE, client_order_id);
   }
 }
 
 void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
   auto &[trace_info, order_place] = event;
   if (order_place.header.status == 200) {
-    dispatch_order_update(trace_info, order_place.data.result, UpdateType::INCREMENTAL);
+    auto &result = order_place.data.result;
+    // note! first ack doesn't contain the actual order (probably just validation)
+    if (!std::empty(result.text))
+      dispatch_order_update(trace_info, result, UpdateType::INCREMENTAL);
   } else {
-    // XXX TODO parse error code
     auto response = server::oms::Response{
         .request_type = RequestType::CREATE_ORDER,
         .origin = Origin::EXCHANGE,
         .request_status = RequestStatus::REJECTED,
-        .error = Error::UNKNOWN,
+        .error = Error::UNKNOWN,  // XXX TODO parse error code
         .text = order_place.data.errs.message,
         .version = 1,
-        .request_id = {},
+        .request_id = order_place.request_id,
         .quantity = NaN,
         .price = NaN,
     };
@@ -704,6 +711,7 @@ void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
 }
 
 void DropCopy::operator()(Trace<json::TradeOrderAmend> const &) {
+  // XXX TODO implement
 }
 
 void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
@@ -712,15 +720,14 @@ void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
   if (header.status == 200) {
     dispatch_order_update(trace_info, order_cancel.data.result, UpdateType::INCREMENTAL);
   } else {
-    // XXX TODO parse error code
     auto response = server::oms::Response{
         .request_type = RequestType::CANCEL_ORDER,
         .origin = Origin::EXCHANGE,
         .request_status = RequestStatus::REJECTED,
-        .error = Error::UNKNOWN,
+        .error = Error::UNKNOWN,  // XXX TODO parse error code
         .text = order_cancel.data.errs.message,
-        .version = 1,
-        .request_id = {},
+        .version = {},  // note! we could encode this in request_id...?
+        .request_id = order_cancel.request_id,
         .quantity = NaN,
         .price = NaN,
     };
@@ -739,9 +746,12 @@ void DropCopy::operator()(Trace<json::TradeOrderList> const &event) {
     log::info<2>("item={}"sv, item);
     dispatch_order_update(trace_info, item, UpdateType::SNAPSHOT);
   }
+  auto const STATE = DropCopyState::ORDERS;
+  download_.check_relaxed(STATE);
 }
 
-void DropCopy::dispatch_order_update(TraceInfo const &trace_info, auto const &value, UpdateType update_type) {
+template <typename T>
+void DropCopy::dispatch_order_update(TraceInfo const &trace_info, T const &value, UpdateType update_type) {
   auto client_order_id = get_client_order_id(value.text);
   if (std::empty(client_order_id)) {
     log::warn("*** EXTERNAL ORDER ***"sv);
@@ -749,23 +759,44 @@ void DropCopy::dispatch_order_update(TraceInfo const &trace_info, auto const &va
   }
   auto external_order_id = fmt::format("{}"sv, value.id);
   auto side = value.size < 0 ? Side::SELL : Side::BUY;
+  auto create_time_utc = [&]() -> std::chrono::nanoseconds {
+    constexpr bool has_create_time_ms = requires(T const &t) { t.create_time_ms; };
+    if constexpr (has_create_time_ms) {
+      if (value.create_time_ms.count())
+        return value.create_time_ms;
+    }
+    return value.create_time;
+  }();
+  auto update_time_utc = [&]() -> std::chrono::nanoseconds {
+    constexpr bool has_update_time_ms = requires(T const &t) { t.update_time_ms; };
+    if constexpr (has_update_time_ms) {
+      if (value.update_time_ms.count())
+        return value.update_time_ms;
+    }
+    return value.update_time;
+  }();
   auto order_status = get_order_status(value.finish_as, value.status);
   auto quantity = static_cast<double>(std::abs(value.size));
   auto remaining_quantity = static_cast<double>(std::abs(value.left));
-  auto traded_quantity = quantity - remaining_quantity;  // XXX ???
+  auto traded_quantity = quantity - remaining_quantity;
+  auto average_traded_price = [&]() -> double {
+    if (utils::compare(traded_quantity, 0.0) > 0)
+      return value.fill_price;
+    return NaN;
+  }();
   auto order_update = server::oms::OrderUpdate{
       .account = account_.name,
       .exchange = shared_.settings.exchange,
       .symbol = value.contract,
       .side = side,
       .position_effect = {},
-      .margin_mode = {},
+      .margin_mode = {},  // ???
       .max_show_quantity = NaN,
-      .order_type = OrderType::LIMIT,
+      .order_type = OrderType::LIMIT,  // ???
       .time_in_force = json::Map{value.tif},
       .execution_instructions = {},
-      .create_time_utc = value.create_time,
-      .update_time_utc = value.update_time,
+      .create_time_utc = create_time_utc,
+      .update_time_utc = update_time_utc,
       .external_account = {},
       .external_order_id = external_order_id,
       .client_order_id = client_order_id,
@@ -775,7 +806,7 @@ void DropCopy::dispatch_order_update(TraceInfo const &trace_info, auto const &va
       .stop_price = NaN,
       .remaining_quantity = remaining_quantity,
       .traded_quantity = traded_quantity,
-      .average_traded_price = value.fill_price,  // ???
+      .average_traded_price = average_traded_price,
       .last_traded_quantity = NaN,
       .last_traded_price = NaN,
       .last_liquidity = {},

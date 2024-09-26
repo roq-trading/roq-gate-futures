@@ -12,6 +12,24 @@ namespace roq {
 namespace gate_futures {
 namespace json {
 
+// XXX TODO protocol error:
+//
+// R"({)"
+// R"("time":1727318820,)"
+// R"("time_ms":1727318820205,)"
+// R"("conn_id":"c7799af51014ea53",)"
+// R"("trace_id":"4d07b2abbe99cc9656b50d9dc980cb60",)"
+// R"("channel":"",)"
+// R"("event":"",)"
+// R"("error":{)"
+// R"("code":1,)"
+// R"("message":"request message need json scheme")"
+// R"(},)"
+// R"("result":{)"
+// R"("status":"fail")"
+// R"(})"
+// R"(})"
+
 // === IMPLEMENTATION ===
 
 bool TradeParser::dispatch(Handler &handler, std::string_view const &message, std::span<std::byte> const &buffer, TraceInfo const &trace_info) {

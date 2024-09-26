@@ -12,6 +12,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
+// {"time":1727318820,"time_ms":1727318820205,"conn_id":"c7799af51014ea53","trace_id":"4d07b2abbe99cc9656b50d9dc980cb60","channel":"","event":"","error":{"code":1,"message":"request
+// message need json scheme"},"result":{"status":"fail"}}
+
 // note! there are two acks -- received and success/failure
 
 TEST_CASE("json_order_place_received_1", "[json_order_place]") {

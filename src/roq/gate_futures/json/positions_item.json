@@ -103,7 +103,8 @@
     },
     {
       "name": "update_time",
-      "type": "std/seconds"
+      "type": "std/seconds",
+      "comment": "REST"
     },
     {
       "name": "cross_leverage_limit",
@@ -123,7 +124,8 @@
     },
     {
       "name": "open_time",
-      "type": "std/seconds"
+      "type": "std/seconds",
+      "comment": "REST"
     },
     {
       "name": "trade_max_size",
@@ -131,11 +133,13 @@
     },
     {
       "name": "time",
-      "type": "std/seconds"
+      "type": "std/seconds",
+      "comment": "WS"
     },
     {
       "name": "time_ms",
-      "type": "std/milliseconds"
+      "type": "std/milliseconds",
+      "comment": "WS"
     }
   ]
 }

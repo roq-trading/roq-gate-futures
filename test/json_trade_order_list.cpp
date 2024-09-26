@@ -12,6 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
+// empty
 TEST_CASE("json_trade_order_list_1", "[json_trade_order_list]") {
   auto message = R"({)"
                  R"("header":{)"
@@ -48,7 +49,8 @@ TEST_CASE("json_trade_order_list_1", "[json_trade_order_list]") {
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
-  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(res == true);
   CHECK(handler.found == true);
 }
 
@@ -108,6 +110,7 @@ TEST_CASE("json_trade_order_list_2", "[json_trade_order_list]") {
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
-  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(res == true);
   CHECK(handler.found == true);
 }

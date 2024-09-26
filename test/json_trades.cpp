@@ -30,5 +30,10 @@ TEST_CASE("json_trades_update", "[json_trades]") {
                  R"(])"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Trades obj{message, buffer};
+  json::Trades trades{message, buffer};
+  CHECK(trades.time == 1641366055s);
+  REQUIRE(std::size(trades.result) == 1);
+  auto &result_0 = trades.result[0];
+  CHECK(result_0.create_time == 1641366055s);
+  CHECK(result_0.create_time_ms == 1641366055959ms);
 }
