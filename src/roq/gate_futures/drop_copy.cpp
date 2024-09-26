@@ -312,31 +312,37 @@ uint16_t DropCopy::operator()(
 }
 
 uint16_t DropCopy::operator()(Event<CancelAllOrders> const &, std::string_view const &request_id) {
-  auto request_id_2 = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
-  auto const channel = "futures.order_cancel_cp"sv;
-  auto const event_2 = "api"sv;
-  auto message = fmt::format(
-      R"({{)"
-      R"("id":{},)"
-      R"("time":{},)"
-      R"("channel":"{}",)"
-      R"("event":"{}",)"
-      R"("payload":{{)"
-      R"("req_id":"{}",)"
-      R"("req_param":{{)"
-      R"("contract":"SOL_USDT")"  // XXX
-      R"(}})"
-      R"(}})"
-      R"(}})"sv,
-      request_id_2,
-      now.count(),
-      channel,
-      event_2,
-      request_id);
-  // XXX side ?
-  log::debug(R"(message="{}")"sv, message);
-  (*connection_).send_text(message);
+  auto helper = [&](auto &symbol) {
+    auto request_id_2 = ++request_id_;
+    auto now = clock::get_realtime<std::chrono::seconds>();
+    auto const channel = "futures.order_cancel_cp"sv;
+    auto const event_2 = "api"sv;
+    auto message = fmt::format(
+        R"({{)"
+        R"("id":{},)"
+        R"("time":{},)"
+        R"("channel":"{}",)"
+        R"("event":"{}",)"
+        R"("payload":{{)"
+        R"("req_id":"{}",)"
+        R"("req_param":{{)"
+        R"("contract":"{}")"
+        R"(}})"
+        R"(}})"
+        R"(}})"sv,
+        request_id_2,
+        now.count(),
+        channel,
+        event_2,
+        request_id,
+        symbol);
+    log::warn(R"(DEBUG message="{}")"sv, message);
+    (*connection_).send_text(message);
+  };
+  if (shared_.get_all_order_symbols(helper, account_.name)) {
+  } else {
+    log::warn("DEBUG *** NO ORDERS ***"sv);
+  }
   return stream_id_;
 }
 

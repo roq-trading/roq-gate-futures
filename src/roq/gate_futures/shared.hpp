@@ -42,6 +42,11 @@ struct Shared final {
     return dispatcher_(std::forward<Args>(args)...);
   }
 
+  template <typename Callback>
+  bool get_all_order_symbols(Callback callback, std::string_view const &account) const {
+    return dispatcher_.get_all_order_symbols(callback, account);
+  }
+
  public:
   API const api;
 
