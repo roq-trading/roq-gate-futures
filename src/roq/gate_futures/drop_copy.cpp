@@ -635,9 +635,13 @@ void DropCopy::operator()(Trace<json::TradePositions> const &event) {
 
 void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
   auto &[trace_info, orders] = event;
+  auto helper = [&](auto &order_update) {
+    Trace event_2{trace_info, order_update};
+    (*this)(event_2, order_update.client_order_id);
+  };
   for (auto &item : orders.result) {
     log::info<2>("item={}"sv, item);
-    dispatch_order_update(trace_info, item, UpdateType::INCREMENTAL);
+    create_order_update(helper, item, UpdateType::INCREMENTAL);
   }
 }
 
@@ -697,8 +701,24 @@ void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
   if (order_place.header.status == 200) {
     auto &result = order_place.data.result;
     // note! first ack doesn't contain the actual order (probably just validation)
-    if (!std::empty(result.text))
-      dispatch_order_update(trace_info, result, UpdateType::INCREMENTAL);
+    if (!std::empty(result.text)) {
+      auto response = server::oms::Response{
+          .request_type = RequestType::CREATE_ORDER,
+          .origin = Origin::EXCHANGE,
+          .request_status = RequestStatus::ACCEPTED,
+          .error = {},
+          .text = {},
+          .version = {},
+          .request_id = order_place.request_id,
+          .quantity = NaN,
+          .price = NaN,
+      };
+      auto helper = [&](auto &order_update) {
+        Trace event_2{trace_info, response};
+        (*this)(event_2, order_update.client_order_id, order_update);
+      };
+      create_order_update(helper, result, UpdateType::INCREMENTAL);
+    }
   } else {
     auto response = server::oms::Response{
         .request_type = RequestType::CREATE_ORDER,
@@ -711,20 +731,68 @@ void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
         .quantity = NaN,
         .price = NaN,
     };
-    Trace event_2{event, response};
+    Trace event_2{trace_info, response};
     (*this)(event_2, order_place.request_id);
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderAmend> const &) {
-  // XXX TODO implement
+void DropCopy::operator()(Trace<json::TradeOrderAmend> const &event) {
+  auto &[trace_info, order_amend] = event;
+  auto &header = order_amend.header;
+  if (header.status == 200) {
+    auto response = server::oms::Response{
+        .request_type = RequestType::MODIFY_ORDER,
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::ACCEPTED,
+        .error = {},
+        .text = {},
+        .version = {},
+        .request_id = order_amend.request_id,
+        .quantity = NaN,
+        .price = NaN,
+    };
+    auto helper = [&](auto &order_update) {
+      Trace event_2{trace_info, response};
+      (*this)(event_2, order_update.client_order_id, order_update);
+    };
+    create_order_update(helper, order_amend.data.result, UpdateType::INCREMENTAL);
+  } else {
+    auto response = server::oms::Response{
+        .request_type = RequestType::CANCEL_ORDER,
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::REJECTED,
+        .error = Error::UNKNOWN,  // XXX TODO parse error code
+        .text = order_amend.data.errs.message,
+        .version = {},
+        .request_id = order_amend.request_id,
+        .quantity = NaN,
+        .price = NaN,
+    };
+    Trace event_2{trace_info, response};
+    (*this)(event_2, order_amend.request_id);
+  }
 }
 
 void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
   auto &[trace_info, order_cancel] = event;
   auto &header = order_cancel.header;
   if (header.status == 200) {
-    dispatch_order_update(trace_info, order_cancel.data.result, UpdateType::INCREMENTAL);
+    auto response = server::oms::Response{
+        .request_type = RequestType::CANCEL_ORDER,
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::ACCEPTED,
+        .error = {},
+        .text = {},
+        .version = {},
+        .request_id = order_cancel.request_id,
+        .quantity = NaN,
+        .price = NaN,
+    };
+    auto helper = [&](auto &order_update) {
+      Trace event_2{trace_info, response};
+      (*this)(event_2, order_update.client_order_id, order_update);
+    };
+    create_order_update(helper, order_cancel.data.result, UpdateType::INCREMENTAL);
   } else {
     auto response = server::oms::Response{
         .request_type = RequestType::CANCEL_ORDER,
@@ -732,32 +800,81 @@ void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
         .request_status = RequestStatus::REJECTED,
         .error = Error::UNKNOWN,  // XXX TODO parse error code
         .text = order_cancel.data.errs.message,
-        .version = {},  // note! we could encode this in request_id...?
+        .version = {},
         .request_id = order_cancel.request_id,
         .quantity = NaN,
         .price = NaN,
     };
-    Trace event_2{event, response};
+    Trace event_2{trace_info, response};
     (*this)(event_2, order_cancel.request_id);
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderCancelCP> const &) {
+void DropCopy::operator()(Trace<json::TradeOrderCancelCP> const &event) {
+  auto &[trace_info, order_cancel_cp] = event;
+  auto &header = order_cancel_cp.header;
+  if (header.status == 200) {
+    auto cancel_all_orders_ack = CancelAllOrdersAck{
+        .stream_id = stream_id_,
+        .account = account_.name,
+        .order_id = {},
+        .exchange = {},
+        .symbol = {},
+        .side = {},
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::ACCEPTED,
+        .error = {},
+        .text = {},
+        .request_id = order_cancel_cp.request_id,
+        .external_account = {},
+        .number_of_affected_orders = {},
+        .round_trip_latency = {},
+        .user = {},
+        .strategy_id = {},
+    };
+    Trace event_2{trace_info, cancel_all_orders_ack};
+    shared_(event_2);
+  } else {
+    auto cancel_all_orders_ack = CancelAllOrdersAck{
+        .stream_id = stream_id_,
+        .account = account_.name,
+        .order_id = {},
+        .exchange = {},
+        .symbol = {},
+        .side = {},
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::REJECTED,
+        .error = Error::UNKNOWN,  // XXX TODO parse error code
+        .text = order_cancel_cp.data.errs.message,
+        .request_id = order_cancel_cp.request_id,
+        .external_account = {},
+        .number_of_affected_orders = {},
+        .round_trip_latency = {},
+        .user = {},
+        .strategy_id = {},
+    };
+    Trace event_2{trace_info, cancel_all_orders_ack};
+    shared_(event_2);
+  }
 }
 
 void DropCopy::operator()(Trace<json::TradeOrderList> const &event) {
   auto &[trace_info, order_list] = event;
+  auto helper = [&](auto &order_update) {
+    Trace event_2{trace_info, order_update};
+    (*this)(event_2, order_update.client_order_id);
+  };
   log::info<2>("order_list={}"sv, order_list);
   for (auto &item : order_list.data.result) {
     log::info<2>("item={}"sv, item);
-    dispatch_order_update(trace_info, item, UpdateType::SNAPSHOT);
+    create_order_update(helper, item, UpdateType::SNAPSHOT);
   }
   auto const STATE = DropCopyState::ORDERS;
   download_.check_relaxed(STATE);
 }
 
-template <typename T>
-void DropCopy::dispatch_order_update(TraceInfo const &trace_info, T const &value, UpdateType update_type) {
+template <typename Callback, typename T>
+void DropCopy::create_order_update(Callback callback, T const &value, UpdateType update_type) {
   auto client_order_id = get_client_order_id(value.text);
   if (std::empty(client_order_id)) {
     log::warn("*** EXTERNAL ORDER ***"sv);
@@ -823,13 +940,13 @@ void DropCopy::dispatch_order_update(TraceInfo const &trace_info, T const &value
       .update_type = update_type,
       .sending_time_utc = value.update_time,
   };
-  Trace event_2{trace_info, order_update};
-  (*this)(event_2, client_order_id);
+  callback(order_update);
 }
 
-void DropCopy::operator()(Trace<server::oms::Response> const &event, std::string_view const &client_order_id) {
+template <typename... Args>
+void DropCopy::operator()(Trace<server::oms::Response> const &event, std::string_view const &client_order_id, Args &&...args) {
   auto &[trace_info, response] = event;
-  if (shared_.update_order(client_order_id, stream_id_, trace_info, response, []([[maybe_unused]] auto &order) {})) {
+  if (shared_.update_order(client_order_id, stream_id_, trace_info, response, std::forward<Args>(args)..., []([[maybe_unused]] auto &order) {})) {
   } else {
     log::warn(R"(Did not find order: client_order_id="{}")"sv, client_order_id);
   }

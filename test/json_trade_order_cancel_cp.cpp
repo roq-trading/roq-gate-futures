@@ -70,7 +70,8 @@ TEST_CASE("json_order_cancel_cp_success_1", "[json_order_cancel_cp]") {
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
-  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(res == true);
   CHECK(handler.found == true);
 }
 
@@ -155,7 +156,8 @@ TEST_CASE("json_order_cancel_cp_success_2", "[json_order_cancel_cp]") {
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
-  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(res == true);
   CHECK(handler.found == true);
 }
 
@@ -195,6 +197,51 @@ TEST_CASE("json_order_cancel_cp_error_1", "[json_order_cancel_cp]") {
   } handler;
   std::vector<std::byte> buffer(8192);
   TraceInfo trace_info;
-  [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(res == true);
+  CHECK(handler.found == true);
+}
+
+TEST_CASE("json_order_cancel_cp_error_2", "[json_order_cancel_cp]") {
+  auto message = R"({)"
+                 R"("header":{)"
+                 R"("response_time":"1727404856256",)"
+                 R"("status":"400",)"
+                 R"("channel":"futures.order_cancel_cp",)"
+                 R"("event":"api",)"
+                 R"("client_id":"94.228.147.34-0xc172c7ba40")"
+                 R"(},)"
+                 R"("data":{)"
+                 R"("errs":{)"
+                 R"("label":"CONTRACT_NOT_FOUND",)"
+                 R"("message":"label: CONTRACT_NOT_FOUND, message: ")"
+                 R"(})"
+                 R"(},)"
+                 R"("request_id":"RwICAAAAAAAAAAAAAAAA")"
+                 R"(})"sv;
+  struct MyHandler final : public json::TradeParser::Handler {
+    bool found = false;
+
+   protected:
+    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
+    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
+    void operator()(Trace<json::TradeOrderCancelCP> const &event) override {
+      found = true;
+      auto &order_cancel_cp = event.value;
+      CHECK(order_cancel_cp.header.response_time == 1727404856256ms);
+    }
+    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
+  } handler;
+  std::vector<std::byte> buffer(8192);
+  TraceInfo trace_info;
+  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  CHECK(res == true);
   CHECK(handler.found == true);
 }

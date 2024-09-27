@@ -35,6 +35,10 @@
       "type": "std/string_view"
     },
     {
+      "name": "finish_as",
+      "type": "roq/gate_futures/json/FinishAs"
+    },
+    {
       "name": "fill_price",
       "type": "std/double"
     },
@@ -49,6 +53,10 @@
     {
       "name": "size",
       "type": "std/int32"
+    },
+    {
+      "name": "finish_time",
+      "type": "std/milliseconds"
     },
     {
       "name": "update_time",
