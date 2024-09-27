@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_order_book_simple", "[json_order_book]") {
+TEST_CASE("json_order_book_simple_1", "[json_order_book]") {
   auto message = R"({)"
                  R"("current":1643191515.447,)"
                  R"("asks":[)"
@@ -43,16 +43,75 @@ TEST_CASE("json_order_book_simple", "[json_order_book]") {
                  R"("update":1643191515.446)"
                  R"(})"sv;
   std::vector<std::byte> buffer(8192);
-  json::OrderBook obj{message, buffer};
-  CHECK(obj.current == 1643191515.447_a);
-  REQUIRE(std::size(obj.asks) == 10);
-  auto &a0 = obj.asks[0];
+  json::OrderBook order_book{message, buffer};
+  CHECK(order_book.current == 1643191515447ms);
+  REQUIRE(std::size(order_book.asks) == 10);
+  auto &a0 = order_book.asks[0];
   CHECK(a0.size == 117293.0_a);
   CHECK(a0.price == 37705.6_a);
-  REQUIRE(std::size(obj.bids) == 10);
-  auto &b0 = obj.bids[0];
+  REQUIRE(std::size(order_book.bids) == 10);
+  auto &b0 = order_book.bids[0];
   CHECK(b0.size == 72890.0_a);
   CHECK(b0.price == 37705.5_a);
-  CHECK(obj.id == 11144476177);
-  CHECK(obj.update == 1643191515.446_a);
+  CHECK(order_book.id == 11144476177);
+  CHECK(order_book.update == 1643191515446ms);
+}
+
+TEST_CASE("json_order_book_simple_2", "[json_order_book]") {
+  auto message = R"({)"
+                 R"("id":67732406375,)"
+                 R"("current":1727407595.364,)"
+                 R"("update":1727407595.29,)"
+                 R"("asks":[)"
+                 R"({"s":38875,"p":"64957.1"},)"
+                 R"({"s":1,"p":"64957.2"},)"
+                 R"({"s":1,"p":"64957.3"},)"
+                 R"({"s":2148,"p":"64959.5"},)"
+                 R"({"s":2230,"p":"64959.6"},)"
+                 R"({"s":1261,"p":"64959.7"},)"
+                 R"({"s":1,"p":"64959.8"},)"
+                 R"({"s":308,"p":"64960"},)"
+                 R"({"s":131,"p":"64962.7"},)"
+                 R"({"s":5436,"p":"64963.5"},)"
+                 R"({"s":3,"p":"64963.6"},)"
+                 R"({"s":4950,"p":"64963.7"},)"
+                 R"({"s":335,"p":"64964.7"},)"
+                 R"({"s":553,"p":"64965"},)"
+                 R"({"s":1,"p":"64965.3"},)"
+                 R"({"s":100,"p":"64965.9"},)"
+                 R"({"s":1,"p":"64966"},)"
+                 R"({"s":5133,"p":"64966.8"},)"
+                 R"({"s":5258,"p":"64967"},)"
+                 R"({"s":28,"p":"64967.9"})"
+                 R"(],)"
+                 R"("bids":[)"
+                 R"({"s":13379,"p":"64957"},)"
+                 R"({"s":1,"p":"64956.9"},)"
+                 R"({"s":1,"p":"64956.8"},)"
+                 R"({"s":1,"p":"64956.3"},)"
+                 R"({"s":3089,"p":"64953.8"},)"
+                 R"({"s":5134,"p":"64953.7"},)"
+                 R"({"s":308,"p":"64953"},)"
+                 R"({"s":1109,"p":"64951.4"},)"
+                 R"({"s":1538,"p":"64951.3"},)"
+                 R"({"s":1,"p":"64951.1"},)"
+                 R"({"s":1538,"p":"64951"},)"
+                 R"({"s":38,"p":"64950.8"},)"
+                 R"({"s":2693,"p":"64950.7"},)"
+                 R"({"s":1,"p":"64950.5"},)"
+                 R"({"s":252,"p":"64949.9"},)"
+                 R"({"s":1,"p":"64949.8"},)"
+                 R"({"s":308,"p":"64949.5"},)"
+                 R"({"s":1852,"p":"64949.2"},)"
+                 R"({"s":2309,"p":"64949"},)"
+                 R"({"s":1,"p":"64948.5"})"
+                 R"(])"
+                 R"(})"sv;
+  std::vector<std::byte> buffer(8192);
+  json::OrderBook order_book{message, buffer};
+  CHECK(order_book.id == 67732406375);
+  CHECK(order_book.current == 1727407595364ms);
+  CHECK(order_book.update == 1727407595290ms);
+  REQUIRE(std::size(order_book.asks) == 20);
+  REQUIRE(std::size(order_book.bids) == 20);
 }

@@ -95,11 +95,14 @@ TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
                  R"("trade_id":1200661,)"
                  R"("orderbook_id":1131459666)"
                  R"(})"
-                 R"(])";
+                 R"(])"sv;
   std::vector<std::byte> buffer(8192);
-  json::Contracts obj{message, buffer};
-  auto &data = obj.data;
+  json::Contracts contracts{message, buffer};
+  auto &data = contracts.data;
   REQUIRE(std::size(data) == 2);
+  auto &data_0 = contracts.data[0];
+  CHECK(data_0.funding_next_apply == 1641312000s);
+  CHECK(data_0.config_change_time == 1611037808s);
 }
 
 // note! reduced
@@ -185,9 +188,68 @@ TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
                  R"("trade_id":1202533,)"
                  R"("orderbook_id":58911366)"
                  R"(})"
-                 R"(])";
+                 R"(])"sv;
   std::vector<std::byte> buffer(8192);
-  json::Contracts obj{message, buffer};
-  auto &data = obj.data;
+  json::Contracts contracts{message, buffer};
+  auto &data = contracts.data;
   REQUIRE(std::size(data) == 2);
+}
+
+// note! reduced
+TEST_CASE("json_contracts_simple_3", "[json_contracts]") {
+  auto message = R"([{)"
+                 R"("funding_rate_indicative":"0.0001",)"
+                 R"("mark_price_round":"0.01",)"
+                 R"("funding_offset":0,)"
+                 R"("in_delisting":false,)"
+                 R"("risk_limit_base":"500000",)"
+                 R"("interest_rate":"0.0003",)"
+                 R"("index_price":"154.7167",)"
+                 R"("order_price_round":"0.01",)"
+                 R"("order_size_min":1,)"
+                 R"("ref_rebate_rate":"0.2",)"
+                 R"("name":"SOL_USDT",)"
+                 R"("ref_discount_rate":"0",)"
+                 R"("order_price_deviate":"0.5",)"
+                 R"("maintenance_rate":"0.01",)"
+                 R"("mark_type":"index",)"
+                 R"("funding_interval":28800,)"
+                 R"("type":"direct",)"
+                 R"("risk_limit_step":"500000",)"
+                 R"("enable_bonus":true,)"
+                 R"("enable_credit":true,)"
+                 R"("leverage_min":"1",)"
+                 R"("funding_rate":"0.0001",)"
+                 R"("last_price":"154.62",)"
+                 R"("mark_price":"154.67",)"
+                 R"("order_size_max":1000000,)"
+                 R"("funding_next_apply":1727424000,)"
+                 R"("short_users":702,)"
+                 R"("config_change_time":1721887713,)"
+                 R"("create_time":1604880000,)"
+                 R"("trade_size":678452715,)"
+                 R"("position_size":178932,)"
+                 R"("long_users":1142,)"
+                 R"("quanto_multiplier":"1",)"
+                 R"("funding_impact_value":"5000",)"
+                 R"("leverage_max":"50",)"
+                 R"("cross_leverage_default":"10",)"
+                 R"("risk_limit_max":"5000000",)"
+                 R"("maker_fee_rate":"-0.0001",)"
+                 R"("taker_fee_rate":"0.00075",)"
+                 R"("orders_limit":100,)"
+                 R"("trade_id":60300267,)"
+                 R"("orderbook_id":23526739503,)"
+                 R"("funding_cap_ratio":"0.75",)"
+                 R"("voucher_leverage":"2")"
+                 R"(})"
+                 R"(])"sv;
+  std::vector<std::byte> buffer(8192);
+  json::Contracts contracts{message, buffer};
+  REQUIRE(std::size(contracts.data) == 1);
+  auto &data_0 = contracts.data[0];
+  CHECK(data_0.funding_next_apply == 1727424000s);
+  CHECK(data_0.config_change_time == 1721887713s);
+  CHECK(data_0.config_change_time == 1721887713s);
+  CHECK(data_0.create_time == 1604880000s);
 }

@@ -319,11 +319,11 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
         .strike_price = NaN,
         .underlying = {},
         .time_zone = {},
-        .issue_date = {},
+        .issue_date = std::chrono::duration_cast<std::chrono::days>(item.create_time),
         .settlement_date = {},
         .expiry_datetime = {},
         .expiry_datetime_utc = {},
-        .exchange_time_utc = {},
+        .exchange_time_utc = item.config_change_time,
         .exchange_sequence = {},
         .sending_time_utc = {},
         .discard = discard,
@@ -406,7 +406,6 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
     emplace_back(mbp.bids, item);
   for (auto &item : order_book.asks)
     emplace_back(mbp.asks, item);
-  auto exchange_time_utc = std::chrono::nanoseconds{static_cast<int64_t>(order_book.update * 1.0e9)};
   try {
     auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence, auto retries, auto delay) {
       log::info(
@@ -419,12 +418,12 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
           .stream_id = stream_id_,
           .exchange = shared_.settings.exchange,
           .symbol = symbol,
-          .bids = {const_cast<MBPUpdate *>(std::data(bids)), std::size(bids)},  // FIXME
-          .asks = {const_cast<MBPUpdate *>(std::data(asks)), std::size(asks)},  // FIXME
+          .bids = bids,
+          .asks = asks,
           .update_type = UpdateType::SNAPSHOT,
-          .exchange_time_utc = exchange_time_utc,
+          .exchange_time_utc = order_book.update,
           .exchange_sequence = sequencer.last_sequence(),
-          .sending_time_utc = {},
+          .sending_time_utc = order_book.current,
           .price_precision = {},
           .quantity_precision = {},
           .checksum = {},

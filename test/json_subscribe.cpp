@@ -24,5 +24,6 @@ TEST_CASE("json_subscribe_success", "[json_subscribe]") {
                  R"(})"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Subscribe obj{message, buffer};
+  json::Subscribe subscribe{message, buffer};
+  CHECK(subscribe.time == 1641365392s);
 }

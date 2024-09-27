@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_trades_update", "[json_trades]") {
+TEST_CASE("json_trades_update_1", "[json_trades]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641366055,)"
@@ -36,4 +36,30 @@ TEST_CASE("json_trades_update", "[json_trades]") {
   auto &result_0 = trades.result[0];
   CHECK(result_0.create_time == 1641366055s);
   CHECK(result_0.create_time_ms == 1641366055959ms);
+}
+
+TEST_CASE("json_trades_update_2", "[json_trades]") {
+  auto message = R"({)"
+                 R"("channel":"futures.trades",)"
+                 R"("event":"update",)"
+                 R"("result":[{)"
+                 R"("id":360366365,)"
+                 R"("size":-500,)"
+                 R"("create_time":1727407595,)"
+                 R"("create_time_ms":1727407595183,)"
+                 R"("price":"64957",)"
+                 R"("contract":"BTC_USDT")"
+                 R"(})"
+                 R"(],)"
+                 R"("time":1727407595,)"
+                 R"("time_ms":1727407595193)"
+                 R"(})";
+  std::vector<std::byte> buffer(8192);
+  json::Trades trades{message, buffer};
+  REQUIRE(std::size(trades.result) == 1);
+  auto &result_0 = trades.result[0];
+  CHECK(result_0.create_time == 1727407595s);
+  CHECK(result_0.create_time_ms == 1727407595183ms);
+  CHECK(trades.time == 1727407595s);
+  CHECK(trades.time_ms == 1727407595193ms);
 }

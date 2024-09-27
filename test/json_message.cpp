@@ -24,7 +24,8 @@ TEST_CASE("json_message_subscribe_success", "[json_message]") {
                  R"(})"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Message obj{message, buffer};
+  json::Message message_2{message, buffer};
+  CHECK(message_2.channel == json::Channel::TICKERS);
 }
 
 TEST_CASE("json_message_book_ticker", "[json_message]") {
@@ -45,7 +46,8 @@ TEST_CASE("json_message_book_ticker", "[json_message]") {
                  R"(})"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Message obj{message, buffer};
+  json::Message message_2{message, buffer};
+  CHECK(message_2.channel == json::Channel::BOOK_TICKER);
 }
 
 TEST_CASE("json_message_tickers", "[json_message]") {
@@ -75,7 +77,8 @@ TEST_CASE("json_message_tickers", "[json_message]") {
                  R"(])"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Message obj{message, buffer};
+  json::Message message_2{message, buffer};
+  CHECK(message_2.channel == json::Channel::TICKERS);
 }
 
 TEST_CASE("json_message_trades", "[json_message]") {
@@ -96,5 +99,6 @@ TEST_CASE("json_message_trades", "[json_message]") {
                  R"(])"
                  R"(})";
   std::vector<std::byte> buffer(8192);
-  [[maybe_unused]] json::Message obj{message, buffer};
+  json::Message message_2{message, buffer};
+  CHECK(message_2.channel == json::Channel::TRADES);
 }

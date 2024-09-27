@@ -49,11 +49,11 @@ TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
                  R"(})"
                  R"(})"sv;
   std::vector<std::byte> buffer(8192);
-  json::OrderBookUpdate obj{message, buffer};
-  CHECK(obj.time == 1643180626s);
-  CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
-  CHECK(obj.event == json::Event::UPDATE);
-  auto &result = obj.result;
+  json::OrderBookUpdate order_book_update{message, buffer};
+  CHECK(order_book_update.time == 1643180626s);
+  CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
+  CHECK(order_book_update.event == json::Event::UPDATE);
+  auto &result = order_book_update.result;
   CHECK(result.timestamp == 1643180626827ms);
   CHECK(result.symbol == "BTC_USDT"sv);
   CHECK(result.first_update_id == 11140379005);
@@ -92,11 +92,11 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
                  R"(})"
                  R"(})"sv;
   std::vector<std::byte> buffer(8192);
-  json::OrderBookUpdate obj{message, buffer};
-  CHECK(obj.time == 1643180627s);
-  CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
-  CHECK(obj.event == json::Event::UPDATE);
-  auto &result = obj.result;
+  json::OrderBookUpdate order_book_update{message, buffer};
+  CHECK(order_book_update.time == 1643180627s);
+  CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
+  CHECK(order_book_update.event == json::Event::UPDATE);
+  auto &result = order_book_update.result;
   CHECK(result.timestamp == 1643180627828ms);
   CHECK(result.symbol == "BTC_USDT"sv);
   CHECK(result.first_update_id == 11140379320);
@@ -109,4 +109,45 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
   auto &a0 = result.asks[0];
   CHECK(a0.price == 37210.2_a);
   CHECK(a0.size == 227146.0_a);
+}
+
+TEST_CASE("json_order_book_update_simple_3", "[json_order_book_update]") {
+  auto message = R"({)"
+                 R"("channel":"futures.order_book_update",)"
+                 R"("event":"update",)"
+                 R"("result":{)"
+                 R"("U":23526668009,)"
+                 R"("a":[],)"
+                 R"("b":[{)"
+                 R"("p":"154.39",)"
+                 R"("s":1545)"
+                 R"(},{)"
+                 R"("p":"154.38",)"
+                 R"("s":817)"
+                 R"(}],)"
+                 R"("s":"SOL_USDT",)"
+                 R"("t":1727407188004,)"
+                 R"("u":23526668010},)"
+                 R"("time":1727407188,)"
+                 R"("time_ms":1727407188072)"
+                 R"(})"sv;
+  std::vector<std::byte> buffer(8192);
+  json::OrderBookUpdate order_book_update{message, buffer};
+  CHECK(order_book_update.time == 1727407188s);
+  CHECK(order_book_update.time_ms == 1727407188072ms);
+  CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
+  CHECK(order_book_update.event == json::Event::UPDATE);
+  auto &result = order_book_update.result;
+  CHECK(result.timestamp == 1727407188004ms);
+  CHECK(result.symbol == "SOL_USDT"sv);
+  CHECK(result.first_update_id == 23526668009);
+  CHECK(result.last_update_id == 23526668010);
+  REQUIRE(std::size(result.bids) == 2);
+  auto &b0 = result.bids[0];
+  CHECK(b0.price == 154.39_a);
+  CHECK(b0.size == 1545_a);
+  auto &b1 = result.bids[1];
+  CHECK(b1.price == 154.38_a);
+  CHECK(b1.size == 817_a);
+  REQUIRE(std::size(result.asks) == 0);
 }

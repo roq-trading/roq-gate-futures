@@ -4,7 +4,7 @@
   "values": [
     {
       "name": "current",
-      "type": "std/double"
+      "type": "std/milliseconds"
     },
     {
       "name": "asks",
@@ -22,7 +22,7 @@
     },
     {
       "name": "update",
-      "type": "std/double"
+      "type": "std/milliseconds"
     }
   ]
 }

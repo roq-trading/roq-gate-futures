@@ -321,9 +321,9 @@ void MarketData::operator()(Trace<json::Tickers> const &event) {
           .symbol = item.contract,
           .statistics = statistics,
           .update_type = UpdateType::INCREMENTAL,
-          .exchange_time_utc = tickers.time,
+          .exchange_time_utc = {},
           .exchange_sequence = {},
-          .sending_time_utc = {},
+          .sending_time_utc = tickers.time_ms,
       };
       create_trace_and_dispatch(handler_, trace_info, statistics_update, true);
     }
@@ -362,7 +362,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
               .trades = trades_2,
               .exchange_time_utc = timestamp,
               .exchange_sequence = {},
-              .sending_time_utc = {},
+              .sending_time_utc = trades.time_ms,
           };
           create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
           trades_2.clear();
@@ -381,7 +381,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
           .trades = trades_2,
           .exchange_time_utc = timestamp,
           .exchange_sequence = {},
-          .sending_time_utc = {},
+          .sending_time_utc = trades.time_ms,
       };
       create_trace_and_dispatch(handler_, trace_info, trade_summary, true);
     }
@@ -407,7 +407,7 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
         .update_type = UpdateType::SNAPSHOT,
         .exchange_time_utc = result.timestamp,
         .exchange_sequence = {},
-        .sending_time_utc = {},
+        .sending_time_utc = book_ticker.time_ms,
     };
     create_trace_and_dispatch(handler_, trace_info, top_of_book, true);
   });
@@ -440,19 +440,18 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       emplace_back(mbp.bids, item);
     for (auto &item : result.asks)
       emplace_back(mbp.asks, item);
-    auto exchange_time_utc = result.timestamp;
     try {
       auto create_update = [&](auto &bids, auto &asks, auto update_type, auto exchange_sequence) -> MarketByPriceUpdate {
         return {
             .stream_id = stream_id_,
             .exchange = shared_.settings.exchange,
             .symbol = symbol,
-            .bids = {const_cast<MBPUpdate *>(std::data(bids)), std::size(bids)},  // FIXME
-            .asks = {const_cast<MBPUpdate *>(std::data(asks)), std::size(asks)},  // FIXME
+            .bids = bids,
+            .asks = asks,
             .update_type = update_type,
-            .exchange_time_utc = exchange_time_utc,
+            .exchange_time_utc = result.timestamp,
             .exchange_sequence = exchange_sequence,
-            .sending_time_utc = {},
+            .sending_time_utc = order_book_update.time_ms,
             .price_precision = {},
             .quantity_precision = {},
             .checksum = {},
