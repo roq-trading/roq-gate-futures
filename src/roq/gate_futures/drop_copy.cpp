@@ -680,6 +680,7 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
         .side = side,
         .position_effect = {},
         .margin_mode = {},
+        .quantity_type = {},
         .create_time_utc = exchange_time_utc,
         .update_time_utc = exchange_time_utc,
         .external_account = {},

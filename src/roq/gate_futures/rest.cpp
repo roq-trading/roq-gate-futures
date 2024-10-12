@@ -306,6 +306,7 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
         .security_type = {},
         .base_currency = {},
         .quote_currency = {},
+        .settlement_currency = {},
         .margin_currency = {},
         .commission_currency = {},
         .tick_size = item.order_price_round,

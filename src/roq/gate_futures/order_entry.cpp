@@ -417,6 +417,7 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
         .side = side,
         .position_effect = {},
         .margin_mode = {},
+        .quantity_type = {},
         .create_time_utc = exchange_time_utc,
         .update_time_utc = exchange_time_utc,
         .external_account = {},
