@@ -7,6 +7,7 @@
 
 #include "roq/mask.hpp"
 
+#include "roq/utils/safe_cast.hpp"
 #include "roq/utils/update.hpp"
 
 #include "roq/utils/metrics/factory.hpp"
@@ -298,19 +299,42 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
     log::info<2>("item={}"sv, item);
     auto symbol = item.name;
     auto discard = shared_.discard_symbol(symbol);
+    auto [base_currency, quote_currency] = [&]() -> std::pair<std::string_view, std::string_view> {
+      auto sep = symbol.find('_');
+      if (sep == symbol.npos) [[unlikely]]
+        log::fatal(R"(Unexpected: symbol="{}")"sv, symbol);
+      return {
+          symbol.substr(0, sep),
+          symbol.substr(sep + 1),
+      };
+    }();
+    auto settlement_currency = [&]() -> std::string_view {
+      switch (item.type) {
+        using enum json::ContractType::type_t;
+        case UNDEFINED__:
+        case UNKNOWN__:
+        case INDEX:
+          break;
+        case DIRECT:
+          return quote_currency;
+        case INVERSE:
+          return base_currency;
+      }
+      return {};
+    }();
     auto reference_data = ReferenceData{
         .stream_id = stream_id_,
         .exchange = shared_.settings.exchange,
         .symbol = symbol,
         .description = symbol,
-        .security_type = {},
-        .base_currency = {},
-        .quote_currency = {},
-        .settlement_currency = {},
+        .security_type = SecurityType::SWAP,  // XXX always ???
+        .base_currency = base_currency,
+        .quote_currency = quote_currency,
+        .settlement_currency = settlement_currency,
         .margin_currency = {},
         .commission_currency = {},
         .tick_size = item.order_price_round,
-        .multiplier = 1.0,
+        .multiplier = NaN,
         .min_notional = NaN,
         .min_trade_vol = item.order_size_min,
         .max_trade_vol = item.order_size_max,
@@ -320,7 +344,7 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
         .strike_price = NaN,
         .underlying = {},
         .time_zone = {},
-        .issue_date = std::chrono::duration_cast<std::chrono::days>(item.create_time),
+        .issue_date = utils::safe_cast{item.create_time},
         .settlement_date = {},
         .expiry_datetime = {},
         .expiry_datetime_utc = {},
