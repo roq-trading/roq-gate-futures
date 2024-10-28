@@ -137,6 +137,18 @@
     {
       "name": "stop_profit_price",
       "type": "std/double"
+    },
+    {
+      "name": "fee",
+      "type": "std/double"
+    },
+    {
+      "name": "point_fee",
+      "type": "std/double"
+    },
+    {
+      "name": "role",
+      "type": "std/string_view"
     }
   ]
 }

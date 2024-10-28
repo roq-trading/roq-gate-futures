@@ -435,9 +435,9 @@ uint32_t DropCopy::download(DropCopyState state) {
 void DropCopy::login() {
   auto request_id = ++request_id_;
   auto now = clock::get_realtime<std::chrono::seconds>();
-  auto const channel = "futures.login"sv;
-  auto const event = ""sv;
-  std::string signature = account_.create_signature(channel, event, now);
+  auto event = "api"sv;
+  auto channel = "futures.login"sv;
+  auto signature = account_.create_signature_login(event, channel, {}, now);
   auto message = fmt::format(
       R"({{)"
       R"("id":{},)"
@@ -454,7 +454,7 @@ void DropCopy::login() {
       request_id,
       now.count(),
       channel,
-      std::empty(event) ? "api"sv : event,
+      event,
       request_id,
       now.count(),
       account_.get_key(),
@@ -506,7 +506,7 @@ void DropCopy::subscribe(std::string_view const &channel, std::string_view const
       R"("event":"{}",)"
       R"("payload":{},)"
       R"("auth":{{)"  // <<== from here it's different from login
-      R"("method":"api",)"
+      R"("method":"api_key",)"
       R"("KEY":"{}",)"
       R"("SIGN":"{}")"
       R"(}})"

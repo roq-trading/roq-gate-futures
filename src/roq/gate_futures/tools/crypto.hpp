@@ -26,7 +26,9 @@ struct Crypto final {
   std::string create_headers(
       web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body, std::chrono::seconds now);
 
-  std::string create_signature(std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp);
+  std::string create_signature_login(
+      std::string_view const &event, std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp);
+  std::string create_signature(std::string_view const &channel, std::string_view const &event, std::chrono::seconds timestamp);
 
  private:
   using Hash = utils::hash::SHA512;

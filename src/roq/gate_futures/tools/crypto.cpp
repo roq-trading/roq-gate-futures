@@ -53,8 +53,19 @@ std::string Crypto::create_headers(
   return result;
 }
 
-std::string Crypto::create_signature(std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp) {
-  auto tmp = fmt::format("api\n{}\n{}\n{}"sv, channel, req_param, timestamp.count());
+std::string Crypto::create_signature_login(
+    std::string_view const &event, std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp) {
+  auto tmp = fmt::format("{}\n{}\n{}\n{}"sv, event, channel, req_param, timestamp.count());
+  mac_.clear();
+  mac_.update(tmp);
+  auto digest = mac_.final(digest_);
+  std::string signature_2;
+  utils::codec::Hex::encode(signature_2, digest);
+  return signature_2;
+}
+
+std::string Crypto::create_signature(std::string_view const &channel, std::string_view const &event, std::chrono::seconds timestamp) {
+  auto tmp = fmt::format("channel={}&event={}&time={}"sv, channel, event, timestamp.count());
   mac_.clear();
   mac_.update(tmp);
   auto digest = mac_.final(digest_);
