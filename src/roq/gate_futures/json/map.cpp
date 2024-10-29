@@ -44,8 +44,7 @@ constexpr Helper<TIF>::operator roq::TimeInForce() {
     case FOK:
       return roq::TimeInForce::FOK;
     case POC:
-      // return roq::TimeInForce::POC;
-      break;
+      return roq::TimeInForce::GTC;  // note!
     case IOC:
       return roq::TimeInForce::IOC;
   }
@@ -55,7 +54,7 @@ constexpr Helper<TIF>::operator roq::TimeInForce() {
 static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::UNDEFINED__}}) == roq::TimeInForce::UNDEFINED);
 static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::GTC}}) == roq::TimeInForce::GTC);
 static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::FOK}}) == roq::TimeInForce::FOK);
-// static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::POC}}) == roq::TimeInForce::POC);
+static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::POC}}) == roq::TimeInForce::GTC);
 static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::IOC}}) == roq::TimeInForce::IOC);
 
 // FinishAs ==> roq::OrderStatus

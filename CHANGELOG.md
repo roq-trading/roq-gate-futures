@@ -4,6 +4,11 @@ All notable changes will be documented in this file.
 
 ## Head
 
+### Fixed
+
+* Reverse mapping from time in force "poc" was not implemented #473
+* WS authentication method changed #472
+
 ## 1.0.2 &ndash; 2024-07-14
 
 ## 1.0.1 &ndash; 2024-04-14
