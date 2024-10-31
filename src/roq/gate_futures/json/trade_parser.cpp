@@ -59,6 +59,8 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           TradeLogin login{message, buffer};
           create_trace_and_dispatch(handler, trace_info, login);
           return true;
+        } else {
+          return false;
         }
         break;
       case BALANCES:

@@ -557,7 +557,7 @@ void DropCopy::parse(std::string_view const &message) {
       TraceInfo trace_info;
       if (!json::TradeParser::dispatch(*this, message, decode_buffer_, trace_info)) {
         log_message();
-        log::fatal("HERE"sv);
+        log::fatal("Unexpected"sv);
       }
     } catch (...) {
       log_message();
