@@ -335,6 +335,7 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
         .margin_currency = {},
         .commission_currency = {},
         .tick_size = item.order_price_round,
+        .tick_size_steps = {},
         .multiplier = NaN,
         .min_notional = NaN,
         .min_trade_vol = item.order_size_min,
