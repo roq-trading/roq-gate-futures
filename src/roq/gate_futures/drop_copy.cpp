@@ -884,6 +884,11 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
   }
   auto external_order_id = fmt::format("{}"sv, value.id);
   auto side = value.size < 0 ? Side::SELL : Side::BUY;
+  auto order_type = [&]() -> OrderType {
+    if (update_type == UpdateType::SNAPSHOT)
+      return OrderType::LIMIT;  // download orders must be limit
+    return {};
+  }();
   auto create_time_utc = [&]() -> std::chrono::nanoseconds {
     constexpr bool has_create_time_ms = requires(T const &t) { t.create_time_ms; };
     if constexpr (has_create_time_ms) {
@@ -917,7 +922,7 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .position_effect = {},
       .margin_mode = {},
       .max_show_quantity = NaN,
-      .order_type = {},
+      .order_type = order_type,
       .time_in_force = json::Map{value.tif},
       .execution_instructions = {},
       .create_time_utc = create_time_utc,
