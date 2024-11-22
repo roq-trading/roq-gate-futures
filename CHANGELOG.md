@@ -8,6 +8,7 @@ All notable changes will be documented in this file.
 
 ### Fixed
 
+* Incorrect `order_type` when handling `TradeOrders` (exchange message) #479
 * Reverse mapping from time in force "poc" was not implemented #473
 * WS authentication method changed #472
 

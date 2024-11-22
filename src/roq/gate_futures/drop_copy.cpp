@@ -915,9 +915,9 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .symbol = value.contract,
       .side = side,
       .position_effect = {},
-      .margin_mode = {},  // ???
+      .margin_mode = {},
       .max_show_quantity = NaN,
-      .order_type = OrderType::LIMIT,  // ???
+      .order_type = {},
       .time_in_force = json::Map{value.tif},
       .execution_instructions = {},
       .create_time_utc = create_time_utc,
