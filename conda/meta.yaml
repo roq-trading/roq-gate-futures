@@ -12,7 +12,7 @@ build:
 requirements:
   build:
     - {{ compiler('cxx') }}
-    - clangdev
+    - clang-format
     - cmake
     - coreutils                                                                                                                                                    
     - git
