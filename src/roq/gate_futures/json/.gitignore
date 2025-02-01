@@ -46,6 +46,7 @@ trade_order_cancel_cp.hpp
 trade_order_cancel_data.hpp
 trade_order_cancel_data_result.hpp
 trade_order_cancel.hpp
+trade_order_list_data_error.hpp
 trade_order_list_data.hpp
 trade_order_list_data_result_item.hpp
 trade_order_list.hpp
@@ -109,6 +110,7 @@ trade_order_cancel_cp.cpp
 trade_order_cancel_data.cpp
 trade_order_cancel_data_result.cpp
 trade_order_cancel.cpp
+trade_order_list_data_error.cpp
 trade_order_list_data.cpp
 trade_order_list_data_result_item.cpp
 trade_order_list.cpp

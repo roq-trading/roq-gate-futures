@@ -178,6 +178,10 @@
     {
       "name": "cross_leverage_default",
       "type": "std/double"
+    },
+    {
+      "name": "is_pre_market",
+      "type": "std/bool"
     }
   ]
 }

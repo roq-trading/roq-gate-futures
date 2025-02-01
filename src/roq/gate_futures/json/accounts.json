@@ -101,6 +101,10 @@
     {
       "name": "history",
       "type": "roq/gate_futures/json/AccountsHistory"
+    },
+    {
+      "name": "margin_mode_name",
+      "type": "std/string_view"
     }
   ]
 }

@@ -51,6 +51,7 @@ set(AUTOGEN_SCHEMAS
     trade_order_cancel_data.json
     trade_order_cancel_data_result.json
     trade_order_cancel.json
+    trade_order_list_data_error.json
     trade_order_list_data.json
     trade_order_list_data_result_item.json
     trade_order_list.json
