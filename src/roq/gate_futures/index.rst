@@ -10,7 +10,8 @@ Links
 -----
 
 * `Website <https://www.gate.io/>`__
-* `Documentation <https://www.gate.io/api2>`__
+* `Testnet <https://www.gate.io/testnet/futures_trade/USDT/BTC_USDT>`__
+* `Documentation <https://www.gate.io/docs/developers/apiv4/>`__
 
 
 Supports

@@ -36,6 +36,11 @@
       "validator": "roq/flags/validators/TimePeriod",
       "default": "30s",
       "description": "Request timeout"
+    },
+    {
+      "name": "disable_currencies_download",
+      "type": "std/bool",
+      "description": "Disable currencies download"
     }
   ]
 }

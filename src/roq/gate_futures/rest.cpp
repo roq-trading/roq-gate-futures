@@ -182,6 +182,8 @@ uint32_t Rest::download(RestState state) {
       assert(false);
       break;
     case CURRENCIES:
+      if (shared_.settings.rest.disable_currencies_download)
+        return 0;
       get_currencies();
       return 1;
     case CONTRACTS:
