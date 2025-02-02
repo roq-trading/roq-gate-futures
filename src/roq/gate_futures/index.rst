@@ -170,6 +170,24 @@ Environments
    .. include:: flags/prod/flags-btc.cfg
      :code: shell
 
+.. tab:: Test (USDT)
+
+   .. code-block:: shell
+
+      $ $CONDA_PREFIX/share/roq-gate-futures/flags/test/flags-usdt.cfg
+
+   .. include:: flags/test/flags-usdt.cfg
+     :code: shell
+
+.. tab:: Test (BTC)
+
+   .. code-block:: shell
+
+      $ $CONDA_PREFIX/share/roq-gate-futures/flags/test/flags-btc.cfg
+
+   .. include:: flags/test/flags-btc.cfg
+     :code: shell
+
 
 Configuration
 -------------
@@ -527,3 +545,5 @@ Comments
   Other values may result in a response saying "success', yet updates do not appear to arrive.
 
 * Order/account management is completely missing (needs sponsorship).
+
+* Testnet doesn't support downloading of (spot) currencies. Use :code:`--rest_disable_currencies_download=true`.
