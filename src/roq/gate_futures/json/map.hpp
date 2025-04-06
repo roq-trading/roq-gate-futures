@@ -2,37 +2,28 @@
 
 #pragma once
 
-#include <tuple>
-
-#include "roq/api.hpp"
-
 #include "roq/gate_futures/json/finish_as.hpp"
 #include "roq/gate_futures/json/role.hpp"
 #include "roq/gate_futures/json/tif.hpp"
 
+#include "roq/liquidity.hpp"
+#include "roq/order_status.hpp"
+#include "roq/time_in_force.hpp"
+
+#include "roq/map.hpp"
+
 namespace roq {
-namespace gate_futures {
-namespace json {
 
-template <typename... Args>
-struct Map final {
-  explicit Map(Args &&...args) : args_{std::forward<Args>(args)...} {}
-  explicit Map(Args const &...args) : args_{args...} {}
+template <>
+template <>
+std::optional<OrderStatus> Map<gate_futures::json::FinishAs>::helper() const;
 
-  Map(Map const &) = delete;
+template <>
+template <>
+std::optional<Liquidity> Map<gate_futures::json::Role>::helper() const;
 
-  template <typename R>
-  operator R();
+template <>
+template <>
+std::optional<TimeInForce> Map<gate_futures::json::TIF>::helper() const;
 
- private:
-  std::tuple<Args...> const args_;
-};
-
-template <typename R, typename... Args>
-inline R map(Args &&...args) {
-  return static_cast<R>(Map{std::forward<Args>(args)...});
-}
-
-}  // namespace json
-}  // namespace gate_futures
 }  // namespace roq

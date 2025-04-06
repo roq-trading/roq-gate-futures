@@ -86,7 +86,7 @@ std::string_view get_client_order_id(auto &text) {
 }
 
 OrderStatus get_order_status(json::FinishAs finish_as, json::OrderStatus status) {
-  OrderStatus result = json::Map{finish_as};
+  auto result = map(finish_as).template get<OrderStatus>();
   if (result != OrderStatus{})
     return result;
   if (status == json::OrderStatus::OPEN)
@@ -667,7 +667,7 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
         .external_trade_id = item.id,
         .quantity = quantity,
         .price = item.price,
-        .liquidity = json::Map{item.role},
+        .liquidity = map(item.role),
         .quote_quantity = NaN,
         .commission_quantity = item.fee,  // ???
         .commission_currency = {},
@@ -923,7 +923,7 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .margin_mode = {},
       .max_show_quantity = NaN,
       .order_type = order_type,
-      .time_in_force = json::Map{value.tif},
+      .time_in_force = map(value.tif),
       .execution_instructions = {},
       .create_time_utc = create_time_utc,
       .update_time_utc = update_time_utc,

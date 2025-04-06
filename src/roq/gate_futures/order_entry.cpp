@@ -403,7 +403,7 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
         .external_trade_id = item.trade_id,
         .quantity = quantity,
         .price = item.price,
-        .liquidity = json::Map{item.role},
+        .liquidity = map(item.role),
         .quote_quantity = NaN,
         .commission_quantity = item.fee,  // ???
         .commission_currency = {},

@@ -2,72 +2,28 @@
 
 #include "roq/gate_futures/json/map.hpp"
 
-#include "roq/logging.hpp"
-
 using namespace std::literals;
 
 namespace roq {
-namespace gate_futures {
-namespace json {
-
-// === HELPERS ===
 
 namespace {
-// note! constexpr helper for static testing
 template <typename... Args>
-struct Helper final {
-  explicit constexpr Helper(std::tuple<Args...> const &args) : args_{args} {}
-  explicit constexpr Helper(Args &&...args_) : args_{std::forward<Args>(args_)...} {}
-
-  template <typename R>
-  constexpr operator R();
-
- private:
-  std::tuple<Args...> const args_;
-};
-
-// ==> roq
-
-// TIF ==> roq::TimeInForce
-
-template <>
-template <>
-constexpr Helper<TIF>::operator roq::TimeInForce() {
-  switch (std::get<0>(args_)) {
-    using enum json::TIF::type_t;
-    case UNDEFINED__:
-      return {};
-    case UNKNOWN__:
-      break;
-    case GTC:
-      return roq::TimeInForce::GTC;
-    case FOK:
-      return roq::TimeInForce::FOK;
-    case POC:
-      return roq::TimeInForce::GTC;  // note!
-    case IOC:
-      return roq::TimeInForce::IOC;
-  }
-  roq::log::fatal("Unexpected"sv);
+using Helper = detail::MapHelper<Args...>;
 }
 
-static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::UNDEFINED__}}) == roq::TimeInForce::UNDEFINED);
-static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::GTC}}) == roq::TimeInForce::GTC);
-static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::FOK}}) == roq::TimeInForce::FOK);
-static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::POC}}) == roq::TimeInForce::GTC);
-static_assert(static_cast<roq::TimeInForce>(Helper{TIF{TIF::IOC}}) == roq::TimeInForce::IOC);
+// gate_futures => roq
 
-// FinishAs ==> roq::OrderStatus
+// gate_futures::json::FinishAs ==> roq::OrderStatus
 
 template <>
 template <>
-constexpr Helper<FinishAs>::operator roq::OrderStatus() {
+constexpr Helper<gate_futures::json::FinishAs>::operator std::optional<roq::OrderStatus>() const {
   switch (std::get<0>(args_)) {
-    using enum json::FinishAs::type_t;
+    using enum gate_futures::json::FinishAs::type_t;
     case UNDEFINED__:
-      return {};
+      return roq::OrderStatus::UNDEFINED;
     case UNKNOWN__:
-      break;
+      return roq::OrderStatus::UNDEFINED;
     case FILLED:
       return roq::OrderStatus::COMPLETED;
     case CANCELLED:
@@ -91,70 +47,90 @@ constexpr Helper<FinishAs>::operator roq::OrderStatus() {
     case REDUCE_OUT:
       return roq::OrderStatus::WORKING;  // XXX ???
   }
-  roq::log::fatal("Unexpected"sv);
+  return {};
 }
 
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::UNDEFINED__}}) == roq::OrderStatus::UNDEFINED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::FILLED}}) == roq::OrderStatus::COMPLETED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::CANCELLED}}) == roq::OrderStatus::CANCELED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::LIQUIDATED}}) == roq::OrderStatus::CANCELED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::IOC}}) == roq::OrderStatus::COMPLETED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::AUTO_DELEVERAGED}}) == roq::OrderStatus::CANCELED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::REDUCE_ONLY}}) == roq::OrderStatus::CANCELED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::POSITION_CLOSE}}) == roq::OrderStatus::CANCELED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::STP}}) == roq::OrderStatus::CANCELED);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::NEW}}) == roq::OrderStatus::WORKING);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::UPDATE}}) == roq::OrderStatus::WORKING);
-static_assert(static_cast<roq::OrderStatus>(Helper{FinishAs{FinishAs::REDUCE_OUT}}) == roq::OrderStatus::WORKING);
-
-// Role ==> roq::Liquidity
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::UNDEFINED__}} == roq::OrderStatus::UNDEFINED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::FILLED}} == roq::OrderStatus::COMPLETED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::CANCELLED}} == roq::OrderStatus::CANCELED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::LIQUIDATED}} == roq::OrderStatus::CANCELED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::IOC}} == roq::OrderStatus::COMPLETED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::AUTO_DELEVERAGED}} == roq::OrderStatus::CANCELED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::REDUCE_ONLY}} == roq::OrderStatus::CANCELED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::POSITION_CLOSE}} == roq::OrderStatus::CANCELED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::STP}} == roq::OrderStatus::CANCELED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::NEW}} == roq::OrderStatus::WORKING);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::UPDATE}} == roq::OrderStatus::WORKING);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::REDUCE_OUT}} == roq::OrderStatus::WORKING);
 
 template <>
 template <>
-constexpr Helper<Role>::operator roq::Liquidity() {
+std::optional<roq::OrderStatus> Map<gate_futures::json::FinishAs>::helper() const {
+  return Helper{args_};
+}
+
+// gate_futures::json::Role ==> roq::Liquidity
+
+template <>
+template <>
+constexpr Helper<gate_futures::json::Role>::operator std::optional<roq::Liquidity>() const {
   switch (std::get<0>(args_)) {
-    using enum json::Role::type_t;
+    using enum gate_futures::json::Role::type_t;
     case UNDEFINED__:
-      return {};
+      return roq::Liquidity::UNDEFINED;
     case UNKNOWN__:
-      break;
+      return roq::Liquidity::UNDEFINED;
     case MAKER:
       return roq::Liquidity::MAKER;
     case TAKER:
       return roq::Liquidity::TAKER;
   }
-  roq::log::fatal("Unexpected"sv);
+  return {};
 }
 
-static_assert(static_cast<roq::Liquidity>(Helper{Role{Role::UNDEFINED__}}) == roq::Liquidity::UNDEFINED);
-static_assert(static_cast<roq::Liquidity>(Helper{Role{Role::MAKER}}) == roq::Liquidity::MAKER);
-static_assert(static_cast<roq::Liquidity>(Helper{Role{Role::TAKER}}) == roq::Liquidity::TAKER);
-
-// roq ==>
-}  // namespace
-
-// === IMPLEMENTATION ===
-
-// ==> roq
+static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::UNDEFINED__}} == roq::Liquidity::UNDEFINED);
+static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::MAKER}} == roq::Liquidity::MAKER);
+static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::TAKER}} == roq::Liquidity::TAKER);
 
 template <>
 template <>
-Map<TIF>::operator roq::TimeInForce() {
+std::optional<roq::Liquidity> Map<gate_futures::json::Role>::helper() const {
   return Helper{args_};
 }
 
-template <>
-template <>
-Map<FinishAs>::operator roq::OrderStatus() {
-  return Helper{args_};
-}
+// gate_futures::json::TIF ==> roq::TimeInForce
 
 template <>
 template <>
-Map<Role>::operator roq::Liquidity() {
+constexpr Helper<gate_futures::json::TIF>::operator std::optional<roq::TimeInForce>() const {
+  switch (std::get<0>(args_)) {
+    using enum gate_futures::json::TIF::type_t;
+    case UNDEFINED__:
+      return roq::TimeInForce::UNDEFINED;
+    case UNKNOWN__:
+      return roq::TimeInForce::UNDEFINED;
+    case GTC:
+      return roq::TimeInForce::GTC;
+    case FOK:
+      return roq::TimeInForce::FOK;
+    case POC:
+      return roq::TimeInForce::GTC;  // note!
+    case IOC:
+      return roq::TimeInForce::IOC;
+  }
+  return {};
+}
+
+static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::UNDEFINED__}} == roq::TimeInForce::UNDEFINED);
+static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::GTC}} == roq::TimeInForce::GTC);
+static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::FOK}} == roq::TimeInForce::FOK);
+static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::POC}} == roq::TimeInForce::GTC);
+static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::IOC}} == roq::TimeInForce::IOC);
+
+template <>
+template <>
+std::optional<roq::TimeInForce> Map<gate_futures::json::TIF>::helper() const {
   return Helper{args_};
 }
 
-}  // namespace json
-}  // namespace gate_futures
 }  // namespace roq
