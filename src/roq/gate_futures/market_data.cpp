@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include "roq/logging.hpp"
+
 #include "roq/mask.hpp"
 
 #include "roq/utils/safe_cast.hpp"
@@ -11,11 +13,11 @@
 
 #include "roq/utils/charconv/to_string.hpp"
 
+#include "roq/utils/exceptions/unhandled.hpp"
+
 #include "roq/utils/metrics/factory.hpp"
 
 #include "roq/web/socket/client.hpp"
-
-#include "roq/core/tools/exception.hpp"
 
 #include "roq/gate_futures/json/utils.hpp"
 
@@ -259,7 +261,7 @@ void MarketData::parse(std::string_view const &message) {
         log_message();
     } catch (...) {
       log_message();
-      core::tools::UnhandledException::terminate();
+      utils::exceptions::Unhandled::terminate();
     }
   });
 }
