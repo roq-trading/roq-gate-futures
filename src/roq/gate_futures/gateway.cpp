@@ -149,8 +149,9 @@ void Gateway::operator()(Trace<FundsUpdate> const &event, bool is_last) {
 void Gateway::operator()(Rest::SymbolsUpdate &symbols_update) {
   auto [size, start_from] = shared_.symbols(symbols_update.symbols);
   ensure_symbol_slices(size);
-  for (auto &iter : market_data_)
+  for (auto &iter : market_data_) {
     (*iter).subscribe(start_from);
+  }
 }
 
 void Gateway::ensure_symbol_slices(size_t size) {
@@ -204,25 +205,30 @@ template <typename... Args>
 void Gateway::dispatch(Args &&...args) {
   auto helper = [&](auto &target) { target(std::forward<Args>(args)...); };
   helper(rest_);
-  for (auto &[_, item] : order_entry_)
+  for (auto &[_, item] : order_entry_) {
     helper(*item);
-  for (auto &[_, item] : drop_copy_)
+  }
+  for (auto &[_, item] : drop_copy_) {
     helper(*item);
-  for (auto &item : market_data_)
+  }
+  for (auto &item : market_data_) {
     helper(*item);
+  }
 }
 
 DropCopy &Gateway::get_drop_copy(std::string_view const &account) {
   auto iter = drop_copy_.find(account);
-  if (iter != std::end(drop_copy_))
+  if (iter != std::end(drop_copy_)) {
     return *(*iter).second;
+  }
   throw RuntimeError{R"(Unknown account="{}")"sv, account};
 }
 
 OrderEntry &Gateway::get_order_entry(std::string_view const &account) {
   auto iter = order_entry_.find(account);
-  if (iter != std::end(order_entry_))
+  if (iter != std::end(order_entry_)) {
     return *(*iter).second;
+  }
   throw RuntimeError{R"(Unknown account="{}")"sv, account};
 }
 

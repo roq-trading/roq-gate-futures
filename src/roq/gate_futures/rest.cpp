@@ -107,8 +107,9 @@ void Rest::operator()(Event<Stop> const &) {
 void Rest::operator()(Event<Timer> const &event) {
   auto now = event.value.now;
   (*connection_).refresh(now);
-  if (ready())
+  if (ready()) {
     check_request_queue(now);
+  }
 }
 
 void Rest::operator()(metrics::Writer &writer) {
@@ -160,8 +161,9 @@ void Rest::operator()(Trace<web::rest::Client::Connected> const &) {
 void Rest::operator()(Trace<web::rest::Client::Disconnected> const &) {
   ++counter_.disconnect;
   (*this)(ConnectionStatus::DISCONNECTED);
-  if (!download_.downloading())
+  if (!download_.downloading()) {
     download_.reset();
+  }
 }
 
 void Rest::operator()(Trace<web::rest::Client::Latency> const &event) {
@@ -182,8 +184,9 @@ uint32_t Rest::download(RestState state) {
       assert(false);
       break;
     case CURRENCIES:
-      if (shared_.settings.rest.disable_currencies_download)
+      if (shared_.settings.rest.disable_currencies_download) {
         return 0;
+      }
       get_currencies();
       return 1;
     case CONTRACTS:
@@ -303,8 +306,9 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
     auto discard = shared_.discard_symbol(symbol);
     auto [base_currency, quote_currency] = [&]() -> std::pair<std::string_view, std::string_view> {
       auto sep = symbol.find('_');
-      if (sep == symbol.npos) [[unlikely]]
+      if (sep == symbol.npos) [[unlikely]] {
         log::fatal(R"(Unexpected: symbol="{}")"sv, symbol);
+      }
       return {
           symbol.substr(0, sep),
           symbol.substr(sep + 1),
@@ -358,10 +362,12 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
         .discard = discard,
     };
     create_trace_and_dispatch(handler_, trace_info, reference_data, true);
-    if (discard)
+    if (discard) {
       continue;
-    if (all_symbols_.emplace(symbol).second)  // only include new
+    }
+    if (all_symbols_.emplace(symbol).second) {  // only include new
       symbols.emplace_back(symbol);
+    }
     ++counter;
   }
   if (!std::empty(symbols)) {
@@ -370,8 +376,9 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
     };
     handler_(contracts_update);
   }
-  if (counter > 0) [[unlikely]]
+  if (counter > 0) [[unlikely]] {
     log::info("Symbols {} / {}"sv, counter, std::size(contracts.data));
+  }
 }
 
 // order book
@@ -431,10 +438,12 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
     };
     result.emplace_back(std::move(mbp_update));
   };
-  for (auto &item : order_book.bids)
+  for (auto &item : order_book.bids) {
     emplace_back(mbp.bids, item);
-  for (auto &item : order_book.asks)
+  }
+  for (auto &item : order_book.asks) {
     emplace_back(mbp.asks, item);
+  }
   try {
     auto publish_snapshot = [&](auto &bids, auto &asks, auto sequence, auto retries, auto delay) {
       log::info(

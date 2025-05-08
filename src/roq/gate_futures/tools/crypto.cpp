@@ -27,8 +27,9 @@ std::string Crypto::create_headers(
     web::http::Method method, std::string_view const &path, std::string_view const &query, std::string_view const &body, std::chrono::seconds timestamp) {
   assert(!std::empty(path));
   auto query_2 = [&]() -> std::string_view {
-    if (std::empty(query))
+    if (std::empty(query)) {
       return {};
+    }
     assert(query[0] == '?');
     return query.substr(1);
   }();

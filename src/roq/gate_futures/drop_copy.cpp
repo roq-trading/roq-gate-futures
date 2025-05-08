@@ -80,17 +80,20 @@ struct create_metrics final : public utils::metrics::Factory {
 };
 
 std::string_view get_client_order_id(auto &text) {
-  if (!text.starts_with("t-"sv))
+  if (!text.starts_with("t-"sv)) {
     return {};
+  }
   return text.substr(2);
 }
 
 OrderStatus get_order_status(json::FinishAs finish_as, json::OrderStatus status) {
   auto result = map(finish_as).template get<OrderStatus>();
-  if (result != OrderStatus{})
+  if (result != OrderStatus{}) {
     return result;
-  if (status == json::OrderStatus::OPEN)
+  }
+  if (status == json::OrderStatus::OPEN) {
     return OrderStatus::WORKING;
+  }
   log::fatal("Unexpected: result={}"sv, result);
 }
 }  // namespace
@@ -149,18 +152,22 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
   auto sign = utils::sign(create_order.side);
   auto quantity = sign * create_order.quantity;
   auto price = [&]() {
-    if (create_order.order_type == OrderType::MARKET)
+    if (create_order.order_type == OrderType::MARKET) {
       return 0.0;
-    if (std::isnan(create_order.price))
+    }
+    if (std::isnan(create_order.price)) {
       return 0.0;
+    }
     return create_order.price;
   }();
   auto reduce_only = create_order.execution_instructions.has(ExecutionInstruction::DO_NOT_INCREASE);
   auto tif = [&]() -> std::string_view {
-    if (create_order.order_type == OrderType::MARKET)
+    if (create_order.order_type == OrderType::MARKET) {
       return "ioc"sv;
-    if (create_order.execution_instructions.has(ExecutionInstruction::PARTICIPATE_DO_NOT_INITIATE))
+    }
+    if (create_order.execution_instructions.has(ExecutionInstruction::PARTICIPATE_DO_NOT_INITIATE)) {
       return "poc"sv;
+    }
     switch (create_order.time_in_force) {
       using enum TimeInForce;
       case UNDEFINED:
@@ -570,8 +577,9 @@ void DropCopy::parse(std::string_view const &message) {
 void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
   auto &[trace_info, login] = event;
   log::info<5>("login={}"sv, login);
-  if (login.data.result.uid <= 0)
+  if (login.data.result.uid <= 0) {
     log::fatal("Unexpected: user_id must be positive (login={})"sv, login);
+  }
   user_id_ = login.data.result.uid;
   auto const STATE = DropCopyState::LOGIN;
   download_.check_relaxed(STATE);
@@ -579,8 +587,9 @@ void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
 
 void DropCopy::operator()(Trace<json::TradeSubscribe> const &event) {
   auto &subscribe = event.value;
-  if (subscribe.result.status != json::Status::SUCCESS)
+  if (subscribe.result.status != json::Status::SUCCESS) {
     log::fatal("subscribe={}"sv, subscribe);
+  }
 }
 
 void DropCopy::operator()(Trace<json::TradeBalances> const &event) {
@@ -605,8 +614,9 @@ void DropCopy::operator()(Trace<json::TradeBalances> const &event) {
 void DropCopy::operator()(Trace<json::TradePositions> const &event) {
   auto &[trace_info, positions] = event;
   for (auto &item : positions.result) {
-    if (shared_.discard_symbol(item.contract))
+    if (shared_.discard_symbol(item.contract)) {
       continue;
+    }
     auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
       assert(item.time_ms.count() != 0);
       return item.time_ms;
@@ -885,23 +895,26 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
   auto external_order_id = fmt::format("{}"sv, value.id);
   auto side = value.size < 0 ? Side::SELL : Side::BUY;
   auto order_type = [&]() -> OrderType {
-    if (update_type == UpdateType::SNAPSHOT)
+    if (update_type == UpdateType::SNAPSHOT) {
       return OrderType::LIMIT;  // download orders must be limit
+    }
     return {};
   }();
   auto create_time_utc = [&]() -> std::chrono::nanoseconds {
     constexpr bool has_create_time_ms = requires(T const &t) { t.create_time_ms; };
     if constexpr (has_create_time_ms) {
-      if (value.create_time_ms.count())
+      if (value.create_time_ms.count()) {
         return value.create_time_ms;
+      }
     }
     return value.create_time;
   }();
   auto update_time_utc = [&]() -> std::chrono::nanoseconds {
     constexpr bool has_update_time_ms = requires(T const &t) { t.update_time_ms; };
     if constexpr (has_update_time_ms) {
-      if (value.update_time_ms.count())
+      if (value.update_time_ms.count()) {
         return value.update_time_ms;
+      }
     }
     return value.update_time;
   }();
@@ -910,8 +923,9 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
   auto remaining_quantity = static_cast<double>(std::abs(value.left));
   auto traded_quantity = quantity - remaining_quantity;
   auto average_traded_price = [&]() -> double {
-    if (utils::compare(traded_quantity, 0.0) > 0)
+    if (utils::compare(traded_quantity, 0.0) > 0) {
       return value.fill_price;
+    }
     return NaN;
   }();
   auto order_update = server::oms::OrderUpdate{

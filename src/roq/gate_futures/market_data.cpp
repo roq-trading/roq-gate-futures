@@ -129,8 +129,9 @@ void MarketData::operator()(metrics::Writer &writer) {
 }
 
 void MarketData::subscribe(size_t start_from) {
-  if (ready())
+  if (ready()) {
     subscribe(shared_.symbols.get_slice(index_, start_from));
+  }
 }
 
 void MarketData::operator()(web::socket::Client::Connected const &) {
@@ -191,8 +192,9 @@ void MarketData::operator()(ConnectionStatus status) {
 }
 
 void MarketData::subscribe(std::span<Symbol const> const &symbols) {
-  if (std::empty(symbols))
+  if (std::empty(symbols)) {
     return;
+  }
   subscribe("futures.tickers"sv, symbols);
   subscribe("futures.trades"sv, symbols);
   subscribe("futures.book_ticker"sv, symbols);
@@ -257,8 +259,9 @@ void MarketData::parse(std::string_view const &message) {
     auto log_message = [&]() { log::warn(R"(message="{}")"sv, message); };
     try {
       TraceInfo trace_info;
-      if (!json::Parser::dispatch(*this, message, decode_buffer_, trace_info))
+      if (!json::Parser::dispatch(*this, message, decode_buffer_, trace_info)) {
         log_message();
+      }
     } catch (...) {
       log_message();
       utils::exceptions::Unhandled::terminate();
@@ -438,10 +441,12 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       };
       result.emplace_back(std::move(mbp_update));
     };
-    for (auto &item : result.bids)
+    for (auto &item : result.bids) {
       emplace_back(mbp.bids, item);
-    for (auto &item : result.asks)
+    }
+    for (auto &item : result.asks) {
       emplace_back(mbp.asks, item);
+    }
     try {
       auto create_update = [&](auto &bids, auto &asks, auto update_type, auto exchange_sequence) -> MarketByPriceUpdate {
         return {

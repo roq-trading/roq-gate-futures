@@ -78,15 +78,17 @@ struct create_metrics final : public utils::metrics::Factory {
 
 auto get_download_trades_lookback(auto const &settings, auto download_trades_is_first) {
   if (download_trades_is_first) {
-    if (settings.download.trades_lookback_on_restart.count())
+    if (settings.download.trades_lookback_on_restart.count()) {
       return settings.download.trades_lookback_on_restart;
+    }
   }
   return settings.download.trades_lookback;
 }
 
 std::string_view get_client_order_id(auto &text) {
-  if (!text.starts_with("t-"sv))
+  if (!text.starts_with("t-"sv)) {
     return {};
+  }
   return text.substr(2);
 }
 }  // namespace
@@ -153,8 +155,9 @@ void OrderEntry::operator()(Trace<web::rest::Client::Connected> const &) {
 void OrderEntry::operator()(Trace<web::rest::Client::Disconnected> const &) {
   ++counter_.disconnect;
   (*this)(ConnectionStatus::DISCONNECTED);
-  if (!download_.downloading())
+  if (!download_.downloading()) {
     download_.reset();
+  }
 }
 
 void OrderEntry::operator()(Trace<web::rest::Client::Latency> const &event) {
@@ -248,8 +251,9 @@ void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[may
     };
     auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
       log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading())
+      if (download_.downloading()) {
         download_.retry(STATE);
+      }
     };
     process_response(event, handle_success, handle_error);
   });
@@ -295,8 +299,9 @@ void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[ma
     };
     auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
       log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading())
+      if (download_.downloading()) {
         download_.retry(STATE);
+      }
     };
     process_response(event, handle_success, handle_error);
   });
@@ -307,8 +312,9 @@ void OrderEntry::operator()(Trace<json::Positions> const &event) {
   log::info<2>("positions={}"sv, positions);
   for (auto &item : positions.data) {
     log::info<2>("item={}"sv, item);
-    if (shared_.discard_symbol(item.contract))
+    if (shared_.discard_symbol(item.contract)) {
       continue;
+    }
     auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
       assert(item.update_time.count() != 0);
       return item.update_time;
@@ -377,8 +383,9 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
     };
     auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
       log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading())
+      if (download_.downloading()) {
         download_.retry(STATE);
+      }
     };
     process_response(event, handle_success, handle_error);
   });
