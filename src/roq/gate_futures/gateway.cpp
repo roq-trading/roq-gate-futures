@@ -24,7 +24,7 @@ namespace gate_futures {
 namespace {
 template <typename R>
 R create_accounts(auto &config) {
-  using result_type = std::remove_cvref<R>::type;
+  using result_type = std::remove_cvref_t<R>;
   result_type result;
   for (auto &[_, account] : config.accounts) {
     auto account_2 = std::make_unique<Account>(config, account.name);
@@ -35,7 +35,7 @@ R create_accounts(auto &config) {
 
 template <typename R>
 R create_order_entry(auto &gateway, auto &context, auto &stream_id, auto &accounts, auto &shared) {
-  using result_type = std::remove_cvref<R>::type;
+  using result_type = std::remove_cvref_t<R>;
   result_type result;
   for (auto &[name, account] : accounts) {
     auto order_entry = std::make_unique<OrderEntry>(gateway, context, ++stream_id, *account, shared);
@@ -46,7 +46,7 @@ R create_order_entry(auto &gateway, auto &context, auto &stream_id, auto &accoun
 
 template <typename R>
 R create_drop_copy(auto &gateway, auto &context, auto &stream_id, auto &accounts, auto &shared) {
-  using result_type = std::remove_cvref<R>::type;
+  using result_type = std::remove_cvref_t<R>;
   result_type result;
   for (auto &[name, account] : accounts) {
     auto drop_copy = std::make_unique<DropCopy>(gateway, context, ++stream_id, *account, shared);
