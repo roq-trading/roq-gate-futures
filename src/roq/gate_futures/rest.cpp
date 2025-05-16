@@ -317,8 +317,8 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
     auto settlement_currency = [&]() -> std::string_view {
       switch (item.type) {
         using enum json::ContractType::type_t;
-        case UNDEFINED__:
-        case UNKNOWN__:
+        case _UNDEFINED:
+        case _UNKNOWN:
         case INDEX:
           break;
         case DIRECT:

@@ -16,9 +16,9 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
   Message message_{message, buffer};
   switch (message_.event) {
     using enum Event::type_t;
-    case UNDEFINED__:
+    case _UNDEFINED:
       break;
-    case UNKNOWN__:
+    case _UNKNOWN:
       assert(false);
       break;
     case SUBSCRIBE: {
@@ -29,9 +29,9 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
     case UPDATE:
       switch (message_.channel) {
         using enum Channel::type_t;
-        case UNDEFINED__:
+        case _UNDEFINED:
           break;
-        case UNKNOWN__:
+        case _UNKNOWN:
           assert(false);
           break;
         case TICKERS: {

@@ -20,9 +20,9 @@ template <>
 constexpr Helper<gate_futures::json::FinishAs>::operator std::optional<roq::OrderStatus>() const {
   switch (std::get<0>(args_)) {
     using enum gate_futures::json::FinishAs::type_t;
-    case UNDEFINED__:
+    case _UNDEFINED:
       return roq::OrderStatus::UNDEFINED;
-    case UNKNOWN__:
+    case _UNKNOWN:
       return roq::OrderStatus::UNDEFINED;
     case FILLED:
       return roq::OrderStatus::COMPLETED;
@@ -50,7 +50,7 @@ constexpr Helper<gate_futures::json::FinishAs>::operator std::optional<roq::Orde
   return {};
 }
 
-static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::UNDEFINED__}} == roq::OrderStatus::UNDEFINED);
+static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::_UNDEFINED}} == roq::OrderStatus::UNDEFINED);
 static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::FILLED}} == roq::OrderStatus::COMPLETED);
 static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::CANCELLED}} == roq::OrderStatus::CANCELED);
 static_assert(Helper{gate_futures::json::FinishAs{gate_futures::json::FinishAs::LIQUIDATED}} == roq::OrderStatus::CANCELED);
@@ -76,9 +76,9 @@ template <>
 constexpr Helper<gate_futures::json::Role>::operator std::optional<roq::Liquidity>() const {
   switch (std::get<0>(args_)) {
     using enum gate_futures::json::Role::type_t;
-    case UNDEFINED__:
+    case _UNDEFINED:
       return roq::Liquidity::UNDEFINED;
-    case UNKNOWN__:
+    case _UNKNOWN:
       return roq::Liquidity::UNDEFINED;
     case MAKER:
       return roq::Liquidity::MAKER;
@@ -88,7 +88,7 @@ constexpr Helper<gate_futures::json::Role>::operator std::optional<roq::Liquidit
   return {};
 }
 
-static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::UNDEFINED__}} == roq::Liquidity::UNDEFINED);
+static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::_UNDEFINED}} == roq::Liquidity::UNDEFINED);
 static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::MAKER}} == roq::Liquidity::MAKER);
 static_assert(Helper{gate_futures::json::Role{gate_futures::json::Role::TAKER}} == roq::Liquidity::TAKER);
 
@@ -105,9 +105,9 @@ template <>
 constexpr Helper<gate_futures::json::TIF>::operator std::optional<roq::TimeInForce>() const {
   switch (std::get<0>(args_)) {
     using enum gate_futures::json::TIF::type_t;
-    case UNDEFINED__:
+    case _UNDEFINED:
       return roq::TimeInForce::UNDEFINED;
-    case UNKNOWN__:
+    case _UNKNOWN:
       return roq::TimeInForce::UNDEFINED;
     case GTC:
       return roq::TimeInForce::GTC;
@@ -121,7 +121,7 @@ constexpr Helper<gate_futures::json::TIF>::operator std::optional<roq::TimeInFor
   return {};
 }
 
-static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::UNDEFINED__}} == roq::TimeInForce::UNDEFINED);
+static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::_UNDEFINED}} == roq::TimeInForce::UNDEFINED);
 static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::GTC}} == roq::TimeInForce::GTC);
 static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::FOK}} == roq::TimeInForce::FOK);
 static_assert(Helper{gate_futures::json::TIF{gate_futures::json::TIF::POC}} == roq::TimeInForce::GTC);
