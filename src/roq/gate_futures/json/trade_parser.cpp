@@ -44,9 +44,9 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
     assert(header.event == Event::API);
     switch (header.channel) {
       using enum Channel::type_t;
-      case _UNDEFINED:
+      case UNDEFINED_INTERNAL:
         break;
-      case _UNKNOWN:
+      case UNKNOWN_INTERNAL:
         assert(false);
         break;
       case TICKERS:
@@ -99,17 +99,17 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
   } else {  // subscribe or update do not have "header"
     switch (message_2.event) {
       using enum Event::type_t;
-      case _UNDEFINED:
+      case UNDEFINED_INTERNAL:
         break;
-      case _UNKNOWN:
+      case UNKNOWN_INTERNAL:
         assert(false);
         break;
       case SUBSCRIBE:
         switch (message_2.channel) {
           using enum Channel::type_t;
-          case _UNDEFINED:
+          case UNDEFINED_INTERNAL:
             break;
-          case _UNKNOWN:
+          case UNKNOWN_INTERNAL:
             assert(false);
             break;
           case TICKERS:
@@ -139,9 +139,9 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
       case UPDATE:
         switch (message_2.channel) {
           using enum Channel::type_t;
-          case _UNDEFINED:
+          case UNDEFINED_INTERNAL:
             break;
-          case _UNKNOWN:
+          case UNKNOWN_INTERNAL:
             assert(false);
             break;
           case TICKERS:
