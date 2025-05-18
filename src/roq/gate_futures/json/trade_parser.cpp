@@ -36,11 +36,11 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
   TradeMessage message_2{message, buffer};
   log::debug("{}"sv, message_2);
   auto &error = message_2.error;
-  if (error.code) {
+  if (error.code != 0) {
     log::fatal(R"(Unexpected: message="{}")"sv, message);
   }
   auto &header = message_2.header;
-  if (header.status) {  // api has "header"
+  if (header.status != 0) {  // api has "header"
     assert(header.event == Event::API);
     switch (header.channel) {
       using enum Channel::type_t;

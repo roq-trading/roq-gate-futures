@@ -13,7 +13,7 @@ namespace gate_futures {
 
 API API::create(Settings const &settings) {
   auto api = settings.app.api;
-  if (api.compare("btc"sv) == 0) {
+  if (api == "btc"sv) {
     return {
         .spot_currencies = "/spot/currencies"sv,
         .futures_contracts = "/futures/btc/contracts"sv,
@@ -24,7 +24,7 @@ API API::create(Settings const &settings) {
         .trades = "/futures/btc/my_trades_timerange"sv,
     };
   }
-  if (api.compare("usdt"sv) == 0) {
+  if (api == "usdt"sv) {
     return {
         .spot_currencies = "/spot/currencies"sv,
         .futures_contracts = "/futures/usdt/contracts"sv,

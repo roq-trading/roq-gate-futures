@@ -299,14 +299,13 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
   std::vector<Symbol> symbols;
   symbols.reserve(std::size(contracts.data));
   size_t counter = 0;
-  for (size_t i = 0; i < std::size(contracts.data); ++i) {
-    auto &item = contracts.data[i];
+  for (auto &item : contracts.data) {
     log::info<2>("item={}"sv, item);
     auto symbol = item.name;
     auto discard = shared_.discard_symbol(symbol);
     auto [base_currency, quote_currency] = [&]() -> std::pair<std::string_view, std::string_view> {
       auto sep = symbol.find('_');
-      if (sep == symbol.npos) [[unlikely]] {
+      if (sep == std::string_view::npos) [[unlikely]] {
         log::fatal(R"(Unexpected: symbol="{}")"sv, symbol);
       }
       return {

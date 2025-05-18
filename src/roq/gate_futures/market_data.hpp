@@ -76,7 +76,6 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
   void operator()(Trace<json::BookTicker> const &) override;
   void operator()(Trace<json::OrderBookUpdate> const &) override;
 
- private:
   Handler &handler_;
   // config
   uint16_t const stream_id_;

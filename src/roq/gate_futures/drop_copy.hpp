@@ -105,7 +105,6 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   void operator()(Trace<server::oms::Response> const &, std::string_view const &client_order_id, Args &&...);
   void operator()(Trace<server::oms::OrderUpdate> const &, std::string_view const &client_order_id);
 
- private:
   Handler &handler_;
   // config
   uint16_t const stream_id_;

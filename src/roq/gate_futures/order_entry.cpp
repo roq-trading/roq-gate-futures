@@ -322,8 +322,8 @@ void OrderEntry::operator()(Trace<json::Positions> const &event) {
     auto margin_mode = [&]() -> MarginMode {
       return {};  // XXX TODO item.mode ???
     }();
-    auto long_quantity = std::max<double>(0.0, item.size);
-    auto short_quantity = std::max<double>(0.0, -item.size);
+    auto long_quantity = std::max<double>(0.0, utils::safe_cast(item.size));
+    auto short_quantity = std::max<double>(0.0, utils::safe_cast(-item.size));
     auto position_update = PositionUpdate{
         .stream_id = stream_id_,
         .account = account_.name,

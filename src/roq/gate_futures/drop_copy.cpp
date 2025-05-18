@@ -624,8 +624,8 @@ void DropCopy::operator()(Trace<json::TradePositions> const &event) {
     auto margin_mode = [&]() -> MarginMode {
       return {};  // XXX TODO item.mode ???
     }();
-    auto long_quantity = std::max<double>(0.0, item.size);
-    auto short_quantity = std::max<double>(0.0, -item.size);
+    auto long_quantity = std::max<double>(0.0, utils::safe_cast(item.size));
+    auto short_quantity = std::max<double>(0.0, utils::safe_cast(-item.size));
     auto position_update = PositionUpdate{
         .stream_id = stream_id_,
         .account = account_.name,
@@ -901,7 +901,7 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
     return {};
   }();
   auto create_time_utc = [&]() -> std::chrono::nanoseconds {
-    constexpr bool has_create_time_ms = requires(T const &t) { t.create_time_ms; };
+    constexpr bool has_create_time_ms = requires(T const &type) { type.create_time_ms; };
     if constexpr (has_create_time_ms) {
       if (value.create_time_ms.count()) {
         return value.create_time_ms;
@@ -910,7 +910,7 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
     return value.create_time;
   }();
   auto update_time_utc = [&]() -> std::chrono::nanoseconds {
-    constexpr bool has_update_time_ms = requires(T const &t) { t.update_time_ms; };
+    constexpr bool has_update_time_ms = requires(T const &type) { type.update_time_ms; };
     if constexpr (has_update_time_ms) {
       if (value.update_time_ms.count()) {
         return value.update_time_ms;
