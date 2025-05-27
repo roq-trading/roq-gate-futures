@@ -75,6 +75,9 @@ struct Gateway final : public server::Handler, public Rest::Handler, public Orde
   template <typename... Args>
   void dispatch(Args &&...);
 
+  template <typename... Args>
+  static void dispatch_helper(auto &self, Args &&...);
+
   DropCopy &get_drop_copy(std::string_view const &account);
   OrderEntry &get_order_entry(std::string_view const &account);
 
