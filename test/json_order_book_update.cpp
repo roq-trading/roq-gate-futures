@@ -59,13 +59,13 @@ TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
   CHECK(result.first_update_id == 11140379005);
   CHECK(result.last_update_id == 11140379319);
   REQUIRE(std::size(result.bids) == 9);
-  auto &b0 = result.bids[0];
-  CHECK(b0.price == 37203.3_a);
-  CHECK(b0.size == 1613.0_a);
+  auto &bid_0 = result.bids[0];
+  CHECK(bid_0.price == 37203.3_a);
+  CHECK(bid_0.size == 1613.0_a);
   REQUIRE(std::size(result.asks) == 9);
-  auto &a0 = result.asks[0];
-  CHECK(a0.price == 37210.2_a);
-  CHECK(a0.size == 206362.0_a);
+  auto &ask_0 = result.asks[0];
+  CHECK(ask_0.price == 37210.2_a);
+  CHECK(ask_0.size == 206362.0_a);
 }
 
 TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
@@ -102,13 +102,13 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
   CHECK(result.first_update_id == 11140379320);
   CHECK(result.last_update_id == 11140379509);
   REQUIRE(std::size(result.bids) == 4);
-  auto &b0 = result.bids[0];
-  CHECK(b0.price == 37207.6_a);
-  CHECK(b0.size == 66016.0_a);
+  auto &bid_0 = result.bids[0];
+  CHECK(bid_0.price == 37207.6_a);
+  CHECK(bid_0.size == 66016.0_a);
   REQUIRE(std::size(result.asks) == 1);
-  auto &a0 = result.asks[0];
-  CHECK(a0.price == 37210.2_a);
-  CHECK(a0.size == 227146.0_a);
+  auto &ask_0 = result.asks[0];
+  CHECK(ask_0.price == 37210.2_a);
+  CHECK(ask_0.size == 227146.0_a);
 }
 
 TEST_CASE("json_order_book_update_simple_3", "[json_order_book_update]") {
@@ -143,11 +143,11 @@ TEST_CASE("json_order_book_update_simple_3", "[json_order_book_update]") {
   CHECK(result.first_update_id == 23526668009);
   CHECK(result.last_update_id == 23526668010);
   REQUIRE(std::size(result.bids) == 2);
-  auto &b0 = result.bids[0];
-  CHECK(b0.price == 154.39_a);
-  CHECK(b0.size == 1545_a);
-  auto &b1 = result.bids[1];
-  CHECK(b1.price == 154.38_a);
-  CHECK(b1.size == 817_a);
+  auto &bid_0 = result.bids[0];
+  CHECK(bid_0.price == 154.39_a);
+  CHECK(bid_0.size == 1545_a);
+  auto &bid_1 = result.bids[1];
+  CHECK(bid_1.price == 154.38_a);
+  CHECK(bid_1.size == 817_a);
   REQUIRE(std::size(result.asks) == 0);
 }

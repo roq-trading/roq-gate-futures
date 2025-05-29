@@ -203,35 +203,18 @@ void MarketData::subscribe(std::span<Symbol const> const &symbols) {
 
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols) {
   assert(!std::empty(symbols));
-  if (true) {
-    auto now = clock::get_realtime<std::chrono::seconds>();
-    auto message = fmt::format(
-        R"({{)"
-        R"("time":{},)"
-        R"("channel":"{}",)"
-        R"("event":"subscribe",)"
-        R"("payload":["{}"])"
-        R"(}})"sv,
-        now.count(),
-        channel,
-        fmt::join(symbols, R"(",")"));
-    (*connection_).send_text(message);
-  } else {
-    for (auto &symbol : symbols) {
-      auto now = clock::get_realtime<std::chrono::seconds>();
-      auto message = fmt::format(
-          R"({{)"
-          R"("time":{},)"
-          R"("channel":"{}",)"
-          R"("event":"subscribe",)"
-          R"("payload":["{}"])"
-          R"(}})"sv,
-          now.count(),
-          channel,
-          symbol);
-      (*connection_).send_text(message);
-    }
-  }
+  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto message = fmt::format(
+      R"({{)"
+      R"("time":{},)"
+      R"("channel":"{}",)"
+      R"("event":"subscribe",)"
+      R"("payload":["{}"])"
+      R"(}})"sv,
+      now.count(),
+      channel,
+      fmt::join(symbols, R"(",")"));
+  (*connection_).send_text(message);
 }
 
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth) {
@@ -358,7 +341,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
     std::string_view contract;
     decltype(json::TradesItem::create_time_ms) timestamp = {};
     for (auto &item : result) {
-      if (item.contract.compare(contract) != 0) {
+      if (item.contract != contract) {
         if (!std::empty(contract) && !std::empty(trades_2)) {
           auto trade_summary = TradeSummary{
               .stream_id = stream_id_,

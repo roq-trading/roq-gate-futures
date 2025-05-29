@@ -46,13 +46,13 @@ TEST_CASE("json_order_book_simple_1", "[json_order_book]") {
   json::OrderBook order_book{message, buffer};
   CHECK(order_book.current == 1643191515447ms);
   REQUIRE(std::size(order_book.asks) == 10);
-  auto &a0 = order_book.asks[0];
-  CHECK(a0.size == 117293.0_a);
-  CHECK(a0.price == 37705.6_a);
+  auto &ask_0 = order_book.asks[0];
+  CHECK(ask_0.size == 117293.0_a);
+  CHECK(ask_0.price == 37705.6_a);
   REQUIRE(std::size(order_book.bids) == 10);
-  auto &b0 = order_book.bids[0];
-  CHECK(b0.size == 72890.0_a);
-  CHECK(b0.price == 37705.5_a);
+  auto &bid_0 = order_book.bids[0];
+  CHECK(bid_0.size == 72890.0_a);
+  CHECK(bid_0.price == 37705.5_a);
   CHECK(order_book.id == 11144476177);
   CHECK(order_book.update == 1643191515446ms);
 }
