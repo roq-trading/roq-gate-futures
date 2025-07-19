@@ -683,7 +683,7 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
         .quote_amount = NaN,
         .commission_amount = item.fee,  // ???
         .commission_currency = {},
-        .profit_loss_amount = NaN,
+        .profit_loss_cost_amount = NaN,
     };
     auto trade_update = TradeUpdate{
         .stream_id = stream_id_,
