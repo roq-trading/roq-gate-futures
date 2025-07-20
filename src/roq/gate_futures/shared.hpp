@@ -47,6 +47,11 @@ struct Shared final {
     return dispatcher_.get_all_order_symbols(callback, account);
   }
 
+  template <typename... Args>
+  auto get_ref_data(Args &&...args) {
+    return dispatcher_.get_ref_data(std::forward<Args>(args)...);
+  }
+
  public:
   API const api;
 

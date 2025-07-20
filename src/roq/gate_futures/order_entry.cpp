@@ -6,6 +6,7 @@
 
 #include "roq/mask.hpp"
 
+#include "roq/utils/common.hpp"
 #include "roq/utils/safe_cast.hpp"
 #include "roq/utils/update.hpp"
 
@@ -405,6 +406,8 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
     auto external_order_id = fmt::format("{}"sv, item.order_id);
     auto side = item.size < 0 ? Side::SELL : Side::BUY;
     auto quantity = static_cast<double>(std::abs(item.size));
+    auto ref_data = shared_.get_ref_data(shared_.settings.exchange, item.contract);
+    auto profit_loss_cost_amount = utils::compute_profit_loss_cost_amount(side, quantity, item.price, ref_data.multiplier);
     auto fill = Fill{
         .exchange_time_utc = exchange_time_utc,
         .external_trade_id = item.trade_id,
@@ -415,7 +418,7 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
         .quote_amount = NaN,
         .commission_amount = item.fee,  // ???
         .commission_currency = {},
-        .profit_loss_cost_amount = NaN,
+        .profit_loss_cost_amount = profit_loss_cost_amount,
     };
     auto trade_update = TradeUpdate{
         .stream_id = stream_id_,
