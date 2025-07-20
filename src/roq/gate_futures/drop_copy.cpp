@@ -681,10 +681,10 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
         .quantity = quantity,
         .price = item.price,
         .liquidity = map(item.role),
-        .base_amount = NaN,
-        .quote_amount = NaN,
         .commission_amount = item.fee,  // ???
         .commission_currency = {},
+        .base_amount = NaN,
+        .quote_amount = NaN,
         .profit_loss_amount = profit_loss_amount,
     };
     auto trade_update = TradeUpdate{
