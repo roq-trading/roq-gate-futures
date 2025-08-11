@@ -54,6 +54,11 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
         }
+        case CANDLESTICKS: {
+          Candlesticks candlesticks{message, buffer};
+          create_trace_and_dispatch(handler, trace_info, candlesticks);
+          return true;
+        }
         case LOGIN:
         case BALANCES:
         case POSITIONS:

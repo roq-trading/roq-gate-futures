@@ -33,6 +33,11 @@
       "name": "asks",
       "type": "roq/gate_futures/json/PriceSize",
       "array": "std/span"
+    },
+    {
+      "raw": "l",
+      "name": "level",
+      "type": "std/uint32"
     }
   ]
 }

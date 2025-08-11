@@ -34,6 +34,7 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
     virtual void operator()(Trace<MarketByPriceUpdate> const &, bool is_last) = 0;
     virtual void operator()(Trace<TradeSummary> const &, bool is_last) = 0;
     virtual void operator()(Trace<StatisticsUpdate> const &, bool is_last) = 0;
+    virtual void operator()(Trace<TimeSeriesUpdate> const &, bool is_last) = 0;
   };
 
   MarketData(Handler &, io::Context &, uint16_t stream_id, Shared &, size_t index);
@@ -67,6 +68,7 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
   void subscribe(std::span<Symbol const> const &symbols);
   void subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols);
   void subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth);
+  void subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::string_view const &interval);
 
   void parse(std::string_view const &message);
 
@@ -75,6 +77,7 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
   void operator()(Trace<json::Trades> const &) override;
   void operator()(Trace<json::BookTicker> const &) override;
   void operator()(Trace<json::OrderBookUpdate> const &) override;
+  void operator()(Trace<json::Candlesticks> const &) override;
 
   Handler &handler_;
   // config
@@ -90,7 +93,7 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
     utils::metrics::Counter disconnect;
   } counter_;
   struct {
-    utils::metrics::Profile parse, subscribe, tickers, trades, book_ticker, order_book_update;
+    utils::metrics::Profile parse, subscribe, tickers, trades, book_ticker, order_book_update, candlesticks;
   } profile_;
   struct {
     utils::metrics::Latency ping;

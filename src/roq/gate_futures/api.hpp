@@ -13,6 +13,7 @@ struct API final {
   std::string_view spot_currencies;
   std::string_view futures_contracts;
   std::string_view futures_order_book;
+  std::string_view futures_candlesticks;
 
   std::string_view accounts;
   std::string_view positions;

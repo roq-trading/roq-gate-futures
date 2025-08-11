@@ -28,4 +28,5 @@ $PREFIX ./roq-gate-futures \
   --rest_uri "$REST_URI" \
   --ws_uri "$WS_URI" \
   --api "usdt" \
+  --download_time_series_lookback "2h" \
   $@

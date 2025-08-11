@@ -85,6 +85,9 @@ struct Shared final {
   core::limit::RateLimiter rate_limiter;
   core::Symbols symbols;
   core::TimerQueue<std::string> depth_request_queue;
+  core::TimerQueue<std::string> time_series_request_queue;
+
+  std::vector<Bar> bars;
 };
 
 }  // namespace gate_futures

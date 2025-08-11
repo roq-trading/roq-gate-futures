@@ -5,6 +5,9 @@ accounts.hpp
 balances_item.hpp
 book_ticker.hpp
 book_ticker_result.hpp
+candlesticks_item.hpp
+candlesticks.hpp
+candlesticks_response.hpp
 channel.hpp
 contracts_item.hpp
 contracts.hpp
@@ -69,6 +72,9 @@ accounts.cpp
 balances_item.cpp
 book_ticker.cpp
 book_ticker_result.cpp
+candlesticks_item.cpp
+candlesticks.cpp
+candlesticks_response.cpp
 channel.cpp
 contracts_item.cpp
 contracts.cpp

@@ -53,6 +53,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
       case TRADES:
       case BOOK_TICKER:
       case ORDER_BOOK_UPDATE:
+      case CANDLESTICKS:
         break;
       case LOGIN:
         if (header.status == 200) {
@@ -116,6 +117,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           case TRADES:
           case BOOK_TICKER:
           case ORDER_BOOK_UPDATE:
+          case CANDLESTICKS:
           case LOGIN:
             log::fatal("Unexpected"sv);
             break;
@@ -148,6 +150,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           case TRADES:
           case BOOK_TICKER:
           case ORDER_BOOK_UPDATE:
+          case CANDLESTICKS:
           case LOGIN:
             log::fatal("Unexpected"sv);
             break;

@@ -1,0 +1,56 @@
+{
+  "name": "roq/gate_futures/json/CandlesticksItem",
+  "type": "item",
+  "values": [
+    {
+      "raw": "t",
+      "name": "time",
+      "type": "std/seconds"
+    },
+    {
+      "raw": "o",
+      "name": "open",
+      "type": "std/double"
+    },
+    {
+      "raw": "c",
+      "name": "close",
+      "type": "std/double"
+    },
+    {
+      "raw": "h",
+      "name": "high",
+      "type": "std/double"
+    },
+    {
+      "raw": "l",
+      "name": "low",
+      "type": "std/double"
+    },
+    {
+      "raw": "v",
+      "name": "volume",
+      "type": "std/double"
+    },
+    {
+      "raw": "n",
+      "name": "name",
+      "type": "std/string_view"
+    },
+    {
+      "raw": "a",
+      "name": "amount",
+      "type": "std/double"
+    },
+    {
+      "raw": "w",
+      "name": "confirmed",
+      "type": "std/bool"
+    },
+    {
+      "name": "sum",
+      "type": "std/double",
+      "comment": "REST only"
+    }
+  ]
+}

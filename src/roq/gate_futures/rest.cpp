@@ -89,6 +89,8 @@ Rest::Rest(Handler &handler, io::Context &context, uint16_t stream_id, Shared &s
           .contracts_ack = create_metrics(shared.settings, name_, "contracts_ack"sv),
           .order_book = create_metrics(shared.settings, name_, "order_book"sv),
           .order_book_ack = create_metrics(shared.settings, name_, "order_book_ack"sv),
+          .candlesticks = create_metrics(shared.settings, name_, "candlesticks"sv),
+          .candlesticks_ack = create_metrics(shared.settings, name_, "candlesticks_ack"sv),
       },
       latency_{
           .ping = create_metrics(shared.settings, name_, "ping"sv),
@@ -123,6 +125,8 @@ void Rest::operator()(metrics::Writer &writer) const {
       .write(profile_.contracts_ack, metrics::Type::PROFILE)
       .write(profile_.order_book, metrics::Type::PROFILE)
       .write(profile_.order_book_ack, metrics::Type::PROFILE)
+      .write(profile_.candlesticks, metrics::Type::PROFILE)
+      .write(profile_.candlesticks_ack, metrics::Type::PROFILE)
       // latency
       .write(latency_.ping, metrics::Type::LATENCY);
 }
@@ -420,8 +424,7 @@ void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::stri
 }
 
 void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view const &symbol) {
-  auto &trace_info = event.trace_info;
-  auto &order_book = event.value;
+  auto &[trace_info, order_book] = event;
   log::info<3>("order_book={}"sv, order_book);
   auto sequence = order_book.id;
   auto &sequencer = shared_.mbp_sequencer[symbol];
@@ -485,10 +488,88 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
   }
 }
 
+// candlesticks
+
+void Rest::get_candlesticks(std::string_view const &symbol) {
+  profile_.candlesticks([&]() {
+    auto query = fmt::format("?contract={}&interval=1m"sv, symbol);
+    auto request = web::rest::Request{
+        .method = web::http::Method::GET,
+        .path = shared_.api.futures_candlesticks,
+        .query = query,
+        .accept = web::http::Accept::APPLICATION_JSON,
+        .content_type = {},
+        .headers = {},
+        .body = {},
+        .quality_of_service = {},
+    };
+    auto callback = [this, symbol = std::string{symbol}]([[maybe_unused]] auto &request_id, auto &response) {
+      TraceInfo trace_info;
+      Trace event{trace_info, response};
+      get_candlesticks_ack(event, symbol);
+    };
+    log::info("{}"sv, request);
+    (*connection_)("futures-order-book"sv, request, callback);
+  });
+}
+
+void Rest::get_candlesticks_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
+  profile_.candlesticks_ack([&]() {
+    auto handle_success = [&](auto &body) {
+      json::CandlesticksResponse candlesticks{body, decode_buffer_};
+      Trace event_2{event, candlesticks};
+      (*this)(event_2, symbol);
+    };
+    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
+      log::warn(R"(error={}, text="{}")"sv, error, text);
+      // XXX WHAT ???
+    };
+    process_response(event, handle_success, handle_error);
+  });
+}
+
+void Rest::operator()(Trace<json::CandlesticksResponse> const &event, std::string_view const &symbol) {
+  auto &[trace_info, candlesticks] = event;
+  log::info<3>("candlesticks={}"sv, candlesticks);
+  auto &bars = shared_.bars;
+  bars.clear();
+  for (auto &item : candlesticks.data) {
+    auto bar = Bar{
+        .begin_time_utc = item.time,
+        .open_price = item.open,
+        .high_price = item.open,
+        .low_price = item.open,
+        .close_price = item.open,
+        .quantity = item.volume,
+        .base_amount = roq::NaN,
+        .quote_amount = item.sum,  // note! different field from WS
+        .number_of_trades = {},
+        .vwap = roq::NaN,
+    };
+    bars.emplace_back(std::move(bar));
+  }
+  auto time_series_update = TimeSeriesUpdate{
+      .stream_id = stream_id_,
+      .exchange = shared_.settings.exchange,
+      .symbol = symbol,
+      .data_source = DataSource::TRADE_SUMMARY,
+      .interval = Interval::_60,
+      .origin = Origin::EXCHANGE,
+      .bars = bars,
+      .update_type = UpdateType::SNAPSHOT,
+      .exchange_time_utc = {},  // note! unavailable
+  };
+  create_trace_and_dispatch(handler_, trace_info, time_series_update, true);
+  bars.clear();
+}
+
 // queue
 
 void Rest::check_request_queue(std::chrono::nanoseconds now) {
-  shared_.depth_request_queue.dispatch([&](auto now) { return shared_.rate_limiter.can_request(now); }, [&](auto &symbol) { get_order_book(symbol); }, now);
+  auto depth_helper = [&](auto &symbol) { get_order_book(symbol); };
+  shared_.depth_request_queue.dispatch([&](auto now) { return shared_.rate_limiter.can_request(now); }, depth_helper, now);
+  auto time_series_helper = [&](auto &symbol) { get_candlesticks(symbol); };
+  shared_.time_series_request_queue.dispatch([&](auto now) { return shared_.rate_limiter.can_request(now); }, time_series_helper, now);
 }
 
 template <typename SuccessHandler, typename ErrorHandler>

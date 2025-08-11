@@ -93,6 +93,7 @@ MarketData::MarketData(Handler &handler, io::Context &context, uint16_t stream_i
           .trades = create_metrics(shared.settings, name_, "trades"sv),
           .book_ticker = create_metrics(shared.settings, name_, "book_ticker"sv),
           .order_book_update = create_metrics(shared.settings, name_, "order_book_update"sv),
+          .candlesticks = create_metrics(shared.settings, name_, "candlesticks"sv),
       },
       latency_{
           .ping = create_metrics(shared.settings, name_, "ping"sv),
@@ -124,6 +125,7 @@ void MarketData::operator()(metrics::Writer &writer) const {
       .write(profile_.trades, metrics::Type::PROFILE)
       .write(profile_.book_ticker, metrics::Type::PROFILE)
       .write(profile_.order_book_update, metrics::Type::PROFILE)
+      .write(profile_.candlesticks, metrics::Type::PROFILE)
       // latency
       .write(latency_.ping, metrics::Type::LATENCY);
 }
@@ -199,6 +201,9 @@ void MarketData::subscribe(std::span<Symbol const> const &symbols) {
   subscribe("futures.trades"sv, symbols);
   subscribe("futures.book_ticker"sv, symbols);
   subscribe("futures.order_book_update"sv, symbols, utils::safe_cast(shared_.settings.misc.order_book_freq), shared_.settings.misc.order_book_depth);
+  if (shared_.settings.download.time_series_lookback.count()) {
+    subscribe("futures.candlesticks"sv, symbols, "1m"sv);
+  }
 }
 
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols) {
@@ -217,6 +222,7 @@ void MarketData::subscribe(std::string_view const &channel, std::span<Symbol con
   (*connection_).send_text(message);
 }
 
+// order book
 void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth) {
   assert(!std::empty(symbols));
   for (auto &symbol : symbols) {
@@ -234,6 +240,28 @@ void MarketData::subscribe(std::string_view const &channel, std::span<Symbol con
         frequency.count(),
         depth);
     (*connection_).send_text(message);
+  }
+}
+
+// candlesticks
+void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::string_view const &interval) {
+  assert(!std::empty(symbols));
+  for (auto &symbol : symbols) {
+    auto now = clock::get_realtime<std::chrono::seconds>();
+    auto message = fmt::format(
+        R"({{)"
+        R"("time":{},)"
+        R"("channel":"{}",)"
+        R"("event":"subscribe",)"
+        R"("payload":["{}","{}"])"
+        R"(}})"sv,
+        now.count(),
+        channel,
+        interval,
+        symbol);
+    (*connection_).send_text(message);
+    // request snapshot
+    shared_.time_series_request_queue.emplace_back(symbol);
   }
 }
 
@@ -403,8 +431,7 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
 
 void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
-    auto &trace_info = event.trace_info;
-    auto &order_book_update = event.value;
+    auto &[trace_info, order_book_update] = event;
     log::info<3>("order_book_update={}"sv, order_book_update);
     (*connection_).touch(trace_info.source_receive_time);
     auto &result = order_book_update.result;
@@ -476,6 +503,58 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
       sequencer.clear();
       shared_.depth_request_queue.emplace_back(symbol);
     }
+  });
+}
+
+void MarketData::operator()(Trace<json::Candlesticks> const &event) {
+  profile_.candlesticks([&]() {
+    auto &[trace_info, candlesticks] = event;
+    log::info<3>("candlesticks={}"sv, candlesticks);
+    (*connection_).touch(trace_info.source_receive_time);
+    std::string_view symbol;
+    auto &bars = shared_.bars;
+    bars.clear();
+    auto helper = [&]() {
+      if (std::empty(bars)) {
+        return;
+      }
+      auto time_series_update = TimeSeriesUpdate{
+          .stream_id = stream_id_,
+          .exchange = shared_.settings.exchange,
+          .symbol = symbol,
+          .data_source = DataSource::TRADE_SUMMARY,
+          .interval = Interval::_60,
+          .origin = Origin::EXCHANGE,
+          .bars = bars,
+          .update_type = UpdateType::INCREMENTAL,
+          .exchange_time_utc = candlesticks.time_ms,
+      };
+      create_trace_and_dispatch(handler_, trace_info, time_series_update, true);
+      bars.clear();
+    };
+    for (auto &item : candlesticks.result) {
+      if (item.name != symbol) {
+        helper();
+        symbol = item.name;
+      }
+      if (!item.confirmed) {
+        continue;
+      }
+      auto bar = Bar{
+          .begin_time_utc = item.time,
+          .open_price = item.open,
+          .high_price = item.open,
+          .low_price = item.open,
+          .close_price = item.open,
+          .quantity = item.volume,
+          .base_amount = roq::NaN,
+          .quote_amount = item.amount,
+          .number_of_trades = {},
+          .vwap = roq::NaN,
+      };
+      bars.emplace_back(std::move(bar));
+    }
+    helper();
   });
 }
 

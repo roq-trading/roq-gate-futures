@@ -87,6 +87,10 @@
     {
       "name": "change_from",
       "type": "std/string_view"
+    },
+    {
+      "name": "change_price",
+      "type": "std/double"
     }
   ]
 }

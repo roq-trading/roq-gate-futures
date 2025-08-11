@@ -33,6 +33,13 @@
     {
       "name": "chain",
       "type": "std/string_view"
+    },
+    {
+      "name": "name",
+      "type": "std/string_view"
+    },
+    {
+      "name": "chains"
     }
   ]
 }

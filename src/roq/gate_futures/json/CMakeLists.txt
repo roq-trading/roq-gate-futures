@@ -10,6 +10,9 @@ set(AUTOGEN_SCHEMAS
     balances_item.json
     book_ticker.json
     book_ticker_result.json
+    candlesticks_item.json
+    candlesticks.json
+    candlesticks_response.json
     channel.json
     contracts_item.json
     contracts.json

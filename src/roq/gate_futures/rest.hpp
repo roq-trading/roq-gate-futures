@@ -23,6 +23,7 @@
 #include "roq/gate_futures/rest_state.hpp"
 #include "roq/gate_futures/shared.hpp"
 
+#include "roq/gate_futures/json/candlesticks_response.hpp"
 #include "roq/gate_futures/json/contracts.hpp"
 #include "roq/gate_futures/json/currencies.hpp"
 #include "roq/gate_futures/json/order_book.hpp"
@@ -40,6 +41,7 @@ struct Rest final : public web::rest::Client::Handler {
     virtual void operator()(Trace<ExternalLatency> const &) = 0;
     virtual void operator()(Trace<ReferenceData> const &, bool is_last) = 0;
     virtual void operator()(Trace<MarketStatus> const &, bool is_last) = 0;
+    virtual void operator()(Trace<TimeSeriesUpdate> const &, bool is_last) = 0;
     // cross-communication
     virtual void operator()(SymbolsUpdate &) = 0;
   };
@@ -77,6 +79,10 @@ struct Rest final : public web::rest::Client::Handler {
   void get_order_book_ack(Trace<web::rest::Response> const &, std::string_view const &symbol);
   void operator()(Trace<json::OrderBook> const &, std::string_view const &symbol);
 
+  void get_candlesticks(std::string_view const &symbol);
+  void get_candlesticks_ack(Trace<web::rest::Response> const &, std::string_view const &symbol);
+  void operator()(Trace<json::CandlesticksResponse> const &, std::string_view const &symbol);
+
   void check_request_queue(std::chrono::nanoseconds now);
 
   template <typename SuccessHandler, typename ErrorHandler>
@@ -96,7 +102,7 @@ struct Rest final : public web::rest::Client::Handler {
     utils::metrics::Counter disconnect;
   } counter_;
   struct {
-    utils::metrics::Profile currencies, currencies_ack, contracts, contracts_ack, order_book, order_book_ack;
+    utils::metrics::Profile currencies, currencies_ack, contracts, contracts_ack, order_book, order_book_ack, candlesticks, candlesticks_ack;
   } profile_;
   struct {
     utils::metrics::Latency ping;

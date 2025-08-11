@@ -5,22 +5,27 @@
     {
       "raw": "futures.tickers",
       "name": "tickers",
-      "comment": "market date"
+      "comment": "market data"
     },
     {
       "raw": "futures.trades",
       "name": "trades",
-      "comment": "market date"
+      "comment": "market data"
     },
     {
       "raw": "futures.book_ticker",
       "name": "book_ticker",
-      "comment": "market date"
+      "comment": "market data"
     },
     {
       "raw": "futures.order_book_update",
       "name": "order_book_update",
-      "comment": "market date"
+      "comment": "market data"
+    },
+    {
+      "raw": "futures.candlesticks",
+      "name": "candlesticks",
+      "comment": "market data"
     },
     {
       "raw": "futures.login",

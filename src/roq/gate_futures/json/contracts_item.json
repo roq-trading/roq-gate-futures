@@ -182,6 +182,14 @@
     {
       "name": "is_pre_market",
       "type": "std/bool"
+    },
+    {
+      "name": "status",
+      "type": "std/string_view"
+    },
+    {
+      "name": "launch_time",
+      "type": "std/seconds"
     }
   ]
 }
