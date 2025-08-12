@@ -542,6 +542,7 @@ void MarketData::operator()(Trace<json::Candlesticks> const &event) {
       }
       auto bar = Bar{
           .begin_time_utc = item.time,
+          .confirmed = item.confirmed,
           .open_price = item.open,
           .high_price = item.open,
           .low_price = item.open,

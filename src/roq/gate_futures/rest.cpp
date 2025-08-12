@@ -536,6 +536,7 @@ void Rest::operator()(Trace<json::CandlesticksResponse> const &event, std::strin
   for (auto &item : candlesticks.data) {
     auto bar = Bar{
         .begin_time_utc = item.time,
+        .confirmed = true,
         .open_price = item.open,
         .high_price = item.open,
         .low_price = item.open,
