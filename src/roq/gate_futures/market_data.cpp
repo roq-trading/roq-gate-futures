@@ -523,7 +523,7 @@ void MarketData::operator()(Trace<json::Candlesticks> const &event) {
           .exchange = shared_.settings.exchange,
           .symbol = symbol,
           .data_source = DataSource::TRADE_SUMMARY,
-          .interval = Interval::_60,
+          .interval = shared_.settings_time_series_interval,
           .origin = Origin::EXCHANGE,
           .bars = bars,
           .update_type = UpdateType::INCREMENTAL,
@@ -537,7 +537,7 @@ void MarketData::operator()(Trace<json::Candlesticks> const &event) {
         helper();
         symbol = item.name;
       }
-      if (!item.confirmed) {
+      if (!item.confirmed && !shared_.settings.time_series.realtime) {
         continue;
       }
       auto bar = Bar{

@@ -82,6 +82,7 @@ struct Shared final {
 
  public:
   Settings const &settings;
+  Interval const settings_time_series_interval;
   core::limit::RateLimiter rate_limiter;
   core::Symbols symbols;
   core::TimerQueue<std::string> depth_request_queue;
