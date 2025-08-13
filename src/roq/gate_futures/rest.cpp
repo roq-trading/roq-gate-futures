@@ -554,7 +554,7 @@ void Rest::operator()(Trace<json::CandlesticksResponse> const &event, std::strin
       .exchange = shared_.settings.exchange,
       .symbol = symbol,
       .data_source = DataSource::TRADE_SUMMARY,
-      .interval = shared_.settings_time_series_interval,
+      .interval = shared_.settings.time_series.interval,
       .origin = Origin::EXCHANGE,
       .bars = bars,
       .update_type = UpdateType::SNAPSHOT,
