@@ -190,6 +190,14 @@
     {
       "name": "launch_time",
       "type": "std/seconds"
+    },
+    {
+      "name": "enable_circuit_breaker",
+      "type": "std/bool"
+    },
+    {
+      "name": "funding_rate_limit",
+      "type": "std/double"
     }
   ]
 }
