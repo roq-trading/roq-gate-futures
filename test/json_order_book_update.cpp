@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/order_book_update.hpp"
 
 using namespace roq;
@@ -48,7 +50,7 @@ TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
                  R"(])"
                  R"(})"
                  R"(})"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::OrderBookUpdate order_book_update{message, buffer};
   CHECK(order_book_update.time == 1643180626s);
   CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
@@ -91,7 +93,7 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
                  R"(])"
                  R"(})"
                  R"(})"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::OrderBookUpdate order_book_update{message, buffer};
   CHECK(order_book_update.time == 1643180627s);
   CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
@@ -131,7 +133,7 @@ TEST_CASE("json_order_book_update_simple_3", "[json_order_book_update]") {
                  R"("time":1727407188,)"
                  R"("time_ms":1727407188072)"
                  R"(})"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::OrderBookUpdate order_book_update{message, buffer};
   CHECK(order_book_update.time == 1727407188s);
   CHECK(order_book_update.time_ms == 1727407188072ms);

@@ -12,8 +12,8 @@ namespace roq {
 namespace gate_futures {
 namespace json {
 
-bool Parser::dispatch(Handler &handler, std::string_view const &message, std::span<std::byte> const &buffer, TraceInfo const &trace_info) {
-  Message message_{message, buffer};
+bool Parser::dispatch(Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info) {
+  Message message_{message, buffer_stack};
   switch (message_.event) {
     using enum Event::type_t;
     case UNDEFINED_INTERNAL:
@@ -22,7 +22,7 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
       assert(false);
       break;
     case SUBSCRIBE: {
-      Subscribe subscribe{message, buffer};
+      Subscribe subscribe{message, buffer_stack};
       create_trace_and_dispatch(handler, trace_info, subscribe);
       return true;
     }
@@ -35,27 +35,27 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, std::sp
           assert(false);
           break;
         case TICKERS: {
-          Tickers tickers{message, buffer};
+          Tickers tickers{message, buffer_stack};
           create_trace_and_dispatch(handler, trace_info, tickers);
           return true;
         }
         case TRADES: {
-          Trades trades{message, buffer};
+          Trades trades{message, buffer_stack};
           create_trace_and_dispatch(handler, trace_info, trades);
           return true;
         }
         case BOOK_TICKER: {
-          BookTicker book_ticker{message, buffer};
+          BookTicker book_ticker{message, buffer_stack};
           create_trace_and_dispatch(handler, trace_info, book_ticker);
           return true;
         }
         case ORDER_BOOK_UPDATE: {
-          OrderBookUpdate order_book_update{message, buffer};
+          OrderBookUpdate order_book_update{message, buffer_stack};
           create_trace_and_dispatch(handler, trace_info, order_book_update);
           return true;
         }
         case CANDLESTICKS: {
-          Candlesticks candlesticks{message, buffer};
+          Candlesticks candlesticks{message, buffer_stack};
           create_trace_and_dispatch(handler, trace_info, candlesticks);
           return true;
         }

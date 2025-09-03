@@ -6,6 +6,8 @@
 
 #include "roq/trace_info.hpp"
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/book_ticker.hpp"
 #include "roq/gate_futures/json/candlesticks.hpp"
 #include "roq/gate_futures/json/order_book_update.hpp"
@@ -27,7 +29,7 @@ struct Parser final {
     virtual void operator()(Trace<json::Candlesticks> const &) = 0;
   };
 
-  static bool dispatch(Handler &, std::string_view const &message, std::span<std::byte> const &, TraceInfo const &);
+  static bool dispatch(Handler &, std::string_view const &message, core::json::BufferStack &, TraceInfo const &);
 };
 
 }  // namespace json

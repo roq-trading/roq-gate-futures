@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/trade_parser.hpp"
 
 using namespace roq;
@@ -81,7 +83,7 @@ TEST_CASE("json_orders_update_1", "[json_orders]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -156,7 +158,7 @@ TEST_CASE("json_orders_update_2", "[json_orders]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -232,7 +234,7 @@ TEST_CASE("json_orders_update_3", "[json_orders]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -308,7 +310,7 @@ TEST_CASE("json_orders_update_4", "[json_orders]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);

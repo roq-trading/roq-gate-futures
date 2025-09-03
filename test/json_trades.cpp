@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/trades.hpp"
 
 using namespace roq;
@@ -29,7 +31,7 @@ TEST_CASE("json_trades_update_1", "[json_trades]") {
                  R"(})"
                  R"(])"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Trades trades{message, buffer};
   CHECK(trades.time == 1641366055s);
   REQUIRE(std::size(trades.result) == 1);
@@ -54,7 +56,7 @@ TEST_CASE("json_trades_update_2", "[json_trades]") {
                  R"("time":1727407595,)"
                  R"("time_ms":1727407595193)"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Trades trades{message, buffer};
   REQUIRE(std::size(trades.result) == 1);
   auto &result_0 = trades.result[0];

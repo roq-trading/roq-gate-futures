@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/positions.hpp"
 
 using namespace roq;
@@ -49,7 +51,7 @@ TEST_CASE("json_positions", "[json_positions]") {
                  R"("trade_max_size":"0")"
                  R"(})"
                  R"(])"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Positions positions{message, buffer};
   REQUIRE(std::size(positions.data) == 1);
   auto &result_0 = positions.data[0];

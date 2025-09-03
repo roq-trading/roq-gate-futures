@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/trade_parser.hpp"
 
 using namespace roq;
@@ -77,7 +79,7 @@ TEST_CASE("json_order_place_received_1", "[json_order_place]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -137,7 +139,7 @@ TEST_CASE("json_order_place_success_1", "[json_order_place]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -199,7 +201,7 @@ TEST_CASE("json_order_place_success_2", "[json_order_place]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -245,7 +247,7 @@ TEST_CASE("json_order_place_error_1", "[json_order_place]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);
@@ -290,7 +292,7 @@ TEST_CASE("json_order_place_error_2", "[json_order_place]") {
     void operator()(Trace<json::TradeOrderCancelCP> const &) override { FAIL(); }
     void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   [[maybe_unused]] auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(handler.found == true);

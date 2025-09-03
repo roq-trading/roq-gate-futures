@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/trade_parser.hpp"
 
 using namespace roq;
@@ -47,7 +49,7 @@ TEST_CASE("json_trade_order_list_1", "[json_trade_order_list]") {
       CHECK(order_list.header.response_time == 1727250838664ms);
     }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(res == true);
@@ -108,7 +110,7 @@ TEST_CASE("json_trade_order_list_2", "[json_trade_order_list]") {
       CHECK(result_0.update_time == 1727251125952ms);
     }
   } handler;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
   auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(res == true);

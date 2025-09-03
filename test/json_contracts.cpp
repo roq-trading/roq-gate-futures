@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/contracts.hpp"
 
 using namespace roq;
@@ -96,7 +98,7 @@ TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
                  R"("orderbook_id":1131459666)"
                  R"(})"
                  R"(])"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Contracts contracts{message, buffer};
   auto &data = contracts.data;
   REQUIRE(std::size(data) == 2);
@@ -189,7 +191,7 @@ TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
                  R"("orderbook_id":58911366)"
                  R"(})"
                  R"(])"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Contracts contracts{message, buffer};
   auto &data = contracts.data;
   REQUIRE(std::size(data) == 2);
@@ -244,7 +246,7 @@ TEST_CASE("json_contracts_simple_3", "[json_contracts]") {
                  R"("voucher_leverage":"2")"
                  R"(})"
                  R"(])"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Contracts contracts{message, buffer};
   REQUIRE(std::size(contracts.data) == 1);
   auto &data_0 = contracts.data[0];

@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/message.hpp"
 
 using namespace roq;
@@ -23,7 +25,7 @@ TEST_CASE("json_message_subscribe_success", "[json_message]") {
                  R"("status":"success")"
                  R"(})"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Message message_2{message, buffer};
   CHECK(message_2.channel == json::Channel::TICKERS);
 }
@@ -45,7 +47,7 @@ TEST_CASE("json_message_book_ticker", "[json_message]") {
                  R"("A":90229)"
                  R"(})"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Message message_2{message, buffer};
   CHECK(message_2.channel == json::Channel::BOOK_TICKER);
 }
@@ -76,7 +78,7 @@ TEST_CASE("json_message_tickers", "[json_message]") {
                  R"(})"
                  R"(])"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Message message_2{message, buffer};
   CHECK(message_2.channel == json::Channel::TICKERS);
 }
@@ -98,7 +100,7 @@ TEST_CASE("json_message_trades", "[json_message]") {
                  R"(})"
                  R"(])"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Message message_2{message, buffer};
   CHECK(message_2.channel == json::Channel::TRADES);
 }

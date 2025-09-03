@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/book_ticker.hpp"
 
 using namespace roq;
@@ -29,7 +31,7 @@ TEST_CASE("json_book_ticker_update_1", "[json_book_ticker]") {
                  R"("A":90229)"
                  R"(})"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::BookTicker book_ticker{message, buffer};
   CHECK(book_ticker.time == 1641365392s);
 }
@@ -50,7 +52,7 @@ TEST_CASE("json_book_ticker_update_2", "[json_book_ticker]") {
                  R"("time":1727407594,)"
                  R"("time_ms":1727407594837)"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::BookTicker book_ticker{message, buffer};
   CHECK(book_ticker.time == 1727407594s);
   CHECK(book_ticker.time_ms == 1727407594837ms);

@@ -16,6 +16,8 @@
 
 #include "roq/web/socket/client.hpp"
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/server.hpp"
 
 #include "roq/gate_futures/shared.hpp"
@@ -87,7 +89,7 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
   // web socket
   std::unique_ptr<web::socket::Client> const connection_;
   // buffers
-  std::vector<std::byte> decode_buffer_;
+  core::json::BufferStack decode_buffer_;
   // metrics
   struct {
     utils::metrics::Counter disconnect;

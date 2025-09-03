@@ -32,8 +32,8 @@ namespace json {
 
 // === IMPLEMENTATION ===
 
-bool TradeParser::dispatch(Handler &handler, std::string_view const &message, std::span<std::byte> const &buffer, TraceInfo const &trace_info) {
-  TradeMessage message_2{message, buffer};
+bool TradeParser::dispatch(Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info) {
+  TradeMessage message_2{message, buffer_stack};
   log::debug("{}"sv, message_2);
   auto &error = message_2.error;
   if (error.code != 0) {
@@ -57,7 +57,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
         break;
       case LOGIN:
         if (header.status == 200) {
-          TradeLogin login{message, buffer};
+          TradeLogin login{message, buffer_stack};
           create_trace_and_dispatch(handler, trace_info, login);
           return true;
         } else {
@@ -71,27 +71,27 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
         log::fatal("Unexpected"sv);
         break;
       case ORDER_PLACE: {
-        TradeOrderPlace order_place{message, buffer};
+        TradeOrderPlace order_place{message, buffer_stack};
         create_trace_and_dispatch(handler, trace_info, order_place);
         return true;
       }
       case ORDER_AMEND: {
-        TradeOrderAmend order_amend{message, buffer};
+        TradeOrderAmend order_amend{message, buffer_stack};
         create_trace_and_dispatch(handler, trace_info, order_amend);
         return true;
       }
       case ORDER_CANCEL: {
-        TradeOrderCancel order_cancel{message, buffer};
+        TradeOrderCancel order_cancel{message, buffer_stack};
         create_trace_and_dispatch(handler, trace_info, order_cancel);
         return true;
       }
       case ORDER_CANCEL_CP: {
-        TradeOrderCancelCP order_cancel_cp{message, buffer};
+        TradeOrderCancelCP order_cancel_cp{message, buffer_stack};
         create_trace_and_dispatch(handler, trace_info, order_cancel_cp);
         return true;
       }
       case ORDER_LIST: {
-        TradeOrderList order_list{message, buffer};
+        TradeOrderList order_list{message, buffer_stack};
         create_trace_and_dispatch(handler, trace_info, order_list);
         return true;
       }
@@ -125,7 +125,7 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
           case POSITIONS:
           case ORDERS:
           case USERTRADES: {
-            TradeSubscribe subscribe{message, buffer};
+            TradeSubscribe subscribe{message, buffer_stack};
             create_trace_and_dispatch(handler, trace_info, subscribe);
             return true;
           }
@@ -155,22 +155,22 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, st
             log::fatal("Unexpected"sv);
             break;
           case BALANCES: {
-            TradeBalances balances{message, buffer};
+            TradeBalances balances{message, buffer_stack};
             create_trace_and_dispatch(handler, trace_info, balances);
             return true;
           }
           case POSITIONS: {
-            TradePositions positions{message, buffer};
+            TradePositions positions{message, buffer_stack};
             create_trace_and_dispatch(handler, trace_info, positions);
             return true;
           }
           case ORDERS: {
-            TradeOrders orders{message, buffer};
+            TradeOrders orders{message, buffer_stack};
             create_trace_and_dispatch(handler, trace_info, orders);
             return true;
           }
           case USERTRADES: {
-            TradeTrades trades{message, buffer};
+            TradeTrades trades{message, buffer_stack};
             create_trace_and_dispatch(handler, trace_info, trades);
             return true;
           }

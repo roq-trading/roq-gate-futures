@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/order_book.hpp"
 
 using namespace roq;
@@ -42,7 +44,7 @@ TEST_CASE("json_order_book_simple_1", "[json_order_book]") {
                  R"("id":11144476177,)"
                  R"("update":1643191515.446)"
                  R"(})"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::OrderBook order_book{message, buffer};
   CHECK(order_book.current == 1643191515447ms);
   REQUIRE(std::size(order_book.asks) == 10);
@@ -107,7 +109,7 @@ TEST_CASE("json_order_book_simple_2", "[json_order_book]") {
                  R"({"s":1,"p":"64948.5"})"
                  R"(])"
                  R"(})"sv;
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::OrderBook order_book{message, buffer};
   CHECK(order_book.id == 67732406375);
   CHECK(order_book.current == 1727407595364ms);

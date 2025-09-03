@@ -2,6 +2,8 @@
 
 #include <catch2/catch_all.hpp>
 
+#include "roq/core/json/buffer_stack.hpp"
+
 #include "roq/gate_futures/json/subscribe.hpp"
 
 using namespace roq;
@@ -23,7 +25,7 @@ TEST_CASE("json_subscribe_success", "[json_subscribe]") {
                  R"("status":"success")"
                  R"(})"
                  R"(})";
-  std::vector<std::byte> buffer(8192);
+  core::json::BufferStack buffer{8192, 1};
   json::Subscribe subscribe{message, buffer};
   CHECK(subscribe.time == 1641365392s);
 }
