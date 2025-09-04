@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/PositionsItem",
-  "type": "item",
+  "type": "dictionary",
   "values": [
     {
       "name": "user",

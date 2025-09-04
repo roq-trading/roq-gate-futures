@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/TradeOrderAmendDataResult",
-  "type": "comp",
+  "type": "dictionary",
   "values": [
     {
       "name": "text",

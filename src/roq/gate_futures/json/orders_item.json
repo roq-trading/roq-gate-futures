@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/OrdersItem",
-  "type": "item",
+  "type": "dictionary",
   "values": [
     {
       "name": "id",

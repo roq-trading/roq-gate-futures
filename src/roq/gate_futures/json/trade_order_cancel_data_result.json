@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/TradeOrderCancelDataResult",
-  "type": "comp",
+  "type": "dictionary",
   "values": [
     {
       "name": "text",

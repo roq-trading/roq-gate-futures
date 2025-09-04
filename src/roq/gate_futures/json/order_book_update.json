@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/OrderBookUpdate",
-  "type": "comp",
+  "type": "dictionary",
   "values": [
     {
       "name": "id"

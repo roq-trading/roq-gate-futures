@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/TradeLoginDataResult",
-  "type": "comp",
+  "type": "dictionary",
   "values": [
     {
       "name": "uid",

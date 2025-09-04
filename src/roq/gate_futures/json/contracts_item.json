@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/ContractsItem",
-  "type": "item",
+  "type": "dictionary",
   "values": [
     {
       "name": "funding_rate_indicative",

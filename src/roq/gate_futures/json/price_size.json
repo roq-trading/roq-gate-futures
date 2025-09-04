@@ -1,6 +1,6 @@
 {
   "name": "roq/gate_futures/json/PriceSize",
-  "type": "item",
+  "type": "dictionary",
   "values": [
     {
       "raw": "p",
