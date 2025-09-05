@@ -12,6 +12,18 @@ namespace roq {
 namespace gate_futures {
 namespace json {
 
+// === HELPERS ===
+
+namespace {
+template <typename T>
+void dispatch_helper(auto &handler, auto &message, auto &buffer_stack, auto &trace_info) {
+  T obj{message, buffer_stack};
+  create_trace_and_dispatch(handler, trace_info, obj);
+}
+}  // namespace
+
+// === IMPLEMENTATION ===
+
 bool Parser::dispatch(Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info) {
   Message message_{message, buffer_stack};
   switch (message_.event) {
@@ -21,11 +33,9 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, core::j
     case UNKNOWN_INTERNAL:
       assert(false);
       break;
-    case SUBSCRIBE: {
-      Subscribe subscribe{message, buffer_stack};
-      create_trace_and_dispatch(handler, trace_info, subscribe);
+    case SUBSCRIBE:
+      dispatch_helper<Subscribe>(handler, message, buffer_stack, trace_info);
       return true;
-    }
     case UPDATE:
       switch (message_.channel) {
         using enum Channel::type_t;
@@ -34,31 +44,21 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, core::j
         case UNKNOWN_INTERNAL:
           assert(false);
           break;
-        case TICKERS: {
-          Tickers tickers{message, buffer_stack};
-          create_trace_and_dispatch(handler, trace_info, tickers);
+        case TICKERS:
+          dispatch_helper<Tickers>(handler, message, buffer_stack, trace_info);
           return true;
-        }
-        case TRADES: {
-          Trades trades{message, buffer_stack};
-          create_trace_and_dispatch(handler, trace_info, trades);
+        case TRADES:
+          dispatch_helper<Trades>(handler, message, buffer_stack, trace_info);
           return true;
-        }
-        case BOOK_TICKER: {
-          BookTicker book_ticker{message, buffer_stack};
-          create_trace_and_dispatch(handler, trace_info, book_ticker);
+        case BOOK_TICKER:
+          dispatch_helper<BookTicker>(handler, message, buffer_stack, trace_info);
           return true;
-        }
-        case ORDER_BOOK_UPDATE: {
-          OrderBookUpdate order_book_update{message, buffer_stack};
-          create_trace_and_dispatch(handler, trace_info, order_book_update);
+        case ORDER_BOOK_UPDATE:
+          dispatch_helper<OrderBookUpdate>(handler, message, buffer_stack, trace_info);
           return true;
-        }
-        case CANDLESTICKS: {
-          Candlesticks candlesticks{message, buffer_stack};
-          create_trace_and_dispatch(handler, trace_info, candlesticks);
+        case CANDLESTICKS:
+          dispatch_helper<Candlesticks>(handler, message, buffer_stack, trace_info);
           return true;
-        }
         case LOGIN:
         case BALANCES:
         case POSITIONS:
