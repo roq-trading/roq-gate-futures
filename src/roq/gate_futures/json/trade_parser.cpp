@@ -42,7 +42,8 @@ void dispatch_helper(auto &handler, auto &message, auto &buffer_stack, auto &tra
 
 // === IMPLEMENTATION ===
 
-bool TradeParser::dispatch(Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info) {
+bool TradeParser::dispatch(
+    Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info, bool allow_unknown_event_types) {
   TradeMessage message_2{message, buffer_stack};
   log::debug("{}"sv, message_2);
   auto &error = message_2.error;
@@ -57,7 +58,9 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
       case UNDEFINED_INTERNAL:
         break;
       case UNKNOWN_INTERNAL:
-        assert(false);
+        if (allow_unknown_event_types) {
+          return false;
+        }
         break;
       case TICKERS:
       case TRADES:
@@ -77,7 +80,6 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
       case POSITIONS:
       case ORDERS:
       case USERTRADES:
-        log::fatal("Unexpected"sv);
         break;
       case ORDER_PLACE:
         dispatch_helper<TradeOrderPlace>(handler, message, buffer_stack, trace_info);
@@ -95,14 +97,15 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
         dispatch_helper<TradeOrderList>(handler, message, buffer_stack, trace_info);
         return true;
     }
-    log::fatal("Unexpected"sv);
   } else {  // subscribe or update do not have "header"
     switch (message_2.event) {
       using enum Event::type_t;
       case UNDEFINED_INTERNAL:
         break;
       case UNKNOWN_INTERNAL:
-        assert(false);
+        if (allow_unknown_event_types) {
+          return false;
+        }
         break;
       case SUBSCRIBE:
         switch (message_2.channel) {
@@ -110,7 +113,9 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
           case UNDEFINED_INTERNAL:
             break;
           case UNKNOWN_INTERNAL:
-            assert(false);
+            if (allow_unknown_event_types) {
+              return false;
+            }
             break;
           case TICKERS:
           case TRADES:
@@ -118,7 +123,6 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
           case ORDER_BOOK_UPDATE:
           case CANDLESTICKS:
           case LOGIN:
-            log::fatal("Unexpected"sv);
             break;
           case BALANCES:
           case POSITIONS:
@@ -131,7 +135,6 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
           case ORDER_CANCEL:
           case ORDER_CANCEL_CP:
           case ORDER_LIST:
-            log::fatal("Unexpected"sv);
             break;
         }
         break;
@@ -149,7 +152,6 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
           case ORDER_BOOK_UPDATE:
           case CANDLESTICKS:
           case LOGIN:
-            log::fatal("Unexpected"sv);
             break;
           case BALANCES:
             dispatch_helper<TradeBalances>(handler, message, buffer_stack, trace_info);
@@ -168,16 +170,17 @@ bool TradeParser::dispatch(Handler &handler, std::string_view const &message, co
           case ORDER_CANCEL:
           case ORDER_CANCEL_CP:
           case ORDER_LIST:
-            log::fatal("Unexpected"sv);
             break;
         }
         break;
       case API:
-        log::fatal("Unexpected"sv);
+        if (allow_unknown_event_types) {
+          return false;
+        }
         break;
     }
   }
-  return false;
+  log::fatal(R"(Unexpected: message="{}")"sv, message);
 }
 
 }  // namespace json

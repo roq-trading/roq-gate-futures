@@ -562,12 +562,11 @@ void DropCopy::get_orders() {
 void DropCopy::parse(std::string_view const &message) {
   log::debug(R"(message="{}")"sv, message);
   profile_.parse([&]() {
-    auto log_message = [&]() { log::warn(R"(message="{}")"sv, message); };
+    auto log_message = [&]() { log::warn(R"(*** PLEASE REPORT *** message="{}")"sv, message); };
     try {
       TraceInfo trace_info;
-      if (!json::TradeParser::dispatch(*this, message, decode_buffer_, trace_info)) {
+      if (!json::TradeParser::dispatch(*this, message, decode_buffer_, trace_info, shared_.settings.experimental.allow_unknown_event_types)) {
         log_message();
-        log::fatal("Unexpected"sv);
       }
     } catch (...) {
       log_message();

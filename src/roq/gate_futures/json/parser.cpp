@@ -24,25 +24,30 @@ void dispatch_helper(auto &handler, auto &message, auto &buffer_stack, auto &tra
 
 // === IMPLEMENTATION ===
 
-bool Parser::dispatch(Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info) {
-  Message message_{message, buffer_stack};
-  switch (message_.event) {
+bool Parser::dispatch(
+    Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info, bool allow_unknown_event_types) {
+  Message message_2{message, buffer_stack};
+  switch (message_2.event) {
     using enum Event::type_t;
     case UNDEFINED_INTERNAL:
       break;
     case UNKNOWN_INTERNAL:
-      assert(false);
+      if (allow_unknown_event_types) {
+        return false;
+      }
       break;
     case SUBSCRIBE:
       dispatch_helper<Subscribe>(handler, message, buffer_stack, trace_info);
       return true;
     case UPDATE:
-      switch (message_.channel) {
+      switch (message_2.channel) {
         using enum Channel::type_t;
         case UNDEFINED_INTERNAL:
           break;
         case UNKNOWN_INTERNAL:
-          assert(false);
+          if (allow_unknown_event_types) {
+            return false;
+          }
           break;
         case TICKERS:
           dispatch_helper<Tickers>(handler, message, buffer_stack, trace_info);
@@ -73,9 +78,10 @@ bool Parser::dispatch(Handler &handler, std::string_view const &message, core::j
       }
       break;
     case API:
-      break;
+      // note! don't parse
+      return false;
   }
-  return false;
+  log::fatal(R"(Unexpected: message="{}")"sv, message);
 }
 
 }  // namespace json
