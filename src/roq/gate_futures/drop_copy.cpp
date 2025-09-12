@@ -12,8 +12,6 @@
 
 #include "roq/utils/metrics/factory.hpp"
 
-#include "roq/web/socket/client.hpp"
-
 #include "roq/core/json/buffer.hpp"
 
 #include "roq/server/oms/exceptions.hpp"
@@ -146,206 +144,31 @@ void DropCopy::operator()(metrics::Writer &writer) const {
 }
 
 uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id) {
-  auto &create_order = event.value;
-  auto request_id_2 = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
-  auto channel = "futures.order_place"sv;
-  auto event_2 = "api"sv;
-  auto sign = utils::sign(create_order.side);
-  auto quantity = sign * create_order.quantity;
-  auto price = [&]() {
-    if (create_order.order_type == OrderType::MARKET) {
-      return 0.0;
-    }
-    if (std::isnan(create_order.price)) {
-      return 0.0;
-    }
-    return create_order.price;
-  }();
-  auto reduce_only = create_order.execution_instructions.has(ExecutionInstruction::DO_NOT_INCREASE);
-  auto tif = [&]() -> std::string_view {
-    if (create_order.order_type == OrderType::MARKET) {
-      return "ioc"sv;
-    }
-    if (create_order.execution_instructions.has(ExecutionInstruction::PARTICIPATE_DO_NOT_INITIATE)) {
-      return "poc"sv;
-    }
-    switch (create_order.time_in_force) {
-      using enum TimeInForce;
-      case UNDEFINED:
-        break;
-      case GFD:
-        break;
-      case GTC:
-        return "gtc"sv;
-      case OPG:
-        break;
-      case IOC:
-        return "ioc"sv;
-      case FOK:
-        return "fok"sv;
-      case GTX:
-        break;
-      case GTD:
-        break;
-      case AT_THE_CLOSE:
-        break;
-      case GOOD_THROUGH_CROSSING:
-        break;
-      case AT_CROSSING:
-        break;
-      case GOOD_FOR_TIME:
-        break;
-      case GFA:
-        break;
-      case GFM:
-        break;
-    }
-    throw server::oms::NotSupported{"not supported"sv};
-  }();
-  auto message = fmt::format(
-      R"({{)"
-      R"("id":{},)"
-      R"("time":{},)"
-      R"("channel":"{}",)"
-      R"("event":"{}",)"
-      R"("payload":{{)"
-      R"("req_id":"{}",)"
-      R"("req_param":{{)"
-      R"("contract":"{}",)"
-      R"("size":{},)"
-      R"("iceberg":0,)"
-      R"("price":"{}",)"
-      R"("close":false,)"
-      R"("reduce_only":{},)"
-      R"("tif":"{}",)"
-      R"("text":"t-{}")"
-      // R"("stp_act":"cn")"  // XXX make flag
-      R"(}})"
-      R"(}})"
-      R"(}})"sv,
-      request_id_2,
-      now.count(),
-      channel,
-      event_2,
-      request_id,
-      order.symbol,
-      Decimal{quantity, order.quantity_precision.precision},
-      Decimal{price, order.price_precision.precision},
-      reduce_only,
-      tif,
-      request_id);
+  auto message = json::order_place(encode_buffer_, event, order, request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
 }
 
 uint16_t DropCopy::operator()(
-    Event<ModifyOrder> const &event,
-    server::oms::Order const &order,
-    std::string_view const &request_id,
-    [[maybe_unused]] std::string_view const &previous_request_id) {
-  auto &modify_order = event.value;
-  auto request_id_2 = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
-  auto const channel = "futures.order_amend"sv;
-  auto const event_2 = "api"sv;
-  std::string message;
-  fmt::format_to(
-      std::back_inserter(message),
-      R"({{)"
-      R"("id":{},)"
-      R"("time":{},)"
-      R"("channel":"{}",)"
-      R"("event":"{}",)"
-      R"("payload":{{)"
-      R"("req_id":"{}",)"
-      R"("req_param":{{)"
-      R"("order_id":"t-{}",)"sv,
-      request_id_2,
-      now.count(),
-      channel,
-      event_2,
-      request_id,
-      order.client_order_id);
-  if (!std::isnan(modify_order.quantity)) {
-    auto sign = utils::sign(order.side);
-    auto quantity = sign * modify_order.quantity;
-    fmt::format_to(std::back_inserter(message), R"("size":{},)", Decimal{quantity, order.quantity_precision.precision});
-  }
-  if (!std::isnan(modify_order.price)) {
-    fmt::format_to(std::back_inserter(message), R"("price":"{}",)"sv, Decimal{modify_order.price, order.price_precision.precision});
-  }
-  fmt::format_to(
-      std::back_inserter(message),
-      R"("amend_text":"{}")"
-      R"(}})"
-      R"(}})"
-      R"(}})"sv,
-      order.client_order_id);
+    Event<ModifyOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
+  auto message = json::order_amend(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
 }
 
 uint16_t DropCopy::operator()(
-    Event<CancelOrder> const &,
-    server::oms::Order const &order,
-    std::string_view const &request_id,
-    [[maybe_unused]] std::string_view const &previous_request_id) {
-  auto request_id_2 = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
-  auto const channel = "futures.order_cancel"sv;
-  auto const event_2 = "api"sv;
-  auto message = fmt::format(
-      R"({{)"
-      R"("id":{},)"
-      R"("time":{},)"
-      R"("channel":"{}",)"
-      R"("event":"{}",)"
-      R"("payload":{{)"
-      R"("req_id":"{}",)"
-      R"("req_param":{{)"
-      R"("order_id":"t-{}")"
-      R"(}})"
-      R"(}})"
-      R"(}})"sv,
-      request_id_2,
-      now.count(),
-      channel,
-      event_2,
-      request_id,
-      order.client_order_id);
+    Event<CancelOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
+  auto message = json::order_cancel(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
 }
 
-uint16_t DropCopy::operator()(Event<CancelAllOrders> const &, std::string_view const &request_id) {
+uint16_t DropCopy::operator()(Event<CancelAllOrders> const &event, std::string_view const &request_id) {
   auto helper = [&](auto &symbol) {
-    auto request_id_2 = ++request_id_;
-    auto now = clock::get_realtime<std::chrono::seconds>();
-    auto const channel = "futures.order_cancel_cp"sv;
-    auto const event_2 = "api"sv;
-    auto message = fmt::format(
-        R"({{)"
-        R"("id":{},)"
-        R"("time":{},)"
-        R"("channel":"{}",)"
-        R"("event":"{}",)"
-        R"("payload":{{)"
-        R"("req_id":"{}",)"
-        R"("req_param":{{)"
-        R"("contract":"{}")"
-        R"(}})"
-        R"(}})"
-        R"(}})"sv,
-        request_id_2,
-        now.count(),
-        channel,
-        event_2,
-        request_id,
-        symbol);
+    auto message = json::order_cancel_cp(encode_buffer_, event, request_id, ++request_id_, symbol);
     log::warn(R"(DEBUG message="{}")"sv, message);
     (*connection_).send_text(message);
   };
@@ -578,6 +401,9 @@ void DropCopy::parse(std::string_view const &message) {
 void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
   auto &[trace_info, login] = event;
   log::info<5>("login={}"sv, login);
+  if (login.header.status != 200) {
+    log::fatal("Unexpected: login={}"sv, login);
+  }
   if (login.data.result.uid <= 0) {
     log::fatal("Unexpected: user_id must be positive (login={})"sv, login);
   }

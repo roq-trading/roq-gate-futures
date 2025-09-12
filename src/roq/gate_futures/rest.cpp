@@ -230,8 +230,12 @@ void Rest::get_currencies() {
 }
 
 void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
-  constexpr auto const STATE = RestState::CURRENCIES;
+  auto const STATE = RestState::CURRENCIES;
   profile_.currencies_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      download_.retry(STATE);
+    };
     auto handle_success = [&](auto &body) {
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
@@ -242,11 +246,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
         download_.check(STATE);
       }
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      download_.retry(STATE);
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -279,8 +279,12 @@ void Rest::get_contracts() {
 }
 
 void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
-  constexpr auto const STATE = RestState::CONTRACTS;
+  auto const STATE = RestState::CONTRACTS;
   profile_.contracts_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      download_.retry(STATE);
+    };
     auto handle_success = [&](auto &body) {
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
@@ -291,11 +295,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
         download_.check(STATE);
       }
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      download_.retry(STATE);
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -412,16 +412,16 @@ void Rest::get_order_book(std::string_view const &symbol) {
 
 void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.order_book_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      // XXX WHAT ???
+    };
     auto handle_success = [&](auto &body) {
       json::OrderBook order_book{body, decode_buffer_};
       Trace event_2{event, order_book};
       (*this)(event_2, symbol);
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      // XXX WHAT ???
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -517,16 +517,16 @@ void Rest::get_candlesticks(std::string_view const &symbol) {
 
 void Rest::get_candlesticks_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.candlesticks_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      // XXX WHAT ???
+    };
     auto handle_success = [&](auto &body) {
       json::CandlesticksResponse candlesticks{body, decode_buffer_};
       Trace event_2{event, candlesticks};
       (*this)(event_2, symbol);
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      // XXX WHAT ???
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -575,27 +575,32 @@ void Rest::check_request_queue(std::chrono::nanoseconds now) {
   shared_.time_series_request_queue.dispatch([&](auto now) { return shared_.rate_limiter.can_request(now); }, time_series_helper, now);
 }
 
-template <typename SuccessHandler, typename ErrorHandler>
-void Rest::process_response(web::rest::Response const &response, SuccessHandler success_handler, ErrorHandler error_handler) {
+// helpers
+
+void Rest::process_response(web::rest::Response const &response, auto error_handler, auto success_handler) {
   try {
     auto [status, category, body] = response.result();
     switch (category) {
       using enum web::http::Category;
-      case SUCCESS:  // 2xx
+      case UNKNOWN:
+      case INFORMATIONAL_RESPONSE:
+        response.expect(web::http::Status::OK);  // throws
+        break;
+      case SUCCESS:
         success_handler(body);
         break;
-      case CLIENT_ERROR: {  // 4xx
+      case REDIRECTION:
+        log::fatal("Unexpected: URL is being redirected"sv);
+      case CLIENT_ERROR: {
         auto text = fmt::format("{}"sv, status);
         error_handler(Origin::EXCHANGE, RequestStatus::REJECTED, Error::UNKNOWN, text);
         break;
       }
-      case SERVER_ERROR: {  // 5xx
-        auto text = fmt::format("{}"sv, status);
-        error_handler(Origin::EXCHANGE, RequestStatus::ERROR, Error::UNKNOWN, text);
+      case SERVER_ERROR: {
+        auto message = fmt::format("{}"sv, status);
+        error_handler(Origin::EXCHANGE, RequestStatus::ERROR, Error::UNKNOWN, message);
         break;
       }
-      default:
-        response.expect(web::http::Status::OK);  // throws
     }
   } catch (NetworkError &e) {
     log::warn(R"(Exception type={}, what="{}")"sv, typeid(e).name(), e.what());

@@ -1,0 +1,14 @@
+{
+  "name": "roq/gate_futures/json/TradeLoginDataErrs",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "label",
+      "type": "std/string_view"
+    },
+    {
+      "name": "message",
+      "type": "std/string_view"
+    }
+  ]
+}

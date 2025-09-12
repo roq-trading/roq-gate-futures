@@ -42,6 +42,7 @@ set(AUTOGEN_SCHEMAS
     trade_error.json
     trade_header.json
     trade_login_data.json
+    trade_login_data_errs.json
     trade_login_data_result.json
     trade_login.json
     trade_message.json

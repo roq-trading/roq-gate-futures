@@ -69,13 +69,8 @@ bool TradeParser::dispatch(
       case CANDLESTICKS:
         break;
       case LOGIN:
-        if (header.status == 200) {
-          dispatch_helper<TradeLogin>(handler, message, buffer_stack, trace_info);
-          return true;
-        } else {
-          return false;
-        }
-        break;
+        dispatch_helper<TradeLogin>(handler, message, buffer_stack, trace_info);
+        return true;
       case BALANCES:
       case POSITIONS:
       case ORDERS:

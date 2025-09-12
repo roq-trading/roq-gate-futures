@@ -137,6 +137,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   std::chrono::nanoseconds next_ping_ = {};
   // ...
   int64_t user_id_ = {};
+  std::string encode_buffer_;
 };
 
 }  // namespace gate_futures

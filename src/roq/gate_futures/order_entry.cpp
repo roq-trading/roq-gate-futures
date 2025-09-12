@@ -244,21 +244,21 @@ void OrderEntry::get_accounts() {
 }
 
 void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto constexpr const STATE = OrderEntryState::ACCOUNTS;
+  auto const STATE = OrderEntryState::ACCOUNTS;
   profile_.accounts_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      if (download_.downloading()) {
+        download_.retry(STATE);
+      }
+    };
     auto handle_success = [&](auto &body) {
       json::Accounts accounts{body, decode_buffer_};
       Trace event_2{event, accounts};
       (*this)(event_2);
       download_.check_relaxed(STATE);
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading()) {
-        download_.retry(STATE);
-      }
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -292,21 +292,21 @@ void OrderEntry::get_positions() {
 }
 
 void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto constexpr const STATE = OrderEntryState::POSITIONS;
+  auto const STATE = OrderEntryState::POSITIONS;
   profile_.positions_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      if (download_.downloading()) {
+        download_.retry(STATE);
+      }
+    };
     auto handle_success = [&](auto &body) {
       json::Positions positions{body, decode_buffer_};
       Trace event_2{event, positions};
       (*this)(event_2);
       download_.check_relaxed(STATE);
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading()) {
-        download_.retry(STATE);
-      }
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -375,8 +375,14 @@ void OrderEntry::get_trades() {
 }
 
 void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto constexpr const STATE = OrderEntryState::TRADES;
+  auto const STATE = OrderEntryState::TRADES;
   profile_.trades_ack([&]() {
+    auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
+      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
+      if (download_.downloading()) {
+        download_.retry(STATE);
+      }
+    };
     auto handle_success = [&](auto &body) {
       json::UserTrades trades{body, decode_buffer_};
       Trace event_2{event, trades};
@@ -384,13 +390,7 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
       download_trades_is_first_ = false;
       download_.check_relaxed(STATE);
     };
-    auto handle_error = [&]([[maybe_unused]] auto origin, [[maybe_unused]] auto status, auto error, auto text) {
-      log::warn(R"(error={}, text="{}")"sv, error, text);
-      if (download_.downloading()) {
-        download_.retry(STATE);
-      }
-    };
-    process_response(event, handle_success, handle_error);
+    process_response(event, handle_error, handle_success);
   });
 }
 
@@ -450,17 +450,22 @@ void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
 
 // helpers
 
-template <typename SuccessHandler, typename ErrorHandler>
-void OrderEntry::process_response(web::rest::Response const &response, SuccessHandler success_handler, ErrorHandler error_handler) {
+void OrderEntry::process_response(web::rest::Response const &response, auto error_handler, auto success_handler) {
   try {
     log::debug("response={}"sv, response);
     auto [status, category, body] = response.result();
     switch (category) {
       using enum web::http::Category;
-      case SUCCESS:  // 2xx
+      case UNKNOWN:
+      case INFORMATIONAL_RESPONSE:
+        response.expect(web::http::Status::OK);  // throws
+        break;
+      case SUCCESS:
         success_handler(body);
         break;
-      case CLIENT_ERROR:  // 4xx
+      case REDIRECTION:
+        log::fatal("Unexpected: URL is being redirected"sv);
+      case CLIENT_ERROR:
         switch (status) {
           using enum web::http::Status;
           case FORBIDDEN:           // 403
@@ -481,13 +486,11 @@ void OrderEntry::process_response(web::rest::Response const &response, SuccessHa
           }
         }
         break;
-      case SERVER_ERROR: {  // 5xx
-        auto text = fmt::format("{}"sv, status);
-        error_handler(Origin::EXCHANGE, RequestStatus::ERROR, Error::UNKNOWN, text);
+      case SERVER_ERROR: {
+        auto message = fmt::format("{}"sv, status);
+        error_handler(Origin::EXCHANGE, RequestStatus::ERROR, Error::UNKNOWN, message);
         break;
       }
-      default:
-        response.expect(web::http::Status::OK);  // throws
     }
   } catch (server::oms::Exception &e) {
     log::warn(R"(Exception type={}, what="{}")"sv, typeid(e).name(), e.what());

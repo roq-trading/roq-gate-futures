@@ -37,6 +37,7 @@ trade_balances.hpp
 trade_error.hpp
 trade_header.hpp
 trade_login_data.hpp
+trade_login_data_errs.hpp
 trade_login_data_result.hpp
 trade_login.hpp
 trade_message.hpp
@@ -104,6 +105,7 @@ trade_balances.cpp
 trade_error.cpp
 trade_header.cpp
 trade_login_data.cpp
+trade_login_data_errs.cpp
 trade_login_data_result.cpp
 trade_login.cpp
 trade_message.cpp
