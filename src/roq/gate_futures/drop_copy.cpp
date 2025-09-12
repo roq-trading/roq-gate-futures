@@ -16,8 +16,8 @@
 
 #include "roq/server/oms/exceptions.hpp"
 
+#include "roq/gate_futures/json/encoder.hpp"
 #include "roq/gate_futures/json/map.hpp"
-#include "roq/gate_futures/json/utils.hpp"
 
 using namespace std::literals;
 
@@ -144,7 +144,7 @@ void DropCopy::operator()(metrics::Writer &writer) const {
 }
 
 uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id) {
-  auto message = json::order_place(encode_buffer_, event, order, request_id, ++request_id_);
+  auto message = json::Encoder::order_place(encode_buffer_, event, order, request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
@@ -152,7 +152,7 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
 
 uint16_t DropCopy::operator()(
     Event<ModifyOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
-  auto message = json::order_amend(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
+  auto message = json::Encoder::order_amend(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
@@ -160,7 +160,7 @@ uint16_t DropCopy::operator()(
 
 uint16_t DropCopy::operator()(
     Event<CancelOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
-  auto message = json::order_cancel(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
+  auto message = json::Encoder::order_cancel(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
@@ -168,7 +168,7 @@ uint16_t DropCopy::operator()(
 
 uint16_t DropCopy::operator()(Event<CancelAllOrders> const &event, std::string_view const &request_id) {
   auto helper = [&](auto &symbol) {
-    auto message = json::order_cancel_cp(encode_buffer_, event, request_id, ++request_id_, symbol);
+    auto message = json::Encoder::order_cancel_cp(encode_buffer_, event, request_id, ++request_id_, symbol);
     log::warn(R"(DEBUG message="{}")"sv, message);
     (*connection_).send_text(message);
   };
