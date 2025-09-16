@@ -198,6 +198,14 @@
     {
       "name": "funding_rate_limit",
       "type": "std/double"
+    },
+    {
+      "name": "delisting_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "delisted_time",
+      "type": "std/seconds"
     }
   ]
 }
