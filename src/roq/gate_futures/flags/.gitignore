@@ -1,16 +1,13 @@
 !!! THIS FILE HAS BEEN AUTO-GENERATED !!!
 roq-gate-futures-flags
-download.rstinc
 misc.rstinc
 rest.rstinc
 ws.rstinc
 flags.rstinc
-download.hpp
 misc.hpp
 rest.hpp
 ws.hpp
 flags.hpp
-download.cpp
 misc.cpp
 rest.cpp
 ws.cpp

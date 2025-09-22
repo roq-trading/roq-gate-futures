@@ -8,7 +8,6 @@
 
 #include "roq/server/flags/settings.hpp"
 
-#include "roq/gate_futures/flags/download.hpp"
 #include "roq/gate_futures/flags/flags.hpp"
 #include "roq/gate_futures/flags/misc.hpp"
 #include "roq/gate_futures/flags/rest.hpp"
@@ -25,7 +24,6 @@ struct Settings final : public server::flags::Settings {
   flags::Misc misc;
   flags::REST rest;
   flags::WS ws;
-  flags::Download download;
 
  private:
   Settings(args::Parser const &, flags::Flags const &);
@@ -46,14 +44,12 @@ struct fmt::formatter<roq::gate_futures::Settings> {
         R"(misc={}, )"
         R"(rest={}, )"
         R"(ws={}, )"
-        R"(download={}, )"
         R"(server={})"
         R"(}})"sv,
         value.exchange,
         value.misc,
         value.rest,
         value.ws,
-        value.download,
         static_cast<roq::server::Settings const &>(value));
   }
 };

@@ -206,7 +206,7 @@ void MarketData::subscribe(std::span<Symbol const> const &symbols) {
   subscribe("futures.trades"sv, symbols);
   subscribe("futures.book_ticker"sv, symbols);
   subscribe("futures.order_book_update"sv, symbols, utils::safe_cast(shared_.settings.misc.order_book_freq), shared_.settings.misc.order_book_depth);
-  if (shared_.settings.download.time_series && shared_.settings.time_series.lookback.count()) {
+  if (shared_.settings.download.time_series_lookback.count()) {
     subscribe("futures.candlesticks"sv, symbols, "1m"sv);
   }
 }
