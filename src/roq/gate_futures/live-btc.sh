@@ -12,20 +12,17 @@ CONFIG="${CONFIG:-$NAME}"
 
 CONFIG_FILE="$ROQ_CONFIG_PATH/roq-gate-futures/$CONFIG.toml"
 
-URI="gateio.ws"
+API="btc"
 
-REST_URI="https://api.$URI/api/v4"
-WS_URI="wss://fx-ws.$URI/v4/ws/btc"
+FLAGFILE="../../../share/flags/prod/flags-$API.cfg"
 
 $PREFIX ./roq-gate-futures \
   --name "gate-futures" \
   --config_file "$CONFIG_FILE" \
+  --flagfile "$FLAGFILE" \
   --cache_dir "$HOME/var/lib/roq/cache" \
   --event_log_dir "$HOME/var/lib/roq/data" \
-  --event_log_symlink true \
   --client_listen_address "$HOME/run/$NAME.sock" \
   --service_listen_address "$HOME/run/metrics/${NAME}.sock" \
-  --rest_uri "$REST_URI" \
-  --ws_uri "$WS_URI" \
-  --api "btc" \
+  --api="$API" \
   $@
