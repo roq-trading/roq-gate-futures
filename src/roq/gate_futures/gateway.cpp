@@ -19,7 +19,7 @@ using namespace std::literals;
 namespace roq {
 namespace gate_futures {
 
-// === IMPLEMENTATION ===
+// === HELPERS ===
 
 namespace {
 template <typename R>

@@ -6,12 +6,35 @@ roq-gate-futures
 ================
 
 
-Links
------
+.. tab:: Unstable
 
-* `Website <https://www.gate.io/>`__
-* `Testnet <https://www.gate.io/testnet/futures_trade/USDT/BTC_USDT>`__
-* `Documentation <https://www.gate.io/docs/developers/apiv4/>`__
+  .. code-block:: shell
+
+     $ conda install \
+           --channel https://roq-trading.com/conda/unstable \
+           roq-gate-futures
+
+.. tab:: Stable
+
+  .. code-block:: shell
+
+     $ conda install \
+           --channel https://roq-trading.com/conda/stable \
+           roq-gate-futures
+
+
+:code:`roq-gate-futures`
+------------------------
+
+.. code-block:: shell
+
+   $ roq-gate-futures [FLAGS]
+
+
+Description
+~~~~~~~~~~~
+
+:code:`roq-gate-futures` is a gateway
 
 
 Supports
@@ -81,40 +104,6 @@ Supports
         -
       * - Funds
         - |checkmark|
-
-
-Installing
-----------
-
-* :ref:`Using Conda <tutorial-conda>`
-
-.. tab:: Unstable
-
-  .. code-block:: shell
-
-     $ conda install \
-           --channel https://roq-trading.com/conda/unstable \
-           roq-gate-futures
-
-.. tab:: Stable
-
-  .. code-block:: shell
-
-     $ conda install \
-           --channel https://roq-trading.com/conda/stable \
-           roq-gate-futures
-
-
-Using
------
-
-.. code-block:: shell
-
-   $ roq-gate-futures \
-         --name "gate-futures" \
-         --config_file $CONFIG_FILE_PATH \
-         --client_listen_address $UNIX_SOCKET_PATH \
-         --flagfile $ENVIRONMENT_FLAGFILE
 
 
 .. _roq-gate-futures-flags:
