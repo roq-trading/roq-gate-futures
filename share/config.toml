@@ -1,3 +1,5 @@
+# config template for the roq-gate-futures gateway
+
 symbols = [
   "^BTC_USD[A-Z]?$",
   "^ETH_USD[A-Z]?$"
@@ -7,8 +9,8 @@ symbols = [
 
   [accounts.A1]
   master = true
-  login = "YOUR_GATE.IO_FUTURES_API_KEY_GOES_HERE"
-  secret = "YOUR_GATE.IO_FUTURES_SECRET_GOES_HERE"
+  login = "YOUR_GATE_FUTURES_API_KEY_GOES_HERE"
+  secret = "YOUR_GATE_FUTURES_SECRET_GOES_HERE"
   symbols = [ ".*" ]
 
 [users]
