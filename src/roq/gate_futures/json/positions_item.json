@@ -140,6 +140,26 @@
       "name": "time_ms",
       "type": "std/milliseconds",
       "comment": "WS"
+    },
+    {
+      "name": "risk_limit_table",
+      "type": "std/string_view"
+    },
+    {
+      "name": "average_maintenance_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "voucher_size",
+      "type": "std/double"
+    },
+    {
+      "name": "voucher_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "voucher_id",
+      "type": "std/double"
     }
   ]
 }

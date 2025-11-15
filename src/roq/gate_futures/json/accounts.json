@@ -105,6 +105,18 @@
     {
       "name": "margin_mode_name",
       "type": "std/string_view"
+    },
+    {
+      "name": "cross_virtual_unrealised_pnl",
+      "type": "std/double"
+    },
+    {
+      "name": "enable_tiered_mm",
+      "type": "std/bool"
+    },
+    {
+      "name": "position_voucher_total",
+      "type": "std/double"
     }
   ]
 }

@@ -149,6 +149,14 @@
     {
       "name": "role",
       "type": "std/string_view"
+    },
+    {
+      "name": "id_string",
+      "type": "std/string_view"
+    },
+    {
+      "name": "bbo",
+      "type": "std/string_view"
     }
   ]
 }

@@ -41,6 +41,18 @@
     {
       "name": "x_out_time",
       "type": "std/microseconds"
+    },
+    {
+      "name": "x_gate_ratelimit_requests_remain",
+      "type": "std/int32"
+    },
+    {
+      "name": "x_gate_ratelimit_limit",
+      "type": "std/int32"
+    },
+    {
+      "name": "x_gate_ratelimit_reset_timestamp",
+      "type": "std/milliseconds"
     }
   ]
 }
