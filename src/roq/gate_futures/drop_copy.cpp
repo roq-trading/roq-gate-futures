@@ -780,6 +780,7 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .quantity = quantity,
       .price = value.price,
       .stop_price = NaN,
+      .leverage = NaN,
       .remaining_quantity = remaining_quantity,
       .traded_quantity = traded_quantity,
       .average_traded_price = average_traded_price,
