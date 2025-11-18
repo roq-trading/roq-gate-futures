@@ -434,6 +434,7 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
   });
 }
 
+// XXX TODO there's a new "full" field
 void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
     auto &[trace_info, order_book_update] = event;
