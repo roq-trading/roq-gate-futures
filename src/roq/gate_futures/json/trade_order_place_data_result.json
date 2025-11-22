@@ -103,6 +103,10 @@
     {
       "name": "req_param",
       "comment": "received"
+    },
+    {
+      "name": "is_reduce_only",
+      "type": "std/bool"
     }
   ]
 }
