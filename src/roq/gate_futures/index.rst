@@ -178,7 +178,7 @@ Environments
 
    .. code-block:: shell
 
-      $ $CONDA_PREFIX/share/roq-gate-futures/flags/prod/flags-usdt.cfg
+      $ --flagfile $CONDA_PREFIX/share/roq-gate-futures/flags/prod/flags-usdt.cfg
 
    .. include:: flags/prod/flags-usdt.cfg
      :code: shell
@@ -187,7 +187,7 @@ Environments
 
    .. code-block:: shell
 
-      $ $CONDA_PREFIX/share/roq-gate-futures/flags/prod/flags-btc.cfg
+      $ --flagfile $CONDA_PREFIX/share/roq-gate-futures/flags/prod/flags-btc.cfg
 
    .. include:: flags/prod/flags-btc.cfg
      :code: shell
@@ -196,7 +196,7 @@ Environments
 
    .. code-block:: shell
 
-      $ $CONDA_PREFIX/share/roq-gate-futures/flags/test/flags-usdt.cfg
+      $ --flagfile $CONDA_PREFIX/share/roq-gate-futures/flags/test/flags-usdt.cfg
 
    .. include:: flags/test/flags-usdt.cfg
      :code: shell
@@ -205,7 +205,7 @@ Environments
 
    .. code-block:: shell
 
-      $ $CONDA_PREFIX/share/roq-gate-futures/flags/test/flags-btc.cfg
+      $ --flagfile $CONDA_PREFIX/share/roq-gate-futures/flags/test/flags-btc.cfg
 
    .. include:: flags/test/flags-btc.cfg
      :code: shell
@@ -216,7 +216,7 @@ Configuration
 
 .. code-block:: shell
 
-   $ $CONDA_PREFIX/share/roq-gate-futures/config.toml
+   $ --flagfile $CONDA_PREFIX/share/roq-gate-futures/config.toml
 
 .. important::
 
