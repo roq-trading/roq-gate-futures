@@ -2,9 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/buffer_stack.hpp"
-
-#include "roq/gate_futures/json/order_book_update.hpp"
+#include "parser_tester.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +12,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
+using value_type = json::OrderBookUpdate;
+
+TEST_CASE("simple_1", "[json_order_book_update]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1643180626,)"
@@ -50,27 +50,28 @@ TEST_CASE("json_order_book_update_simple_1", "[json_order_book_update]") {
                  R"(])"
                  R"(})"
                  R"(})"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::OrderBookUpdate order_book_update{message, buffer};
-  CHECK(order_book_update.time == 1643180626s);
-  CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
-  CHECK(order_book_update.event == json::Event::UPDATE);
-  auto &result = order_book_update.result;
-  CHECK(result.timestamp == 1643180626827ms);
-  CHECK(result.symbol == "BTC_USDT"sv);
-  CHECK(result.first_update_id == 11140379005);
-  CHECK(result.last_update_id == 11140379319);
-  REQUIRE(std::size(result.bids) == 9);
-  auto &bid_0 = result.bids[0];
-  CHECK(bid_0.price == 37203.3_a);
-  CHECK(bid_0.size == 1613.0_a);
-  REQUIRE(std::size(result.asks) == 9);
-  auto &ask_0 = result.asks[0];
-  CHECK(ask_0.price == 37210.2_a);
-  CHECK(ask_0.size == 206362.0_a);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1643180626s);
+    CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
+    CHECK(obj.event == json::Event::UPDATE);
+    auto &result = obj.result;
+    CHECK(result.timestamp == 1643180626827ms);
+    CHECK(result.symbol == "BTC_USDT"sv);
+    CHECK(result.first_update_id == 11140379005);
+    CHECK(result.last_update_id == 11140379319);
+    REQUIRE(std::size(result.bids) == 9);
+    auto &bid_0 = result.bids[0];
+    CHECK(bid_0.price == 37203.3_a);
+    CHECK(bid_0.size == 1613.0_a);
+    REQUIRE(std::size(result.asks) == 9);
+    auto &ask_0 = result.asks[0];
+    CHECK(ask_0.price == 37210.2_a);
+    CHECK(ask_0.size == 206362.0_a);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
-TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
+TEST_CASE("simple_2", "[json_order_book_update]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1643180627,)"
@@ -93,27 +94,28 @@ TEST_CASE("json_order_book_update_simple_2", "[json_order_book_update]") {
                  R"(])"
                  R"(})"
                  R"(})"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::OrderBookUpdate order_book_update{message, buffer};
-  CHECK(order_book_update.time == 1643180627s);
-  CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
-  CHECK(order_book_update.event == json::Event::UPDATE);
-  auto &result = order_book_update.result;
-  CHECK(result.timestamp == 1643180627828ms);
-  CHECK(result.symbol == "BTC_USDT"sv);
-  CHECK(result.first_update_id == 11140379320);
-  CHECK(result.last_update_id == 11140379509);
-  REQUIRE(std::size(result.bids) == 4);
-  auto &bid_0 = result.bids[0];
-  CHECK(bid_0.price == 37207.6_a);
-  CHECK(bid_0.size == 66016.0_a);
-  REQUIRE(std::size(result.asks) == 1);
-  auto &ask_0 = result.asks[0];
-  CHECK(ask_0.price == 37210.2_a);
-  CHECK(ask_0.size == 227146.0_a);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1643180627s);
+    CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
+    CHECK(obj.event == json::Event::UPDATE);
+    auto &result = obj.result;
+    CHECK(result.timestamp == 1643180627828ms);
+    CHECK(result.symbol == "BTC_USDT"sv);
+    CHECK(result.first_update_id == 11140379320);
+    CHECK(result.last_update_id == 11140379509);
+    REQUIRE(std::size(result.bids) == 4);
+    auto &bid_0 = result.bids[0];
+    CHECK(bid_0.price == 37207.6_a);
+    CHECK(bid_0.size == 66016.0_a);
+    REQUIRE(std::size(result.asks) == 1);
+    auto &ask_0 = result.asks[0];
+    CHECK(ask_0.price == 37210.2_a);
+    CHECK(ask_0.size == 227146.0_a);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
-TEST_CASE("json_order_book_update_simple_3", "[json_order_book_update]") {
+TEST_CASE("simple_3", "[json_order_book_update]") {
   auto message = R"({)"
                  R"("channel":"futures.order_book_update",)"
                  R"("event":"update",)"
@@ -133,23 +135,24 @@ TEST_CASE("json_order_book_update_simple_3", "[json_order_book_update]") {
                  R"("time":1727407188,)"
                  R"("time_ms":1727407188072)"
                  R"(})"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::OrderBookUpdate order_book_update{message, buffer};
-  CHECK(order_book_update.time == 1727407188s);
-  CHECK(order_book_update.time_ms == 1727407188072ms);
-  CHECK(order_book_update.channel == json::Channel::ORDER_BOOK_UPDATE);
-  CHECK(order_book_update.event == json::Event::UPDATE);
-  auto &result = order_book_update.result;
-  CHECK(result.timestamp == 1727407188004ms);
-  CHECK(result.symbol == "SOL_USDT"sv);
-  CHECK(result.first_update_id == 23526668009);
-  CHECK(result.last_update_id == 23526668010);
-  REQUIRE(std::size(result.bids) == 2);
-  auto &bid_0 = result.bids[0];
-  CHECK(bid_0.price == 154.39_a);
-  CHECK(bid_0.size == 1545_a);
-  auto &bid_1 = result.bids[1];
-  CHECK(bid_1.price == 154.38_a);
-  CHECK(bid_1.size == 817_a);
-  REQUIRE(std::size(result.asks) == 0);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1727407188s);
+    CHECK(obj.time_ms == 1727407188072ms);
+    CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
+    CHECK(obj.event == json::Event::UPDATE);
+    auto &result = obj.result;
+    CHECK(result.timestamp == 1727407188004ms);
+    CHECK(result.symbol == "SOL_USDT"sv);
+    CHECK(result.first_update_id == 23526668009);
+    CHECK(result.last_update_id == 23526668010);
+    REQUIRE(std::size(result.bids) == 2);
+    auto &bid_0 = result.bids[0];
+    CHECK(bid_0.price == 154.39_a);
+    CHECK(bid_0.size == 1545_a);
+    auto &bid_1 = result.bids[1];
+    CHECK(bid_1.price == 154.38_a);
+    CHECK(bid_1.size == 817_a);
+    REQUIRE(std::size(result.asks) == 0);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

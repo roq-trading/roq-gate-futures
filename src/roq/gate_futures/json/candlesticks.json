@@ -23,7 +23,7 @@
     },
     {
       "name": "result",
-      "type": "roq/gate_futures/json/CandlesticksItem",
+      "type": "roq/gate_futures/json/CandlesticksResultItem",
       "array": "std/span"
     },
     {

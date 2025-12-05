@@ -2,9 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/buffer_stack.hpp"
-
-#include "roq/gate_futures/json/book_ticker.hpp"
+#include "parser_tester.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +12,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_book_ticker_update_1", "[json_book_ticker]") {
+using value_type = json::BookTicker;
+
+TEST_CASE("simple_1", "[json_book_ticker]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"
@@ -31,12 +31,14 @@ TEST_CASE("json_book_ticker_update_1", "[json_book_ticker]") {
                  R"("A":90229)"
                  R"(})"
                  R"(})";
-  core::json::BufferStack buffer{8192, 1};
-  json::BookTicker book_ticker{message, buffer};
-  CHECK(book_ticker.time == 1641365392s);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1641365392s);
+    CHECK(obj.channel == json::Channel::BOOK_TICKER);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
-TEST_CASE("json_book_ticker_update_2", "[json_book_ticker]") {
+TEST_CASE("simple_2", "[json_book_ticker]") {
   auto message = R"({)"
                  R"("channel":"futures.book_ticker",)"
                  R"("event":"update",)"
@@ -52,10 +54,12 @@ TEST_CASE("json_book_ticker_update_2", "[json_book_ticker]") {
                  R"("time":1727407594,)"
                  R"("time_ms":1727407594837)"
                  R"(})";
-  core::json::BufferStack buffer{8192, 1};
-  json::BookTicker book_ticker{message, buffer};
-  CHECK(book_ticker.time == 1727407594s);
-  CHECK(book_ticker.time_ms == 1727407594837ms);
-  auto &result = book_ticker.result;
-  CHECK(result.timestamp == 1727407594819ms);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.channel == json::Channel::BOOK_TICKER);
+    CHECK(obj.time == 1727407594s);
+    CHECK(obj.time_ms == 1727407594837ms);
+    auto &result = obj.result;
+    CHECK(result.timestamp == 1727407594819ms);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/order_book.hpp"
+#include "roq/gate_futures/json/order_book_ack.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +14,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_order_book_simple_1", "[json_order_book]") {
+using value_type = json::OrderBookAck;
+
+TEST_CASE("simple_1", "[json_order_book_ack]") {
   auto message = R"({)"
                  R"("current":1643191515.447,)"
                  R"("asks":[)"
@@ -44,22 +46,25 @@ TEST_CASE("json_order_book_simple_1", "[json_order_book]") {
                  R"("id":11144476177,)"
                  R"("update":1643191515.446)"
                  R"(})"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::OrderBook order_book{message, buffer};
-  CHECK(order_book.current == 1643191515447ms);
-  REQUIRE(std::size(order_book.asks) == 10);
-  auto &ask_0 = order_book.asks[0];
-  CHECK(ask_0.size == 117293.0_a);
-  CHECK(ask_0.price == 37705.6_a);
-  REQUIRE(std::size(order_book.bids) == 10);
-  auto &bid_0 = order_book.bids[0];
-  CHECK(bid_0.size == 72890.0_a);
-  CHECK(bid_0.price == 37705.5_a);
-  CHECK(order_book.id == 11144476177);
-  CHECK(order_book.update == 1643191515446ms);
+  auto helper = [&](value_type &obj) {
+    CHECK(obj.current == 1643191515447ms);
+    REQUIRE(std::size(obj.asks) == 10);
+    auto &ask_0 = obj.asks[0];
+    CHECK(ask_0.size == 117293.0_a);
+    CHECK(ask_0.price == 37705.6_a);
+    REQUIRE(std::size(obj.bids) == 10);
+    auto &bid_0 = obj.bids[0];
+    CHECK(bid_0.size == 72890.0_a);
+    CHECK(bid_0.price == 37705.5_a);
+    CHECK(obj.id == 11144476177);
+    CHECK(obj.update == 1643191515446ms);
+  };
+  core::json::BufferStack buffers{8192, 1};
+  value_type obj{message, buffers};
+  helper(obj);
 }
 
-TEST_CASE("json_order_book_simple_2", "[json_order_book]") {
+TEST_CASE("simple_2", "[json_order_book_ack]") {
   auto message = R"({)"
                  R"("id":67732406375,)"
                  R"("current":1727407595.364,)"
@@ -109,11 +114,14 @@ TEST_CASE("json_order_book_simple_2", "[json_order_book]") {
                  R"({"s":1,"p":"64948.5"})"
                  R"(])"
                  R"(})"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::OrderBook order_book{message, buffer};
-  CHECK(order_book.id == 67732406375);
-  CHECK(order_book.current == 1727407595364ms);
-  CHECK(order_book.update == 1727407595290ms);
-  REQUIRE(std::size(order_book.asks) == 20);
-  REQUIRE(std::size(order_book.bids) == 20);
+  auto helper = [&](value_type &obj) {
+    CHECK(obj.id == 67732406375);
+    CHECK(obj.current == 1727407595364ms);
+    CHECK(obj.update == 1727407595290ms);
+    REQUIRE(std::size(obj.asks) == 20);
+    REQUIRE(std::size(obj.bids) == 20);
+  };
+  core::json::BufferStack buffers{8192, 1};
+  value_type obj{message, buffers};
+  helper(obj);
 }

@@ -25,10 +25,10 @@
 #include "roq/gate_futures/rest_state.hpp"
 #include "roq/gate_futures/shared.hpp"
 
-#include "roq/gate_futures/json/candlesticks_response.hpp"
-#include "roq/gate_futures/json/contracts.hpp"
-#include "roq/gate_futures/json/currencies.hpp"
-#include "roq/gate_futures/json/order_book.hpp"
+#include "roq/gate_futures/json/candlesticks_ack.hpp"
+#include "roq/gate_futures/json/contracts_ack.hpp"
+#include "roq/gate_futures/json/currencies_ack.hpp"
+#include "roq/gate_futures/json/order_book_ack.hpp"
 
 namespace roq {
 namespace gate_futures {
@@ -61,6 +61,7 @@ struct Rest final : public web::rest::Client::Handler {
   void operator()(metrics::Writer &) const;
 
  protected:
+  // web::rest::Client::Handler
   void operator()(Trace<web::rest::Client::Connected> const &) override;
   void operator()(Trace<web::rest::Client::Disconnected> const &) override;
   void operator()(Trace<web::rest::Client::Latency> const &) override;
@@ -69,21 +70,31 @@ struct Rest final : public web::rest::Client::Handler {
 
   uint32_t download(RestState);
 
+  // currencies
+
   void get_currencies();
   void get_currencies_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::Currencies> const &);
+  void operator()(Trace<json::CurrenciesAck> const &);
+
+  // contracts
 
   void get_contracts();
   void get_contracts_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::Contracts> const &);
+  void operator()(Trace<json::ContractsAck> const &);
+
+  // order-book
 
   void get_order_book(std::string_view const &symbol);
   void get_order_book_ack(Trace<web::rest::Response> const &, std::string_view const &symbol);
-  void operator()(Trace<json::OrderBook> const &, std::string_view const &symbol);
+  void operator()(Trace<json::OrderBookAck> const &, std::string_view const &symbol);
+
+  // candlesticks
 
   void get_candlesticks(std::string_view const &symbol);
   void get_candlesticks_ack(Trace<web::rest::Response> const &, std::string_view const &symbol);
-  void operator()(Trace<json::CandlesticksResponse> const &, std::string_view const &symbol);
+  void operator()(Trace<json::CandlesticksAck> const &, std::string_view const &symbol);
+
+  // helpers
 
   void check_request_queue(std::chrono::nanoseconds now);
 

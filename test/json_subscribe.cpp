@@ -2,9 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/buffer_stack.hpp"
-
-#include "roq/gate_futures/json/subscribe.hpp"
+#include "parser_tester.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +12,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_subscribe_success", "[json_subscribe]") {
+using value_type = json::Subscribe;
+
+TEST_CASE("success", "[json_subscribe]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365392,)"
@@ -25,7 +25,9 @@ TEST_CASE("json_subscribe_success", "[json_subscribe]") {
                  R"("status":"success")"
                  R"(})"
                  R"(})";
-  core::json::BufferStack buffer{8192, 1};
-  json::Subscribe subscribe{message, buffer};
-  CHECK(subscribe.time == 1641365392s);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1641365392s);
+    CHECK(obj.channel == json::Channel::TICKERS);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

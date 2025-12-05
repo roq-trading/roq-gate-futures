@@ -240,8 +240,8 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        json::Currencies currencies{body, decode_buffer_};
-        Trace event_2{event, currencies};
+        json::CurrenciesAck currencies_ack{body, decode_buffer_};
+        Trace event_2{event, currencies_ack};
         (*this)(event_2);
         download_.check(STATE);
       }
@@ -250,9 +250,9 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
   });
 }
 
-void Rest::operator()(Trace<json::Currencies> const &event) {
-  auto &[trace_info, currencies] = event;
-  log::info<4>("currencies={}"sv, currencies);
+void Rest::operator()(Trace<json::CurrenciesAck> const &event) {
+  auto &[trace_info, currencies_ack] = event;
+  log::info<4>("currencies_ack={}"sv, currencies_ack);
 }
 
 // contracts
@@ -289,8 +289,8 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        json::Contracts contracts{body, decode_buffer_};
-        Trace event_2{event, contracts};
+        json::ContractsAck contracts_ack{body, decode_buffer_};
+        Trace event_2{event, contracts_ack};
         (*this)(event_2);
         download_.check(STATE);
       }
@@ -299,13 +299,13 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
   });
 }
 
-void Rest::operator()(Trace<json::Contracts> const &event) {
-  auto &[trace_info, contracts] = event;
-  log::info<4>("contracts={}"sv, contracts);
+void Rest::operator()(Trace<json::ContractsAck> const &event) {
+  auto &[trace_info, contracts_ack] = event;
+  log::info<4>("contracts_ack={}"sv, contracts_ack);
   std::vector<Symbol> symbols;
-  symbols.reserve(std::size(contracts.data));
+  symbols.reserve(std::size(contracts_ack.data));
   size_t counter = 0;
-  for (auto &item : contracts.data) {
+  for (auto &item : contracts_ack.data) {
     log::info<2>("item={}"sv, item);
     auto symbol = item.name;
     auto discard = shared_.discard_symbol(symbol);
@@ -383,11 +383,11 @@ void Rest::operator()(Trace<json::Contracts> const &event) {
     handler_(contracts_update);
   }
   if (counter > 0) [[unlikely]] {
-    log::info("Symbols {} / {}"sv, counter, std::size(contracts.data));
+    log::info("Symbols {} / {}"sv, counter, std::size(contracts_ack.data));
   }
 }
 
-// order book
+// order-book
 
 void Rest::get_order_book(std::string_view const &symbol) {
   profile_.order_book([&]() {
@@ -418,18 +418,18 @@ void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::stri
       // XXX WHAT ???
     };
     auto handle_success = [&](auto &body) {
-      json::OrderBook order_book{body, decode_buffer_};
-      Trace event_2{event, order_book};
+      json::OrderBookAck order_book_ack{body, decode_buffer_};
+      Trace event_2{event, order_book_ack};
       (*this)(event_2, symbol);
     };
     process_response(event, handle_error, handle_success);
   });
 }
 
-void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view const &symbol) {
-  auto &[trace_info, order_book] = event;
-  log::info<3>("order_book={}"sv, order_book);
-  auto sequence = order_book.id;
+void Rest::operator()(Trace<json::OrderBookAck> const &event, std::string_view const &symbol) {
+  auto &[trace_info, order_book_ack] = event;
+  log::info<3>("order_book_ack={}"sv, order_book_ack);
+  auto sequence = order_book_ack.id;
   auto &sequencer = shared_.mbp_sequencer[symbol];
   auto &mbp = shared_.get_mbp();
   auto emplace_back = [](auto &result, auto &item) {
@@ -443,10 +443,10 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
     };
     result.emplace_back(std::move(mbp_update));
   };
-  for (auto &item : order_book.bids) {
+  for (auto &item : order_book_ack.bids) {
     emplace_back(mbp.bids, item);
   }
-  for (auto &item : order_book.asks) {
+  for (auto &item : order_book_ack.asks) {
     emplace_back(mbp.asks, item);
   }
   try {
@@ -464,9 +464,9 @@ void Rest::operator()(Trace<json::OrderBook> const &event, std::string_view cons
           .bids = bids,
           .asks = asks,
           .update_type = UpdateType::SNAPSHOT,
-          .exchange_time_utc = order_book.update,
+          .exchange_time_utc = order_book_ack.update,
           .exchange_sequence = sequencer.last_sequence(),
-          .sending_time_utc = order_book.current,
+          .sending_time_utc = order_book_ack.current,
           .price_precision = {},
           .quantity_precision = {},
           .checksum = {},
@@ -523,20 +523,20 @@ void Rest::get_candlesticks_ack(Trace<web::rest::Response> const &event, std::st
       // XXX WHAT ???
     };
     auto handle_success = [&](auto &body) {
-      json::CandlesticksResponse candlesticks{body, decode_buffer_};
-      Trace event_2{event, candlesticks};
+      json::CandlesticksAck candlesticks_ack{body, decode_buffer_};
+      Trace event_2{event, candlesticks_ack};
       (*this)(event_2, symbol);
     };
     process_response(event, handle_error, handle_success);
   });
 }
 
-void Rest::operator()(Trace<json::CandlesticksResponse> const &event, std::string_view const &symbol) {
-  auto &[trace_info, candlesticks] = event;
-  log::info<3>("candlesticks={}"sv, candlesticks);
+void Rest::operator()(Trace<json::CandlesticksAck> const &event, std::string_view const &symbol) {
+  auto &[trace_info, candlesticks_ack] = event;
+  log::info<3>("candlesticks_ack={}"sv, candlesticks_ack);
   auto &bars = shared_.bars;
   bars.clear();
-  for (auto &item : candlesticks.data) {
+  for (auto &item : candlesticks_ack.data) {
     auto bar = Bar{
         .begin_time_utc = item.time,
         .confirmed = true,

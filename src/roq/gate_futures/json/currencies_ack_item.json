@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/json/CurrenciesItem",
+  "name": "roq/gate_futures/json/CurrenciesAckItem",
   "type": "dictionary",
   "values": [
     {

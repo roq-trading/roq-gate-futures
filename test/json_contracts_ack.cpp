@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/contracts.hpp"
+#include "roq/gate_futures/json/contracts_ack.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,8 +14,10 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
+using value_type = json::ContractsAck;
+
 // note! reduced
-TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
+TEST_CASE("btc", "[json_contracts_ack]") {
   auto message = R"([{)"
                  R"("funding_rate_indicative":"0.000462",)"
                  R"("mark_price_round":"0.01",)"
@@ -98,17 +100,20 @@ TEST_CASE("json_contracts_simple_btc", "[json_contracts]") {
                  R"("orderbook_id":1131459666)"
                  R"(})"
                  R"(])"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::Contracts contracts{message, buffer};
-  auto &data = contracts.data;
-  REQUIRE(std::size(data) == 2);
-  auto &data_0 = contracts.data[0];
-  CHECK(data_0.funding_next_apply == 1641312000s);
-  CHECK(data_0.config_change_time == 1611037808s);
+  auto helper = [&](value_type &obj) {
+    auto &data = obj.data;
+    REQUIRE(std::size(data) == 2);
+    auto &data_0 = obj.data[0];
+    CHECK(data_0.funding_next_apply == 1641312000s);
+    CHECK(data_0.config_change_time == 1611037808s);
+  };
+  core::json::BufferStack buffers{8192, 1};
+  value_type obj{message, buffers};
+  helper(obj);
 }
 
 // note! reduced
-TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
+TEST_CASE("usdt", "[json_contracts_ack]") {
   auto message = R"([{)"
                  R"("funding_rate_indicative":"0.0001",)"
                  R"("mark_price_round":"0.0001",)"
@@ -191,14 +196,18 @@ TEST_CASE("json_contracts_simple_usdt", "[json_contracts]") {
                  R"("orderbook_id":58911366)"
                  R"(})"
                  R"(])"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::Contracts contracts{message, buffer};
-  auto &data = contracts.data;
-  REQUIRE(std::size(data) == 2);
+  auto helper = [&](value_type &obj) {
+    REQUIRE(std::size(obj.data) == 2);
+    CHECK(obj.data[0].funding_next_apply == 1641312000s);
+    CHECK(obj.data[0].config_change_time == 1640574188s);
+  };
+  core::json::BufferStack buffers{8192, 1};
+  value_type obj{message, buffers};
+  helper(obj);
 }
 
 // note! reduced
-TEST_CASE("json_contracts_simple_3", "[json_contracts]") {
+TEST_CASE("simple", "[json_contracts_ack]") {
   auto message = R"([{)"
                  R"("funding_rate_indicative":"0.0001",)"
                  R"("mark_price_round":"0.01",)"
@@ -246,12 +255,14 @@ TEST_CASE("json_contracts_simple_3", "[json_contracts]") {
                  R"("voucher_leverage":"2")"
                  R"(})"
                  R"(])"sv;
-  core::json::BufferStack buffer{8192, 1};
-  json::Contracts contracts{message, buffer};
-  REQUIRE(std::size(contracts.data) == 1);
-  auto &data_0 = contracts.data[0];
-  CHECK(data_0.funding_next_apply == 1727424000s);
-  CHECK(data_0.config_change_time == 1721887713s);
-  CHECK(data_0.config_change_time == 1721887713s);
-  CHECK(data_0.create_time == 1604880000s);
+  auto helper = [&](value_type &obj) {
+    REQUIRE(std::size(obj.data) == 1);
+    CHECK(obj.data[0].funding_next_apply == 1727424000s);
+    CHECK(obj.data[0].config_change_time == 1721887713s);
+    CHECK(obj.data[0].config_change_time == 1721887713s);
+    CHECK(obj.data[0].create_time == 1604880000s);
+  };
+  core::json::BufferStack buffers{8192, 1};
+  value_type obj{message, buffers};
+  helper(obj);
 }

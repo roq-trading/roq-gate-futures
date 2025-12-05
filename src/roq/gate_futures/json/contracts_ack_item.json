@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/json/ContractsItem",
+  "name": "roq/gate_futures/json/ContractsAckItem",
   "type": "dictionary",
   "values": [
     {

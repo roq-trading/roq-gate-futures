@@ -8,11 +8,11 @@
     },
     {
       "name": "time",
-      "type": "std/nanoseconds"
+      "type": "std/seconds"
     },
     {
       "name": "time_ms",
-      "type": "std/nanoseconds"
+      "type": "std/milliseconds"
     },
     {
       "name": "conn_id",

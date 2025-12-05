@@ -1,0 +1,11 @@
+{
+  "name": "roq/gate_futures/json/ContractsAck",
+  "type": "array",
+  "values": [
+    {
+      "name": "data",
+      "type": "roq/gate_futures/json/ContractsAckItem",
+      "array": "std/span"
+    }
+  ]
+}

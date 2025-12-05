@@ -10,20 +10,21 @@ set(AUTOGEN_SCHEMAS
     balances_item.json
     book_ticker.json
     book_ticker_result.json
-    candlesticks_item.json
+    candlesticks_ack_item.json
+    candlesticks_ack.json
     candlesticks.json
-    candlesticks_response.json
+    candlesticks_result_item.json
     channel.json
-    contracts_item.json
-    contracts.json
+    contracts_ack_item.json
+    contracts_ack.json
     contract_type.json
-    currencies_item.json
-    currencies.json
+    currencies_ack_item.json
+    currencies_ack.json
     event.json
     finish_as.json
     mark_type.json
     message.json
-    order_book.json
+    order_book_ack.json
     order_book_update.json
     order_book_update_result.json
     orders_item.json
@@ -41,8 +42,8 @@ set(AUTOGEN_SCHEMAS
     trade_balances.json
     trade_error.json
     trade_header.json
-    trade_login_data.json
     trade_login_data_errs.json
+    trade_login_data.json
     trade_login_data_result.json
     trade_login.json
     trade_message.json

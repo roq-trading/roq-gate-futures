@@ -2,9 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/buffer_stack.hpp"
-
-#include "roq/gate_futures/json/trade_parser.hpp"
+#include "trade_parser_tester.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -13,6 +11,8 @@ using namespace std::literals;
 using namespace std::chrono_literals;
 
 using namespace Catch::literals;
+
+using value_type = json::TradeOrderCancelCP;
 
 TEST_CASE("json_order_cancel_cp_success_1", "[json_order_cancel_cp]") {
   auto message = R"({)"
@@ -46,35 +46,14 @@ TEST_CASE("json_order_cancel_cp_success_1", "[json_order_cancel_cp]") {
                  R"(},)"
                  R"("request_id":"RwICAAAAAAAAAAAAAAAA")"
                  R"(})"sv;
-  struct MyHandler final : public json::TradeParser::Handler {
-    bool found = false;
-
-   protected:
-    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
-    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancelCP> const &event) override {
-      found = true;
-      auto &order_cancel_cp = event.value;
-      CHECK(order_cancel_cp.header.response_time == 1727227666487ms);
-      auto &result_0 = order_cancel_cp.data.result[0];
-      CHECK(result_0.create_time == 1727227280916ms);
-      CHECK(result_0.finish_time == 1727227666486ms);
-      CHECK(result_0.update_time == 1727227666486ms);
-    }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
-  } handler;
-  core::json::BufferStack buffer{8192, 1};
-  TraceInfo trace_info;
-  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
-  CHECK(res == true);
-  CHECK(handler.found == true);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.header.response_time == 1727227666487ms);
+    auto &result_0 = obj.data.result[0];
+    CHECK(result_0.create_time == 1727227280916ms);
+    CHECK(result_0.finish_time == 1727227666486ms);
+    CHECK(result_0.update_time == 1727227666486ms);
+  };
+  TradeParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
 TEST_CASE("json_order_cancel_cp_success_2", "[json_order_cancel_cp]") {
@@ -128,39 +107,18 @@ TEST_CASE("json_order_cancel_cp_success_2", "[json_order_cancel_cp]") {
                  R"(},)"
                  R"("request_id":"RwICAAAAAAAAAAAAAAAA")"
                  R"(})"sv;
-  struct MyHandler final : public json::TradeParser::Handler {
-    bool found = false;
-
-   protected:
-    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
-    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancelCP> const &event) override {
-      found = true;
-      auto &order_cancel_cp = event.value;
-      CHECK(order_cancel_cp.header.response_time == 1727229849721ms);
-      auto &result_0 = order_cancel_cp.data.result[0];
-      CHECK(result_0.create_time == 1727229839129ms);
-      CHECK(result_0.finish_time == 1727229849721ms);
-      CHECK(result_0.update_time == 1727229849721ms);
-      auto &result_1 = order_cancel_cp.data.result[1];
-      CHECK(result_1.create_time == 1727229847193ms);
-      CHECK(result_1.finish_time == 1727229849721ms);
-      CHECK(result_1.update_time == 1727229849721ms);
-    }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
-  } handler;
-  core::json::BufferStack buffer{8192, 1};
-  TraceInfo trace_info;
-  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
-  CHECK(res == true);
-  CHECK(handler.found == true);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.header.response_time == 1727229849721ms);
+    auto &result_0 = obj.data.result[0];
+    CHECK(result_0.create_time == 1727229839129ms);
+    CHECK(result_0.finish_time == 1727229849721ms);
+    CHECK(result_0.update_time == 1727229849721ms);
+    auto &result_1 = obj.data.result[1];
+    CHECK(result_1.create_time == 1727229847193ms);
+    CHECK(result_1.finish_time == 1727229849721ms);
+    CHECK(result_1.update_time == 1727229849721ms);
+  };
+  TradeParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
 TEST_CASE("json_order_cancel_cp_error_1", "[json_order_cancel_cp]") {
@@ -221,29 +179,6 @@ TEST_CASE("json_order_cancel_cp_error_2", "[json_order_cancel_cp]") {
                  R"(},)"
                  R"("request_id":"RwICAAAAAAAAAAAAAAAA")"
                  R"(})"sv;
-  struct MyHandler final : public json::TradeParser::Handler {
-    bool found = false;
-
-   protected:
-    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
-    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancelCP> const &event) override {
-      found = true;
-      auto &order_cancel_cp = event.value;
-      CHECK(order_cancel_cp.header.response_time == 1727404856256ms);
-    }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
-  } handler;
-  core::json::BufferStack buffer{8192, 1};
-  TraceInfo trace_info;
-  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
-  CHECK(res == true);
-  CHECK(handler.found == true);
+  auto helper = [](value_type const &obj) { CHECK(obj.header.response_time == 1727404856256ms); };
+  TradeParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

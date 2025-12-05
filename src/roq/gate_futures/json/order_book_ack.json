@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/json/OrderBook",
+  "name": "roq/gate_futures/json/OrderBookAck",
   "type": "dictionary",
   "values": [
     {

@@ -2,9 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/buffer_stack.hpp"
-
-#include "roq/gate_futures/json/trades.hpp"
+#include "parser_tester.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +12,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_trades_update_1", "[json_trades]") {
+using value_type = json::Trades;
+
+TEST_CASE("simple_1", "[json_trades]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641366055,)"
@@ -31,16 +31,17 @@ TEST_CASE("json_trades_update_1", "[json_trades]") {
                  R"(})"
                  R"(])"
                  R"(})";
-  core::json::BufferStack buffer{8192, 1};
-  json::Trades trades{message, buffer};
-  CHECK(trades.time == 1641366055s);
-  REQUIRE(std::size(trades.result) == 1);
-  auto &result_0 = trades.result[0];
-  CHECK(result_0.create_time == 1641366055s);
-  CHECK(result_0.create_time_ms == 1641366055959ms);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1641366055s);
+    REQUIRE(std::size(obj.result) == 1);
+    auto &result_0 = obj.result[0];
+    CHECK(result_0.create_time == 1641366055s);
+    CHECK(result_0.create_time_ms == 1641366055959ms);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
-TEST_CASE("json_trades_update_2", "[json_trades]") {
+TEST_CASE("simple_2", "[json_trades]") {
   auto message = R"({)"
                  R"("channel":"futures.trades",)"
                  R"("event":"update",)"
@@ -56,12 +57,13 @@ TEST_CASE("json_trades_update_2", "[json_trades]") {
                  R"("time":1727407595,)"
                  R"("time_ms":1727407595193)"
                  R"(})";
-  core::json::BufferStack buffer{8192, 1};
-  json::Trades trades{message, buffer};
-  REQUIRE(std::size(trades.result) == 1);
-  auto &result_0 = trades.result[0];
-  CHECK(result_0.create_time == 1727407595s);
-  CHECK(result_0.create_time_ms == 1727407595183ms);
-  CHECK(trades.time == 1727407595s);
-  CHECK(trades.time_ms == 1727407595193ms);
+  auto helper = [](value_type const &obj) {
+    REQUIRE(std::size(obj.result) == 1);
+    auto &result_0 = obj.result[0];
+    CHECK(result_0.create_time == 1727407595s);
+    CHECK(result_0.create_time_ms == 1727407595183ms);
+    CHECK(obj.time == 1727407595s);
+    CHECK(obj.time_ms == 1727407595193ms);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

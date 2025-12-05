@@ -2,9 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/core/json/buffer_stack.hpp"
-
-#include "roq/gate_futures/json/tickers.hpp"
+#include "parser_tester.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +12,9 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-TEST_CASE("json_tickers_update_1", "[json_tickers]") {
+using value_type = json::Tickers;
+
+TEST_CASE("simple_1", "[json_tickers]") {
   auto message = R"({)"
                  R"("id":null,)"
                  R"("time":1641365849,)"
@@ -40,12 +40,14 @@ TEST_CASE("json_tickers_update_1", "[json_tickers]") {
                  R"(})"
                  R"(])"
                  R"(})";
-  core::json::BufferStack buffer{8192, 1};
-  json::Tickers tickers{message, buffer};
-  CHECK(tickers.time == 1641365849s);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1641365849s);
+    CHECK(obj.channel == json::Channel::TICKERS);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
 
-TEST_CASE("json_tickers_update_2", "[json_tickers]") {
+TEST_CASE("simple_2", "[json_tickers]") {
   auto message = R"({)"
                  R"("time":1727407596,)"
                  R"("time_ms":1727407596030,)"
@@ -74,6 +76,10 @@ TEST_CASE("json_tickers_update_2", "[json_tickers]") {
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
   json::Tickers tickers{message, buffer};
-  CHECK(tickers.time == 1727407596s);
-  CHECK(tickers.time_ms == 1727407596030ms);
+  auto helper = [](value_type const &obj) {
+    CHECK(obj.time == 1727407596s);
+    CHECK(obj.time_ms == 1727407596030ms);
+    CHECK(obj.channel == json::Channel::TICKERS);
+  };
+  ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

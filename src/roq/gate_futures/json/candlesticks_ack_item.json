@@ -1,5 +1,5 @@
 {
-  "name": "roq/gate_futures/json/CandlesticksItem",
+  "name": "roq/gate_futures/json/CandlesticksAckItem",
   "type": "dictionary",
   "values": [
     {
