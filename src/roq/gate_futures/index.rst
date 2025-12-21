@@ -216,7 +216,7 @@ Configuration
 
 .. code-block:: shell
 
-   $ --flagfile $CONDA_PREFIX/share/roq-gate-futures/config.toml
+   $ --config_file $CONDA_PREFIX/share/roq-gate-futures/config.toml
 
 .. important::
 
