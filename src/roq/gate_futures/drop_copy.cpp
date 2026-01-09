@@ -554,6 +554,7 @@ void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
           .text = {},
           .version = {},
           .request_id = order_place.request_id,
+          .external_order_id = {},
           .quantity = NaN,
           .price = NaN,
       };
@@ -572,6 +573,7 @@ void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
         .text = order_place.data.errs.message,
         .version = 1,
         .request_id = order_place.request_id,
+        .external_order_id = {},
         .quantity = NaN,
         .price = NaN,
     };
@@ -592,6 +594,7 @@ void DropCopy::operator()(Trace<json::TradeOrderAmend> const &event) {
         .text = {},
         .version = {},
         .request_id = order_amend.request_id,
+        .external_order_id = {},
         .quantity = NaN,
         .price = NaN,
     };
@@ -609,6 +612,7 @@ void DropCopy::operator()(Trace<json::TradeOrderAmend> const &event) {
         .text = order_amend.data.errs.message,
         .version = {},
         .request_id = order_amend.request_id,
+        .external_order_id = {},
         .quantity = NaN,
         .price = NaN,
     };
@@ -629,6 +633,7 @@ void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
         .text = {},
         .version = {},
         .request_id = order_cancel.request_id,
+        .external_order_id = {},
         .quantity = NaN,
         .price = NaN,
     };
@@ -646,6 +651,7 @@ void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
         .text = order_cancel.data.errs.message,
         .version = {},
         .request_id = order_cancel.request_id,
+        .external_order_id = {},
         .quantity = NaN,
         .price = NaN,
     };
