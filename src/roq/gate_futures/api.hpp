@@ -22,6 +22,13 @@ struct API final {
 
   // factory
   static API create(Settings const &);
+
+  enum class Key {
+    BTC,
+    USDT,
+  };
+
+  static Key parse_api(Settings const &);
 };
 
 }  // namespace gate_futures
