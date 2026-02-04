@@ -339,6 +339,7 @@ void Rest::operator()(Trace<json::ContractsAck> const &event) {
         .symbol = symbol,
         .description = symbol,
         .security_type = SecurityType::SWAP,  // XXX always ???
+        .external_security_id = {},
         .cfi_code = {},
         .base_currency = base_currency,
         .quote_currency = quote_currency,
