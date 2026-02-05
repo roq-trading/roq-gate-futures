@@ -783,6 +783,8 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .external_order_id = external_order_id,
       .client_order_id = client_order_id,
       .order_status = order_status,
+      .error = {},
+      .text = {},
       .quantity = quantity,
       .price = value.price,
       .stop_price = NaN,
