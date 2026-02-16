@@ -143,7 +143,8 @@ void DropCopy::operator()(metrics::Writer &writer) const {
       .write(latency_.heartbeat, metrics::Type::LATENCY);
 }
 
-uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id) {
+uint16_t DropCopy::operator()(
+    Event<CreateOrder> const &event, server::oms::Order const &order, server::oms::RefData const &, std::string_view const &request_id) {
   auto message = json::Encoder::order_place(encode_buffer_, event, order, request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
@@ -151,7 +152,11 @@ uint16_t DropCopy::operator()(Event<CreateOrder> const &event, server::oms::Orde
 }
 
 uint16_t DropCopy::operator()(
-    Event<ModifyOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
+    Event<ModifyOrder> const &event,
+    server::oms::Order const &order,
+    server::oms::RefData const &,
+    std::string_view const &request_id,
+    std::string_view const &previous_request_id) {
   auto message = json::Encoder::order_amend(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
@@ -159,7 +164,11 @@ uint16_t DropCopy::operator()(
 }
 
 uint16_t DropCopy::operator()(
-    Event<CancelOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, std::string_view const &previous_request_id) {
+    Event<CancelOrder> const &event,
+    server::oms::Order const &order,
+    server::oms::RefData const &,
+    std::string_view const &request_id,
+    std::string_view const &previous_request_id) {
   auto message = json::Encoder::order_cancel(encode_buffer_, event, order, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
