@@ -91,6 +91,11 @@
     {
       "name": "change_price",
       "type": "std/double"
+    },
+    {
+      "raw": "t",
+      "name": "timestamp",
+      "type": "std/milliseconds"
     }
   ]
 }

@@ -17,7 +17,12 @@ namespace gate_futures {
 namespace json {
 
 std::string_view Encoder::order_place(
-    std::string &buffer, roq::Event<CreateOrder> const &event, server::oms::Order const &order, std::string_view const &request_id, uint32_t request_id_2) {
+    std::string &buffer,
+    roq::Event<CreateOrder> const &event,
+    server::oms::Order const &order,
+    server::oms::RefData const &ref_data,
+    std::string_view const &request_id,
+    uint32_t request_id_2) {
   buffer.clear();
   auto &[message_info, create_order] = event;
   assert(message_info.receive_time_utc.count() > 0);
@@ -103,8 +108,8 @@ std::string_view Encoder::order_place(
       event_2,
       request_id,
       order.symbol,
-      Decimal{quantity, order.quantity_precision.precision},
-      Decimal{price, order.price_precision.precision},
+      Decimal{quantity, ref_data.quantity.precision},
+      Decimal{price, ref_data.price.precision},
       reduce_only,
       tif,
       request_id);
@@ -115,6 +120,7 @@ std::string_view Encoder::order_amend(
     std::string &buffer,
     roq::Event<ModifyOrder> const &event,
     server::oms::Order const &order,
+    server::oms::RefData const &ref_data,
     std::string_view const &request_id,
     [[maybe_unused]] std::string_view const &previous_request_id,
     uint32_t request_id_2) {
@@ -143,10 +149,10 @@ std::string_view Encoder::order_amend(
   if (!std::isnan(modify_order.quantity)) {
     auto sign = utils::sign(order.side);
     auto quantity = sign * modify_order.quantity;
-    fmt::format_to(std::back_inserter(buffer), R"("size":{},)", Decimal{quantity, order.quantity_precision.precision});
+    fmt::format_to(std::back_inserter(buffer), R"("size":{},)", Decimal{quantity, ref_data.quantity.precision});
   }
   if (!std::isnan(modify_order.price)) {
-    fmt::format_to(std::back_inserter(buffer), R"("price":"{}",)"sv, Decimal{modify_order.price, order.price_precision.precision});
+    fmt::format_to(std::back_inserter(buffer), R"("price":"{}",)"sv, Decimal{modify_order.price, ref_data.price.precision});
   }
   fmt::format_to(
       std::back_inserter(buffer),
@@ -162,6 +168,7 @@ std::string_view Encoder::order_cancel(
     std::string &buffer,
     roq::Event<CancelOrder> const &event,
     server::oms::Order const &order,
+    server::oms::RefData const &,
     std::string_view const &request_id,
     [[maybe_unused]] std::string_view const &previous_request_id,
     uint32_t request_id_2) {

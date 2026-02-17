@@ -40,6 +40,14 @@
     },
     {
       "name": "chains"
+    },
+    {
+      "name": "total_supply",
+      "type": "std/double"
+    },
+    {
+      "name": "market_cap",
+      "type": "std/double"
     }
   ]
 }

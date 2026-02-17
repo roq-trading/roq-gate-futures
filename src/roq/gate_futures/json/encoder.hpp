@@ -11,6 +11,7 @@
 #include "roq/modify_order.hpp"
 
 #include "roq/server/oms/order.hpp"
+#include "roq/server/oms/ref_data.hpp"
 
 namespace roq {
 namespace gate_futures {
@@ -18,12 +19,18 @@ namespace json {
 
 struct Encoder final {
   static std::string_view order_place(
-      std::string &buffer, roq::Event<CreateOrder> const &, server::oms::Order const &, std::string_view const &request_id, uint32_t request_id_2);
+      std::string &buffer,
+      roq::Event<CreateOrder> const &,
+      server::oms::Order const &,
+      server::oms::RefData const &,
+      std::string_view const &request_id,
+      uint32_t request_id_2);
 
   static std::string_view order_amend(
       std::string &buffer,
       roq::Event<ModifyOrder> const &,
       server::oms::Order const &,
+      server::oms::RefData const &,
       std::string_view const &request_id,
       std::string_view const &previous_request_id,
       uint32_t request_id_2);
@@ -32,6 +39,7 @@ struct Encoder final {
       std::string &buffer,
       roq::Event<CancelOrder> const &,
       server::oms::Order const &,
+      server::oms::RefData const &,
       std::string_view const &request_id,
       std::string_view const &previous_request_id,
       uint32_t request_id_2);
