@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 ## Head
 
+### Fixed
+
+* Failed to parse currencies due to the use of "∞" #564
+
 ## 1.1.2 &ndash; 2026-02-08
 
 ### Fixed

@@ -43,7 +43,8 @@
     },
     {
       "name": "total_supply",
-      "type": "std/double"
+      "type": "std/string_view",
+      "comment": "Have seen the infinity unicode symbol..."
     },
     {
       "name": "market_cap",

@@ -42,3 +42,35 @@ TEST_CASE("simple", "[json_currencies_ack]") {
   value_type obj{message, buffers};
   helper(obj);
 }
+
+TEST_CASE("issue_total_supply", "[json_currencies_ack]") {
+  auto message = R"([{)"
+                 R"("currency":"NEAR",)"
+                 R"("name":"Near",)"
+                 R"("delisted":false,)"
+                 R"("withdraw_disabled":false,)"
+                 R"("withdraw_delayed":false,)"
+                 R"("deposit_disabled":false,)"
+                 R"("trade_disabled":false,)"
+                 R"("fixed_rate":"",)"
+                 R"("chain":"NEAR",)"
+                 R"("chains":[{)"
+                 R"("name":"NEAR",)"
+                 R"("addr":"",)"
+                 R"("withdraw_disabled":false,)"
+                 R"("withdraw_delayed":false,)"
+                 R"("deposit_disabled":false)"
+                 R"(})"
+                 R"(],)"
+                 R"("total_supply":"∞",)"
+                 R"("market_cap":"1303564125.2541")"
+                 R"(})"
+                 R"(])";
+  auto helper = [&](value_type &obj) {
+    REQUIRE(std::size(obj.data) == 1);
+    REQUIRE(obj.data[0].currency == "NEAR"sv);
+  };
+  core::json::BufferStack buffers{8192, 1};
+  value_type obj{message, buffers};
+  helper(obj);
+}
