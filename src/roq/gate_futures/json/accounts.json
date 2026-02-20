@@ -117,6 +117,14 @@
     {
       "name": "position_voucher_total",
       "type": "std/double"
+    },
+    {
+      "name": "enable_dual_plus",
+      "type": "std/bool"
+    },
+    {
+      "name": "position_mode",
+      "type": "std/string_view"
     }
   ]
 }

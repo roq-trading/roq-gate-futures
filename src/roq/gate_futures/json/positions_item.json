@@ -160,6 +160,22 @@
     {
       "name": "voucher_id",
       "type": "std/double"
+    },
+    {
+      "name": "trade_long_size",
+      "type": "std/double"
+    },
+    {
+      "name": "trade_short_size",
+      "type": "std/double"
+    },
+    {
+      "name": "pos_margin_mode",
+      "type": "std/string_view"
+    },
+    {
+      "name": "lever",
+      "type": "std/double"
     }
   ]
 }
