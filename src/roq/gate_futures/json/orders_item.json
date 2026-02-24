@@ -157,6 +157,22 @@
     {
       "name": "bbo",
       "type": "std/string_view"
+    },
+    {
+      "name": "is_voucher",
+      "type": "std/bool"
+    },
+    {
+      "name": "market_order_slip_ratio",
+      "type": "std/double"
+    },
+    {
+      "name": "pos_margin_mode",
+      "type": "std/string_view"
+    },
+    {
+      "name": "leverage",
+      "type": "std/double"
     }
   ]
 }

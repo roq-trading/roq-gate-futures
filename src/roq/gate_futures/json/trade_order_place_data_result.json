@@ -107,6 +107,22 @@
     {
       "name": "is_reduce_only",
       "type": "std/bool"
+    },
+    {
+      "name": "tkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "mkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "bbo",
+      "type": "std/string_view"
+    },
+    {
+      "name": "market_order_slip_ratio",
+      "type": "std/double"
     }
   ]
 }
