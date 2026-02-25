@@ -91,7 +91,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   void operator()(Trace<json::TradeOrderList> const &) override;
 
  private:
-  void operator()(ConnectionStatus);
+  void operator()(ConnectionStatus, std::string_view const &reason = {});
 
   uint32_t download(DropCopyState);
 
@@ -141,7 +141,7 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   // state
   uint32_t request_id_ = {};
   bool ready_ = false;
-  ConnectionStatus status_ = {};
+  ConnectionStatus connection_status_ = {};
   core::Download<DropCopyState> download_;
   std::chrono::nanoseconds logon_timeout_ = {};
   std::chrono::nanoseconds next_ping_ = {};
