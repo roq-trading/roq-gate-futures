@@ -440,6 +440,7 @@ void DropCopy::operator()(Trace<json::TradeBalances> const &event) {
         .balance = item.balance,
         .hold = NaN,
         .borrowed = NaN,
+        .unrealized_pnl = NaN,
         .external_account = {},
         .update_type = UpdateType::INCREMENTAL,
         .exchange_time_utc = item.time_ms,
