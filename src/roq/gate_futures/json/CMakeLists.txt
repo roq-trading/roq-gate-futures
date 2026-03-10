@@ -21,6 +21,7 @@ set(AUTOGEN_SCHEMAS
     currencies_ack_item.json
     currencies_ack.json
     event.json
+    event_type.json
     finish_as.json
     mark_type.json
     message.json

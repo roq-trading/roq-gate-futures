@@ -16,6 +16,7 @@ contract_type.hpp
 currencies_ack_item.hpp
 currencies_ack.hpp
 event.hpp
+event_type.hpp
 finish_as.hpp
 mark_type.hpp
 message.hpp
@@ -85,6 +86,7 @@ contract_type.cpp
 currencies_ack_item.cpp
 currencies_ack.cpp
 event.cpp
+event_type.cpp
 finish_as.cpp
 mark_type.cpp
 message.cpp

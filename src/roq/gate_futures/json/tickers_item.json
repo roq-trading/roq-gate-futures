@@ -96,6 +96,10 @@
       "raw": "t",
       "name": "timestamp",
       "type": "std/milliseconds"
+    },
+    {
+      "name": "event_type",
+      "type": "roq/gate_futures/json/EventType"
     }
   ]
 }
