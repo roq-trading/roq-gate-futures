@@ -125,6 +125,18 @@
     {
       "name": "position_mode",
       "type": "std/string_view"
+    },
+    {
+      "name": "cross_margin_balance",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_mmr",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_imr",
+      "type": "std/double"
     }
   ]
 }

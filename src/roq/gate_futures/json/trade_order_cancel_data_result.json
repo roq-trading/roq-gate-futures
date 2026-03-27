@@ -73,6 +73,18 @@
     {
       "name": "request_id",
       "type": "std/string_view"
+    },
+    {
+      "name": "tkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "mkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "bbo",
+      "type": "std/string_view"
     }
   ]
 }

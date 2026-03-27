@@ -333,6 +333,12 @@ void Rest::operator()(Trace<json::ContractsAck> const &event) {
       }
       return {};
     }();
+    auto min_trade_vol = [&]() {
+      if (utils::is_zero(item.order_size_min)) {
+        return 1.0;
+      }
+      return item.order_size_min;
+    }();
     auto reference_data = ReferenceData{
         .stream_id = stream_id_,
         .exchange = shared_.settings.exchange,
@@ -350,7 +356,7 @@ void Rest::operator()(Trace<json::ContractsAck> const &event) {
         .tick_size_steps = {},
         .multiplier = NaN,
         .min_notional = NaN,
-        .min_trade_vol = item.order_size_min,
+        .min_trade_vol = min_trade_vol,
         .max_trade_vol = item.order_size_max,
         .trade_vol_step_size = NaN,
         .option_type = {},

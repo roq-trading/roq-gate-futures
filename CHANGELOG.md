@@ -4,6 +4,10 @@ All notable changes will be documented in this file.
 
 ## Head
 
+### Fixed
+
+* Invalid reference data crashed the gateway (#576)
+
 ## 1.1.3 &ndash; 2026-03-12
 
 ### Fixed

@@ -49,6 +49,9 @@
     {
       "name": "market_cap",
       "type": "std/double"
+    },
+    {
+      "name": "category"
     }
   ]
 }

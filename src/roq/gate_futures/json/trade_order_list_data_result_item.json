@@ -69,6 +69,26 @@
     {
       "name": "finish_as",
       "type": "roq/gate_futures/json/FinishAs"
+    },
+    {
+      "name": "tkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "mkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "bbo",
+      "type": "std/string_view"
+    },
+    {
+      "name": "market_order_slip_ratio",
+      "type": "std/double"
+    },
+    {
+      "name": "pos_margin_mode",
+      "type": "std/string_view"
     }
   ]
 }
