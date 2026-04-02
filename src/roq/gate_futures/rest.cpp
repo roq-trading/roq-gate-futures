@@ -330,6 +330,8 @@ void Rest::operator()(Trace<json::ContractsAck> const &event) {
           return quote_currency;
         case INVERSE:
           return base_currency;
+        case STOCKS:
+          break;
       }
       return {};
     }();
