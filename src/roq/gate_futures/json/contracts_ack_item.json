@@ -218,6 +218,10 @@
     {
       "name": "market_order_size_max",
       "type": "std/double"
+    },
+    {
+      "name": "contract_type",
+      "type": "std/string_view"
     }
   ]
 }
