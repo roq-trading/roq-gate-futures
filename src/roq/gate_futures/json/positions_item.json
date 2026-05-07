@@ -176,6 +176,14 @@
     {
       "name": "lever",
       "type": "std/double"
+    },
+    {
+      "name": "id",
+      "type": "std/int32"
+    },
+    {
+      "name": "liq_lock",
+      "type": "std/bool"
     }
   ]
 }
