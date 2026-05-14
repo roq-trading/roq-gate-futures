@@ -25,7 +25,6 @@
 #include "roq/gate_futures/json/user_trades.hpp"
 
 #include "roq/gate_futures/account.hpp"
-#include "roq/gate_futures/order_entry_state.hpp"
 #include "roq/gate_futures/shared.hpp"
 
 namespace roq {
@@ -59,7 +58,15 @@ struct OrderEntry final : public web::rest::Client::Handler {
 
   void operator()(ConnectionStatus, std::string_view const &reason = {});
 
-  uint32_t download(OrderEntryState state);
+  enum class State {
+    UNDEFINED = 0,
+    ACCOUNTS,
+    POSITIONS,
+    TRADES,
+    DONE,
+  };
+
+  uint32_t download(State);
 
   void get_accounts();
   void get_accounts_ack(Trace<web::rest::Response> const &, uint32_t sequence);
@@ -111,7 +118,7 @@ struct OrderEntry final : public web::rest::Client::Handler {
   Shared &shared_;
   // state
   ConnectionStatus connection_status_ = {};
-  core::Download<OrderEntryState> download_;
+  core::Download<State> download_;
   bool download_trades_is_first_ = true;
 };
 

@@ -195,9 +195,9 @@ void OrderEntry::operator()(ConnectionStatus connection_status, std::string_view
   create_trace_and_dispatch(handler_, trace_info, stream_status);
 }
 
-uint32_t OrderEntry::download(OrderEntryState state) {
+uint32_t OrderEntry::download(State state) {
   switch (state) {
-    using enum OrderEntryState;
+    using enum State;
     case UNDEFINED:
       assert(false);
       break;
@@ -246,7 +246,7 @@ void OrderEntry::get_accounts() {
 }
 
 void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto const STATE = OrderEntryState::ACCOUNTS;
+  auto const STATE = State::ACCOUNTS;
   profile_.accounts_ack([&]() {
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
@@ -294,7 +294,7 @@ void OrderEntry::get_positions() {
 }
 
 void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto const STATE = OrderEntryState::POSITIONS;
+  auto const STATE = State::POSITIONS;
   profile_.positions_ack([&]() {
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
@@ -377,7 +377,7 @@ void OrderEntry::get_trades() {
 }
 
 void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto const STATE = OrderEntryState::TRADES;
+  auto const STATE = State::TRADES;
   profile_.trades_ack([&]() {
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);

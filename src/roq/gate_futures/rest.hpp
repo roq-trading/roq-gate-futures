@@ -22,7 +22,6 @@
 
 #include "roq/server.hpp"
 
-#include "roq/gate_futures/rest_state.hpp"
 #include "roq/gate_futures/shared.hpp"
 
 #include "roq/gate_futures/json/candlesticks_ack.hpp"
@@ -68,7 +67,14 @@ struct Rest final : public web::rest::Client::Handler {
 
   void operator()(ConnectionStatus, std::string_view const &reason = {});
 
-  uint32_t download(RestState);
+  enum class State {
+    UNDEFINED = 0,
+    CURRENCIES,
+    CONTRACTS,
+    DONE,
+  };
+
+  uint32_t download(State);
 
   // currencies
 
@@ -123,7 +129,7 @@ struct Rest final : public web::rest::Client::Handler {
   Shared &shared_;
   // state
   ConnectionStatus connection_status_ = {};
-  core::Download<RestState> download_;
+  core::Download<State> download_;
 };
 
 }  // namespace gate_futures

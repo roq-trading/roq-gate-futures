@@ -183,9 +183,9 @@ void Rest::operator()(Trace<web::rest::Client::Latency> const &event) {
   latency_.ping.update(latency.sample);
 }
 
-uint32_t Rest::download(RestState state) {
+uint32_t Rest::download(State state) {
   switch (state) {
-    using enum RestState;
+    using enum State;
     case UNDEFINED:
       assert(false);
       break;
@@ -230,7 +230,7 @@ void Rest::get_currencies() {
 }
 
 void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
-  auto const STATE = RestState::CURRENCIES;
+  auto const STATE = State::CURRENCIES;
   profile_.currencies_ack([&]() {
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
@@ -279,7 +279,7 @@ void Rest::get_contracts() {
 }
 
 void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
-  auto const STATE = RestState::CONTRACTS;
+  auto const STATE = State::CONTRACTS;
   profile_.contracts_ack([&]() {
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);

@@ -247,9 +247,9 @@ void DropCopy::operator()(ConnectionStatus connection_status, std::string_view c
   create_trace_and_dispatch(handler_, trace_info, stream_status);
 }
 
-uint32_t DropCopy::download(DropCopyState state) {
+uint32_t DropCopy::download(State state) {
   switch (state) {
-    using enum DropCopyState;
+    using enum State;
     case UNDEFINED:
       assert(false);
       break;
@@ -418,7 +418,7 @@ void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
     log::fatal("Unexpected: user_id must be positive (login={})"sv, login);
   }
   user_id_ = login.data.result.uid;
-  auto const STATE = DropCopyState::LOGIN;
+  auto const STATE = State::LOGIN;
   download_.check_relaxed(STATE);
 }
 
@@ -730,7 +730,7 @@ void DropCopy::operator()(Trace<json::TradeOrderList> const &event) {
     log::info<2>("item={}"sv, item);
     create_order_update(helper, item, UpdateType::SNAPSHOT);
   }
-  auto const STATE = DropCopyState::ORDERS;
+  auto const STATE = State::ORDERS;
   download_.check_relaxed(STATE);
 }
 
