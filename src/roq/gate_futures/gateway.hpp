@@ -15,12 +15,13 @@
 
 #include "roq/gate_futures/account.hpp"
 #include "roq/gate_futures/config.hpp"
+#include "roq/gate_futures/settings.hpp"
+#include "roq/gate_futures/shared.hpp"
+
 #include "roq/gate_futures/drop_copy.hpp"
 #include "roq/gate_futures/market_data.hpp"
 #include "roq/gate_futures/order_entry.hpp"
 #include "roq/gate_futures/rest.hpp"
-#include "roq/gate_futures/settings.hpp"
-#include "roq/gate_futures/shared.hpp"
 
 namespace roq {
 namespace gate_futures {
@@ -31,6 +32,8 @@ struct Gateway final : public server::Handler, public Rest::Handler, public Orde
   Gateway(Gateway const &) = delete;
 
  protected:
+  // server::Handler
+
   void operator()(Event<Start> const &) override;
   void operator()(Event<Stop> const &) override;
   void operator()(Event<Timer> const &) override;
@@ -62,7 +65,7 @@ struct Gateway final : public server::Handler, public Rest::Handler, public Orde
 
   void operator()(metrics::Writer &) const override;
 
-  // many
+  // streams
 
   void operator()(Trace<StreamStatus> const &) override;
   void operator()(Trace<ExternalLatency> const &) override;
@@ -79,9 +82,9 @@ struct Gateway final : public server::Handler, public Rest::Handler, public Orde
 
   void operator()(Rest::SymbolsUpdate &) override;
 
-  void ensure_symbol_slices(size_t size);
-
   // utilities
+
+  void ensure_symbol_slices(size_t size);
 
   template <typename... Args>
   void dispatch(Args &&...);
