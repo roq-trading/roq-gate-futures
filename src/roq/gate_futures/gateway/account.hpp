@@ -7,12 +7,13 @@
 
 #include "roq/web/http/method.hpp"
 
-#include "roq/gate_futures/config.hpp"
+#include "roq/gate_futures/gateway/config.hpp"
 
 #include "roq/gate_futures/tools/crypto.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct Account final {
   Account(Config const &, std::string_view const &name);
@@ -33,5 +34,6 @@ struct Account final {
   tools::Crypto crypto_;
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

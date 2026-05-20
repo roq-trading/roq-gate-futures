@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2026, Hans Erik Thrane */
 
-#include "roq/gate_futures/api.hpp"
+#include "roq/gate_futures/gateway/api.hpp"
 
 #include "roq/logging.hpp"
 
@@ -10,6 +10,7 @@ using namespace std::literals;
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 // === CONSTANTS ===
 
@@ -56,5 +57,6 @@ API::Key API::parse_api(Settings const &settings) {
   return utils::parse_enum<Key>(tmp);
 }
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

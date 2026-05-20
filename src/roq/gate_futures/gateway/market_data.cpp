@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2026, Hans Erik Thrane */
 
-#include "roq/gate_futures/market_data.hpp"
+#include "roq/gate_futures/gateway/market_data.hpp"
 
 #include <algorithm>
 
@@ -25,6 +25,7 @@ using namespace std::literals;
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 // === CONSTANTS ===
 
@@ -564,5 +565,6 @@ void MarketData::operator()(Trace<json::Candlesticks> const &event) {
   });
 }
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

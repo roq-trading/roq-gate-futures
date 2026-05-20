@@ -1,6 +1,6 @@
 /* Copyright (c) 2017-2026, Hans Erik Thrane */
 
-#include "roq/gate_futures/account.hpp"
+#include "roq/gate_futures/gateway/account.hpp"
 
 #include "roq/utils/safe_cast.hpp"
 
@@ -8,6 +8,7 @@
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 // === IMPLEMENTATION ===
 
@@ -28,5 +29,6 @@ std::string Account::create_signature(std::string_view const &channel, std::stri
   return crypto_.create_signature(channel, event, timestamp);
 }
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

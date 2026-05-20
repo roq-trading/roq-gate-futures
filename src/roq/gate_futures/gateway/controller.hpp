@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "roq/compat.hpp"
+
 #include <memory>
 #include <string>
 #include <utility>
@@ -13,23 +15,28 @@
 
 #include "roq/io/context.hpp"
 
-#include "roq/gate_futures/account.hpp"
-#include "roq/gate_futures/config.hpp"
-#include "roq/gate_futures/settings.hpp"
-#include "roq/gate_futures/shared.hpp"
+#include "roq/gate_futures/gateway/account.hpp"
+#include "roq/gate_futures/gateway/config.hpp"
+#include "roq/gate_futures/gateway/settings.hpp"
+#include "roq/gate_futures/gateway/shared.hpp"
 
-#include "roq/gate_futures/drop_copy.hpp"
-#include "roq/gate_futures/market_data.hpp"
-#include "roq/gate_futures/order_entry.hpp"
-#include "roq/gate_futures/rest.hpp"
+#include "roq/gate_futures/gateway/drop_copy.hpp"
+#include "roq/gate_futures/gateway/market_data.hpp"
+#include "roq/gate_futures/gateway/order_entry.hpp"
+#include "roq/gate_futures/gateway/rest.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
-struct Gateway final : public server::Handler, public Rest::Handler, public OrderEntry::Handler, public DropCopy::Handler, public MarketData::Handler {
-  Gateway(server::Dispatcher &, Settings const &, Config const &, io::Context &);
+struct Controller final : public server::Handler, public Rest::Handler, public OrderEntry::Handler, public DropCopy::Handler, public MarketData::Handler {
+  ROQ_PUBLIC static std::unique_ptr<server::Handler> create(server::Dispatcher &, Settings const &, Config const &, io::Context &);
 
-  Gateway(Gateway const &) = delete;
+  Controller(server::Dispatcher &, Settings const &, Config const &, io::Context &);
+
+  Controller(Controller const &) = delete;
+
+  virtual ~Controller() = default;
 
  protected:
   // server::Handler
@@ -114,5 +121,6 @@ struct Gateway final : public server::Handler, public Rest::Handler, public Orde
   std::vector<MBPUpdate> bids_, asks_;
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

@@ -19,13 +19,14 @@
 
 #include "roq/server.hpp"
 
-#include "roq/gate_futures/account.hpp"
-#include "roq/gate_futures/shared.hpp"
+#include "roq/gate_futures/gateway/account.hpp"
+#include "roq/gate_futures/gateway/shared.hpp"
 
 #include "roq/gate_futures/json/trade_parser.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::Handler {
   struct Handler {
@@ -157,5 +158,6 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   std::string encode_buffer_;
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

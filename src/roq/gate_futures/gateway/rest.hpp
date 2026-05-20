@@ -22,7 +22,7 @@
 
 #include "roq/server.hpp"
 
-#include "roq/gate_futures/shared.hpp"
+#include "roq/gate_futures/gateway/shared.hpp"
 
 #include "roq/gate_futures/json/candlesticks_ack.hpp"
 #include "roq/gate_futures/json/contracts_ack.hpp"
@@ -31,6 +31,7 @@
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct Rest final : public web::rest::Client::Handler {
   struct SymbolsUpdate final {
@@ -132,5 +133,6 @@ struct Rest final : public web::rest::Client::Handler {
   core::Download<State> download_;
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

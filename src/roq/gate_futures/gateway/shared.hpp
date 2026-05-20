@@ -19,11 +19,12 @@
 
 #include "roq/market/mbp/sequencer.hpp"
 
-#include "roq/gate_futures/api.hpp"
-#include "roq/gate_futures/settings.hpp"
+#include "roq/gate_futures/gateway/api.hpp"
+#include "roq/gate_futures/gateway/settings.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct Shared final {
   Shared(server::Dispatcher &, Settings const &);
@@ -91,5 +92,6 @@ struct Shared final {
   std::vector<Bar> bars;
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

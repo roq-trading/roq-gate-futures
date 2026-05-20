@@ -2,12 +2,15 @@
 
 #pragma once
 
+#include "roq/compat.hpp"
+
 #include <string_view>
 
-#include "roq/gate_futures/settings.hpp"
+#include "roq/gate_futures/gateway/settings.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct API final {
   std::string_view spot_currencies;
@@ -28,8 +31,9 @@ struct API final {
     USDT,
   };
 
-  static Key parse_api(Settings const &);
+  ROQ_PUBLIC static Key parse_api(Settings const &);
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

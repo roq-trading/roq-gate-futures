@@ -2,9 +2,10 @@
 
 #include "roq/gate_futures/application.hpp"
 
-#include "roq/gate_futures/config.hpp"
-#include "roq/gate_futures/gateway.hpp"
-#include "roq/gate_futures/settings.hpp"
+#include "roq/gate_futures/flags/settings.hpp"
+
+#include "roq/gate_futures/gateway/config.hpp"
+#include "roq/gate_futures/gateway/controller.hpp"
 
 using namespace std::literals;
 
@@ -22,9 +23,9 @@ uint8_t const API_USDT = 0x1;
 
 namespace {
 auto parse_api(auto &settings) {
-  auto api = API::parse_api(settings);
+  auto api = gateway::API::parse_api(settings);
   switch (api) {
-    using enum API::Key;
+    using enum gateway::API::Key;
     case BTC:
       return API_BTC;
     case USDT:
@@ -37,11 +38,11 @@ auto parse_api(auto &settings) {
 // === IMPLEMENTATION ===
 
 int Application::main(args::Parser const &args) {
-  Settings settings{args};
+  flags::Settings settings{args};
   auto api = parse_api(settings);
-  Config config{settings};
+  gateway::Config config{settings};
   auto context = server::create_io_context(settings);
-  server::Trading<Gateway>{settings, config, *context, api}.dispatch();
+  server::Trading<gateway::Controller>{settings, config, *context, api}.dispatch();
   return EXIT_SUCCESS;
 }
 

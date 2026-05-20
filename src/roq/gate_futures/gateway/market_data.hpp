@@ -20,12 +20,13 @@
 
 #include "roq/server.hpp"
 
-#include "roq/gate_futures/shared.hpp"
+#include "roq/gate_futures/gateway/shared.hpp"
 
 #include "roq/gate_futures/json/parser.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct MarketData final : public web::socket::Client::Handler, public json::Parser::Handler {
   struct Handler {
@@ -106,5 +107,6 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
   ConnectionStatus connection_status_ = {};
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

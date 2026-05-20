@@ -24,11 +24,12 @@
 #include "roq/gate_futures/json/positions.hpp"
 #include "roq/gate_futures/json/user_trades.hpp"
 
-#include "roq/gate_futures/account.hpp"
-#include "roq/gate_futures/shared.hpp"
+#include "roq/gate_futures/gateway/account.hpp"
+#include "roq/gate_futures/gateway/shared.hpp"
 
 namespace roq {
 namespace gate_futures {
+namespace gateway {
 
 struct OrderEntry final : public web::rest::Client::Handler {
   struct Handler {
@@ -122,5 +123,6 @@ struct OrderEntry final : public web::rest::Client::Handler {
   bool download_trades_is_first_ = true;
 };
 
+}  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq
