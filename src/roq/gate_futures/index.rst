@@ -12,9 +12,8 @@
 .. |footnote-2| unicode:: U+2777
 .. |footnote-3| unicode:: U+2778
 
-roq-gate-futures
-================
-
+`roq-gate-futures <https://github.com/roq-trading/roq-gate-futures/>`__
+=======================================================================
 
 .. tab:: Unstable
 
@@ -454,6 +453,12 @@ Common
 * :ref:`Using Flags <abseil-cpp>`
 * :ref:`Gateway Flags <gateway-flags>`
 * :ref:`Gateway Config <gateway-config>`
+
+
+GitHub
+~~~~~~
+
+* `roq-gate-futures <https://github.com/roq-trading/roq-gate-futures/>`__
 
 
 Exchange
