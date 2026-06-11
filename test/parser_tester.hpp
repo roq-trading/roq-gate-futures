@@ -2,13 +2,13 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/gate_futures/json/parser.hpp"
+#include "roq/gate_futures/protocol/json/parser.hpp"
 
 namespace roq {
 namespace gate_futures {
 
 template <typename T>
-struct ParserTester final : public json::Parser::Handler {
+struct ParserTester final : public protocol::json::Parser::Handler {
   using value_type = std::remove_cvref_t<T>;
   using callback_type = std::function<void(value_type const &)>;
 
@@ -21,7 +21,7 @@ struct ParserTester final : public json::Parser::Handler {
     // parser
     // XXX FIXME TODO catch2 block ???
     ParserTester handler{callback};
-    auto res = json::Parser::dispatch(handler, message, buffers, {}, false);
+    auto res = protocol::json::Parser::dispatch(handler, message, buffers, {}, false);
     CHECK(res == true);
     CHECK(handler.found_ == true);
   }
@@ -29,12 +29,12 @@ struct ParserTester final : public json::Parser::Handler {
  protected:
   explicit ParserTester(callback_type const &callback) : callback_{callback} {}
 
-  void operator()(Trace<json::Subscribe> const &event) override { dispatch(event); }
-  void operator()(Trace<json::Tickers> const &event) override { dispatch(event); }
-  void operator()(Trace<json::Trades> const &event) override { dispatch(event); }
-  void operator()(Trace<json::BookTicker> const &event) override { dispatch(event); }
-  void operator()(Trace<json::OrderBookUpdate> const &event) override { dispatch(event); }
-  void operator()(Trace<json::Candlesticks> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::Subscribe> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::Tickers> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::Trades> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::BookTicker> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::OrderBookUpdate> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::Candlesticks> const &event) override { dispatch(event); }
 
   template <typename U>
   void dispatch(Trace<U> const &event) {

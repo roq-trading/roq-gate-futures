@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/contracts_ack.hpp"
+#include "roq/gate_futures/protocol/json/contracts_ack.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::ContractsAck;
+using value_type = protocol::json::ContractsAck;
 
 // note! reduced
 TEST_CASE("btc", "[json_contracts_ack]") {

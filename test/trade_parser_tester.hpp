@@ -2,13 +2,13 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/gate_futures/json/trade_parser.hpp"
+#include "roq/gate_futures/protocol/json/trade_parser.hpp"
 
 namespace roq {
 namespace gate_futures {
 
 template <typename T>
-struct TradeParserTester final : public json::TradeParser::Handler {
+struct TradeParserTester final : public protocol::json::TradeParser::Handler {
   using value_type = std::remove_cvref_t<T>;
   using callback_type = std::function<void(value_type const &)>;
 
@@ -21,7 +21,7 @@ struct TradeParserTester final : public json::TradeParser::Handler {
     // parser
     // XXX FIXME TODO catch2 block ???
     TradeParserTester handler{callback};
-    auto res = json::TradeParser::dispatch(handler, message, buffers, {}, false);
+    auto res = protocol::json::TradeParser::dispatch(handler, message, buffers, {}, false);
     CHECK(res == true);
     CHECK(handler.found_ == true);
   }
@@ -29,17 +29,17 @@ struct TradeParserTester final : public json::TradeParser::Handler {
  protected:
   explicit TradeParserTester(callback_type const &callback) : callback_{callback} {}
 
-  void operator()(Trace<json::TradeLogin> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeSubscribe> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeBalances> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradePositions> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeOrders> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeTrades> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeOrderPlace> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeOrderAmend> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeOrderCancel> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeOrderCancelCP> const &event) override { dispatch(event); }
-  void operator()(Trace<json::TradeOrderList> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeLogin> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeSubscribe> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeBalances> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradePositions> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeOrders> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeTrades> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeOrderPlace> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeOrderAmend> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeOrderCancel> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeOrderCancelCP> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::TradeOrderList> const &event) override { dispatch(event); }
 
   template <typename U>
   void dispatch(Trace<U> const &event) {

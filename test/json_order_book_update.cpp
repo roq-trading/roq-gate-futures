@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::OrderBookUpdate;
+using value_type = protocol::json::OrderBookUpdate;
 
 TEST_CASE("simple_1", "[json_order_book_update]") {
   auto message = R"({)"
@@ -52,8 +52,8 @@ TEST_CASE("simple_1", "[json_order_book_update]") {
                  R"(})"sv;
   auto helper = [](value_type const &obj) {
     CHECK(obj.time == 1643180626s);
-    CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
-    CHECK(obj.event == json::Event::UPDATE);
+    CHECK(obj.channel == protocol::json::Channel::ORDER_BOOK_UPDATE);
+    CHECK(obj.event == protocol::json::Event::UPDATE);
     auto &result = obj.result;
     CHECK(result.timestamp == 1643180626827ms);
     CHECK(result.symbol == "BTC_USDT"sv);
@@ -96,8 +96,8 @@ TEST_CASE("simple_2", "[json_order_book_update]") {
                  R"(})"sv;
   auto helper = [](value_type const &obj) {
     CHECK(obj.time == 1643180627s);
-    CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
-    CHECK(obj.event == json::Event::UPDATE);
+    CHECK(obj.channel == protocol::json::Channel::ORDER_BOOK_UPDATE);
+    CHECK(obj.event == protocol::json::Event::UPDATE);
     auto &result = obj.result;
     CHECK(result.timestamp == 1643180627828ms);
     CHECK(result.symbol == "BTC_USDT"sv);
@@ -138,8 +138,8 @@ TEST_CASE("simple_3", "[json_order_book_update]") {
   auto helper = [](value_type const &obj) {
     CHECK(obj.time == 1727407188s);
     CHECK(obj.time_ms == 1727407188072ms);
-    CHECK(obj.channel == json::Channel::ORDER_BOOK_UPDATE);
-    CHECK(obj.event == json::Event::UPDATE);
+    CHECK(obj.channel == protocol::json::Channel::ORDER_BOOK_UPDATE);
+    CHECK(obj.event == protocol::json::Event::UPDATE);
     auto &result = obj.result;
     CHECK(result.timestamp == 1727407188004ms);
     CHECK(result.symbol == "SOL_USDT"sv);

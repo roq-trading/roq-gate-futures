@@ -1,0 +1,45 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeSubscribe",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "id",
+      "type": "std/int64"
+    },
+    {
+      "name": "time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "conn_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "trace_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/protocol/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/protocol/json/Event"
+    },
+    {
+      "name": "payload"
+    },
+    {
+      "name": "result",
+      "type": "roq/gate_futures/protocol/json/TradeSubscribeResult"
+    },
+    {
+      "name": "error",
+      "type": "roq/gate_futures/protocol/json/TradeError"
+    }
+  ]
+}

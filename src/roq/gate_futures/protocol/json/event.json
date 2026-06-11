@@ -1,0 +1,15 @@
+{
+  "name": "roq/gate_futures/protocol/json/Event",
+  "type": "enum",
+  "values": [
+    {
+      "name": "subscribe"
+    },
+    {
+      "name": "update"
+    },
+    {
+      "name": "api"
+    }
+  ]
+}

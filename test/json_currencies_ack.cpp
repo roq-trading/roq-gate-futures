@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/currencies_ack.hpp"
+#include "roq/gate_futures/protocol/json/currencies_ack.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::CurrenciesAck;
+using value_type = protocol::json::CurrenciesAck;
 
 // note! reduced
 TEST_CASE("simple", "[json_currencies_ack]") {

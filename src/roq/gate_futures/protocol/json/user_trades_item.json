@@ -1,0 +1,64 @@
+{
+  "name": "roq/gate_futures/protocol/json/UserTradesItem",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "contract",
+      "type": "std/string_view"
+    },
+    {
+      "name": "create_time",
+      "type": "std/microseconds"
+    },
+    {
+      "name": "id",
+      "type": "std/string_view",
+      "comment": "WS"
+    },
+    {
+      "name": "trade_id",
+      "type": "std/string_view",
+      "comment": "REST"
+    },
+    {
+      "name": "order_id",
+      "type": "std/int64_t"
+    },
+    {
+      "name": "price",
+      "type": "std/double"
+    },
+    {
+      "name": "size",
+      "type": "std/int32"
+    },
+    {
+      "name": "role",
+      "type": "roq/gate_futures/protocol/json/Role"
+    },
+    {
+      "name": "text",
+      "type": "std/string_view"
+    },
+    {
+      "name": "fee",
+      "type": "std/double"
+    },
+    {
+      "name": "point_fee",
+      "type": "std/double"
+    },
+    {
+      "name": "biz_info",
+      "type": "std/string_view"
+    },
+    {
+      "name": "amend_text",
+      "type": "std/string_view"
+    },
+    {
+      "name": "close_size",
+      "type": "std/double"
+    }
+  ]
+}

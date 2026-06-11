@@ -1,0 +1,58 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeHeader",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "response_time",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "status",
+      "type": "std/int32"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/protocol/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/protocol/json/Event"
+    },
+    {
+      "name": "client_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "conn_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "trace_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "conn_trace_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "x_in_time",
+      "type": "std/microseconds"
+    },
+    {
+      "name": "x_out_time",
+      "type": "std/microseconds"
+    },
+    {
+      "name": "x_gate_ratelimit_requests_remain",
+      "type": "std/int32"
+    },
+    {
+      "name": "x_gate_ratelimit_limit",
+      "type": "std/int32"
+    },
+    {
+      "name": "x_gate_ratelimit_reset_timestamp",
+      "type": "std/milliseconds"
+    }
+  ]
+}

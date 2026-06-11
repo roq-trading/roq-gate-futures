@@ -1,0 +1,10 @@
+{
+  "name": "roq/gate_futures/protocol/json/SubscribeResult",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "status",
+      "type": "std/string_view"
+    }
+  ]
+}

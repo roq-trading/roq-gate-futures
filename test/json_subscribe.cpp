@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::Subscribe;
+using value_type = protocol::json::Subscribe;
 
 TEST_CASE("success", "[json_subscribe]") {
   auto message = R"({)"
@@ -27,7 +27,7 @@ TEST_CASE("success", "[json_subscribe]") {
                  R"(})";
   auto helper = [](value_type const &obj) {
     CHECK(obj.time == 1641365392s);
-    CHECK(obj.channel == json::Channel::TICKERS);
+    CHECK(obj.channel == protocol::json::Channel::TICKERS);
   };
   ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

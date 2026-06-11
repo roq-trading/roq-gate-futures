@@ -1,0 +1,16 @@
+{
+  "name": "roq/gate_futures/protocol/json/PriceSize",
+  "type": "dictionary",
+  "values": [
+    {
+      "raw": "p",
+      "name": "price",
+      "type": "std/double"
+    },
+    {
+      "raw": "s",
+      "name": "size",
+      "type": "std/double"
+    }
+  ]
+}

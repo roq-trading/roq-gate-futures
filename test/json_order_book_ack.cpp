@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/order_book_ack.hpp"
+#include "roq/gate_futures/protocol/json/order_book_ack.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,7 +14,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::OrderBookAck;
+using value_type = protocol::json::OrderBookAck;
 
 TEST_CASE("simple_1", "[json_order_book_ack]") {
   auto message = R"({)"

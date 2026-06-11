@@ -1,0 +1,178 @@
+{
+  "name": "roq/gate_futures/protocol/json/OrdersItem",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "id",
+      "type": "std/int64_t"
+    },
+    {
+      "name": "user",
+      "type": "std/int64"
+    },
+    {
+      "name": "contract",
+      "type": "std/string_view"
+    },
+    {
+      "name": "create_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "create_time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "update_time",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "size",
+      "type": "std/int64"
+    },
+    {
+      "name": "iceberg",
+      "type": "std/int32"
+    },
+    {
+      "name": "left",
+      "type": "std/int64"
+    },
+    {
+      "name": "price",
+      "type": "std/double"
+    },
+    {
+      "name": "fill_price",
+      "type": "std/double"
+    },
+    {
+      "name": "mkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "tkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "tif",
+      "type": "roq/gate_futures/protocol/json/TIF"
+    },
+    {
+      "name": "refr",
+      "type": "std/double"
+    },
+    {
+      "name": "refu",
+      "type": "std/int32"
+    },
+    {
+      "name": "is_reduce_only",
+      "type": "std/bool"
+    },
+    {
+      "name": "is_close",
+      "type": "std/bool"
+    },
+    {
+      "name": "is_liq",
+      "type": "std/bool"
+    },
+    {
+      "name": "text",
+      "type": "std/string_view"
+    },
+    {
+      "name": "status",
+      "type": "roq/gate_futures/protocol/json/OrderStatus"
+    },
+    {
+      "name": "finish_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "finish_time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "finish_as",
+      "type": "roq/gate_futures/protocol/json/FinishAs"
+    },
+    {
+      "name": "stdp_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "stp_act",
+      "type": "std/string_view"
+    },
+    {
+      "name": "amend_text",
+      "type": "std/string_view"
+    },
+    {
+      "name": "biz_info",
+      "type": "std/string_view"
+    },
+    {
+      "name": "stp_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "update_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "pnl",
+      "type": "std/double"
+    },
+    {
+      "name": "pnl_margin",
+      "type": "std/double"
+    },
+    {
+      "name": "stop_loss_price",
+      "type": "std/double"
+    },
+    {
+      "name": "stop_profit_price",
+      "type": "std/double"
+    },
+    {
+      "name": "fee",
+      "type": "std/double"
+    },
+    {
+      "name": "point_fee",
+      "type": "std/double"
+    },
+    {
+      "name": "role",
+      "type": "std/string_view"
+    },
+    {
+      "name": "id_string",
+      "type": "std/string_view"
+    },
+    {
+      "name": "bbo",
+      "type": "std/string_view"
+    },
+    {
+      "name": "is_voucher",
+      "type": "std/bool"
+    },
+    {
+      "name": "market_order_slip_ratio",
+      "type": "std/double"
+    },
+    {
+      "name": "pos_margin_mode",
+      "type": "std/string_view"
+    },
+    {
+      "name": "leverage",
+      "type": "std/double"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "name": "roq/gate_futures/protocol/json/Channel",
+  "type": "enum",
+  "values": [
+    {
+      "raw": "futures.tickers",
+      "name": "tickers",
+      "comment": "market data"
+    },
+    {
+      "raw": "futures.trades",
+      "name": "trades",
+      "comment": "market data"
+    },
+    {
+      "raw": "futures.book_ticker",
+      "name": "book_ticker",
+      "comment": "market data"
+    },
+    {
+      "raw": "futures.order_book_update",
+      "name": "order_book_update",
+      "comment": "market data"
+    },
+    {
+      "raw": "futures.candlesticks",
+      "name": "candlesticks",
+      "comment": "market data"
+    },
+    {
+      "raw": "futures.login",
+      "name": "login",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.balances",
+      "name": "balances",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.positions",
+      "name": "positions",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.orders",
+      "name": "orders",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.usertrades",
+      "name": "usertrades",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_place",
+      "name": "order_place",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_amend",
+      "name": "order_amend",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_cancel",
+      "name": "order_cancel",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_cancel_cp",
+      "name": "order_cancel_cp",
+      "comment": "order management"
+    },
+    {
+      "raw": "futures.order_list",
+      "name": "order_list",
+      "comment": "order management"
+    }
+  ]
+}

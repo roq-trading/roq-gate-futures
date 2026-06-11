@@ -1,9 +1,0 @@
-{
-  "name": "roq/gate_futures/json/EventType",
-  "type": "enum",
-  "values": [
-    {
-      "name": "snapshot"
-    }
-  ]
-}

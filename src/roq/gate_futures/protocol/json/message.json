@@ -1,0 +1,38 @@
+{
+  "name": "roq/gate_futures/protocol/json/Message",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "time"
+    },
+    {
+      "name": "time_ms"
+    },
+    {
+      "name": "id"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/protocol/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/protocol/json/Event"
+    },
+    {
+      "name": "result"
+    },
+    {
+      "name": "error"
+    },
+    {
+      "name": "payload"
+    },
+    {
+      "name": "conn_id"
+    },
+    {
+      "name": "trace_id"
+    }
+  ]
+}

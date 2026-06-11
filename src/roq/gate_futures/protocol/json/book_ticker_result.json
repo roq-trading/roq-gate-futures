@@ -1,0 +1,41 @@
+{
+  "name": "roq/gate_futures/protocol/json/BookTickerResult",
+  "type": "dictionary",
+  "values": [
+    {
+      "raw": "t",
+      "name": "timestamp",
+      "type": "std/milliseconds"
+    },
+    {
+      "raw": "u",
+      "name": "update_id",
+      "type": "std/int64"
+    },
+    {
+      "raw": "s",
+      "name": "contract",
+      "type": "std/string_view"
+    },
+    {
+      "raw": "b",
+      "name": "best_bid_price",
+      "type": "std/double"
+    },
+    {
+      "raw": "B",
+      "name": "best_bid_size",
+      "type": "std/double"
+    },
+    {
+      "raw": "a",
+      "name": "best_ask_price",
+      "type": "std/double"
+    },
+    {
+      "raw": "A",
+      "name": "best_ask_size",
+      "type": "std/double"
+    }
+  ]
+}

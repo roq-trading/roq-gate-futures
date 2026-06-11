@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::Tickers;
+using value_type = protocol::json::Tickers;
 
 TEST_CASE("simple_1", "[json_tickers]") {
   auto message = R"({)"
@@ -42,7 +42,7 @@ TEST_CASE("simple_1", "[json_tickers]") {
                  R"(})";
   auto helper = [](value_type const &obj) {
     CHECK(obj.time == 1641365849s);
-    CHECK(obj.channel == json::Channel::TICKERS);
+    CHECK(obj.channel == protocol::json::Channel::TICKERS);
   };
   ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }
@@ -75,11 +75,11 @@ TEST_CASE("simple_2", "[json_tickers]") {
                  R"(])"
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
-  json::Tickers tickers{message, buffer};
+  protocol::json::Tickers tickers{message, buffer};
   auto helper = [](value_type const &obj) {
     CHECK(obj.time == 1727407596s);
     CHECK(obj.time_ms == 1727407596030ms);
-    CHECK(obj.channel == json::Channel::TICKERS);
+    CHECK(obj.channel == protocol::json::Channel::TICKERS);
   };
   ParserTester<value_type>::dispatch(helper, message, 8192, 1);
 }

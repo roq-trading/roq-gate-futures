@@ -1,0 +1,14 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeError",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "code",
+      "type": "std/int32_t"
+    },
+    {
+      "name": "message",
+      "type": "std/string_view"
+    }
+  ]
+}

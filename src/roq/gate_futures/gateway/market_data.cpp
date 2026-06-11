@@ -19,7 +19,7 @@
 
 #include "roq/web/socket/client.hpp"
 
-#include "roq/gate_futures/json/utils.hpp"
+#include "roq/gate_futures/protocol/json/utils.hpp"
 
 using namespace std::literals;
 
@@ -275,7 +275,7 @@ void MarketData::parse(std::string_view const &message) {
     auto log_message = [&]() { log::warn(R"(*** PLEASE REPORT *** message="{}")"sv, message); };
     try {
       TraceInfo trace_info;
-      if (!json::Parser::dispatch(*this, message, decode_buffer_, trace_info, shared_.settings.experimental.allow_unknown_event_types)) {
+      if (!protocol::json::Parser::dispatch(*this, message, decode_buffer_, trace_info, shared_.settings.experimental.allow_unknown_event_types)) {
         log_message();
       }
     } catch (...) {
@@ -285,14 +285,14 @@ void MarketData::parse(std::string_view const &message) {
   });
 }
 
-void MarketData::operator()(Trace<json::Subscribe> const &event) {
+void MarketData::operator()(Trace<protocol::json::Subscribe> const &event) {
   profile_.subscribe([&]() {
     auto &[trace_info, subscribe] = event;
     log::info<3>("subscribe={}"sv, subscribe);
   });
 }
 
-void MarketData::operator()(Trace<json::Tickers> const &event) {
+void MarketData::operator()(Trace<protocol::json::Tickers> const &event) {
   profile_.tickers([&]() {
     auto &[trace_info, tickers] = event;
     log::info<3>("tickers={}"sv, tickers);
@@ -351,7 +351,7 @@ void MarketData::operator()(Trace<json::Tickers> const &event) {
   });
 }
 
-void MarketData::operator()(Trace<json::Trades> const &event) {
+void MarketData::operator()(Trace<protocol::json::Trades> const &event) {
   profile_.trades([&]() {
     auto &[trace_info, trades] = event;
     log::info<3>("trades={}"sv, trades);
@@ -372,7 +372,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
       result.emplace_back(std::move(trade));
     };
     std::string_view contract;
-    decltype(json::TradesItem::create_time_ms) timestamp = {};
+    decltype(protocol::json::TradesItem::create_time_ms) timestamp = {};
     for (auto &item : result) {
       if (item.contract != contract) {
         if (!std::empty(contract) && !std::empty(trades_2)) {
@@ -409,7 +409,7 @@ void MarketData::operator()(Trace<json::Trades> const &event) {
   });
 }
 
-void MarketData::operator()(Trace<json::BookTicker> const &event) {
+void MarketData::operator()(Trace<protocol::json::BookTicker> const &event) {
   profile_.book_ticker([&]() {
     auto &[trace_info, book_ticker] = event;
     log::info<3>("book_ticker={}"sv, book_ticker);
@@ -435,7 +435,7 @@ void MarketData::operator()(Trace<json::BookTicker> const &event) {
 }
 
 // XXX TODO there's a new "full" field
-void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
+void MarketData::operator()(Trace<protocol::json::OrderBookUpdate> const &event) {
   profile_.order_book_update([&]() {
     auto &[trace_info, order_book_update] = event;
     log::info<3>("order_book_update={}"sv, order_book_update);
@@ -512,7 +512,7 @@ void MarketData::operator()(Trace<json::OrderBookUpdate> const &event) {
   });
 }
 
-void MarketData::operator()(Trace<json::Candlesticks> const &event) {
+void MarketData::operator()(Trace<protocol::json::Candlesticks> const &event) {
   profile_.candlesticks([&]() {
     auto &[trace_info, candlesticks] = event;
     log::info<3>("candlesticks={}"sv, candlesticks);

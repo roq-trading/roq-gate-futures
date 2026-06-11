@@ -20,9 +20,9 @@
 
 #include "roq/server.hpp"
 
-#include "roq/gate_futures/json/accounts.hpp"
-#include "roq/gate_futures/json/positions.hpp"
-#include "roq/gate_futures/json/user_trades.hpp"
+#include "roq/gate_futures/protocol/json/accounts.hpp"
+#include "roq/gate_futures/protocol/json/positions.hpp"
+#include "roq/gate_futures/protocol/json/user_trades.hpp"
 
 #include "roq/gate_futures/gateway/account.hpp"
 #include "roq/gate_futures/gateway/shared.hpp"
@@ -71,15 +71,15 @@ struct OrderEntry final : public web::rest::Client::Handler {
 
   void get_accounts();
   void get_accounts_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::Accounts> const &);
+  void operator()(Trace<protocol::json::Accounts> const &);
 
   void get_positions();
   void get_positions_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::Positions> const &);
+  void operator()(Trace<protocol::json::Positions> const &);
 
   void get_trades();
   void get_trades_ack(Trace<web::rest::Response> const &, uint32_t sequence);
-  void operator()(Trace<json::UserTrades> const &);
+  void operator()(Trace<protocol::json::UserTrades> const &);
 
   void process_response(web::rest::Response const &, auto error_handler, auto success_handler);
 

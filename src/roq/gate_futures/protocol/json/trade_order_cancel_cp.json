@@ -1,0 +1,22 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeOrderCancelCP",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "header",
+      "type": "roq/gate_futures/protocol/json/TradeHeader"
+    },
+    {
+      "name": "data",
+      "type": "roq/gate_futures/protocol/json/TradeOrderCancelCPData"
+    },
+    {
+      "name": "request_id",
+      "type": "std/string_view"
+    },
+    {
+      "name": "ack",
+      "type": "std/bool"
+    }
+  ]
+}

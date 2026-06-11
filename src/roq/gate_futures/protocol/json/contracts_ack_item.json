@@ -1,0 +1,227 @@
+{
+  "name": "roq/gate_futures/protocol/json/ContractsAckItem",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "funding_rate_indicative",
+      "type": "std/double"
+    },
+    {
+      "name": "mark_price_round",
+      "type": "std/double"
+    },
+    {
+      "name": "funding_offset",
+      "type": "std/double"
+    },
+    {
+      "name": "in_delisting",
+      "type": "std/bool"
+    },
+    {
+      "name": "risk_limit_base",
+      "type": "std/double"
+    },
+    {
+      "name": "interest_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "index_price",
+      "type": "std/double"
+    },
+    {
+      "name": "order_price_round",
+      "type": "std/double"
+    },
+    {
+      "name": "order_size_min",
+      "type": "std/double"
+    },
+    {
+      "name": "ref_rebate_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "name",
+      "type": "std/string_view"
+    },
+    {
+      "name": "ref_discount_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "order_price_deviate",
+      "type": "std/double"
+    },
+    {
+      "name": "maintenance_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "mark_type",
+      "type": "roq/gate_futures/protocol/json/MarkType"
+    },
+    {
+      "name": "funding_interval",
+      "type": "std/int64"
+    },
+    {
+      "name": "type",
+      "type": "roq/gate_futures/protocol/json/ContractType"
+    },
+    {
+      "name": "risk_limit_step",
+      "type": "std/double"
+    },
+    {
+      "name": "enable_bonus",
+      "type": "std/bool"
+    },
+    {
+      "name": "leverage_min",
+      "type": "std/double"
+    },
+    {
+      "name": "funding_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "last_price",
+      "type": "std/double"
+    },
+    {
+      "name": "mark_price",
+      "type": "std/double"
+    },
+    {
+      "name": "order_size_max",
+      "type": "std/double"
+    },
+    {
+      "name": "funding_next_apply",
+      "type": "std/seconds"
+    },
+    {
+      "name": "short_users",
+      "type": "std/int32"
+    },
+    {
+      "name": "config_change_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "trade_size",
+      "type": "std/double"
+    },
+    {
+      "name": "position_size",
+      "type": "std/double"
+    },
+    {
+      "name": "long_users",
+      "type": "std/int32"
+    },
+    {
+      "name": "quanto_multiplier",
+      "type": "std/double"
+    },
+    {
+      "name": "funding_impact_value",
+      "type": "std/double"
+    },
+    {
+      "name": "leverage_max",
+      "type": "std/double"
+    },
+    {
+      "name": "risk_limit_max",
+      "type": "std/double"
+    },
+    {
+      "name": "maker_fee_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "taker_fee_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "orders_limit",
+      "type": "std/double"
+    },
+    {
+      "name": "trade_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "orderbook_id",
+      "type": "std/int64"
+    },
+    {
+      "name": "enable_credit",
+      "type": "std/bool"
+    },
+    {
+      "name": "create_time",
+      "type": "std/seconds",
+      "comment": "not sure if this is seconds or milliseconds"
+    },
+    {
+      "name": "funding_cap_ratio",
+      "type": "std/double"
+    },
+    {
+      "name": "voucher_leverage",
+      "type": "std/double"
+    },
+    {
+      "name": "cross_leverage_default",
+      "type": "std/double"
+    },
+    {
+      "name": "is_pre_market",
+      "type": "std/bool"
+    },
+    {
+      "name": "status",
+      "type": "std/string_view"
+    },
+    {
+      "name": "launch_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "enable_circuit_breaker",
+      "type": "std/bool"
+    },
+    {
+      "name": "funding_rate_limit",
+      "type": "std/double"
+    },
+    {
+      "name": "delisting_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "delisted_time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "enable_decimal",
+      "type": "std/bool"
+    },
+    {
+      "name": "market_order_slip_ratio",
+      "type": "std/double"
+    },
+    {
+      "name": "market_order_size_max",
+      "type": "std/double"
+    },
+    {
+      "name": "contract_type",
+      "type": "std/string_view"
+    }
+  ]
+}

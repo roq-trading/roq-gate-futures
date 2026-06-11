@@ -22,13 +22,13 @@
 #include "roq/gate_futures/gateway/account.hpp"
 #include "roq/gate_futures/gateway/shared.hpp"
 
-#include "roq/gate_futures/json/trade_parser.hpp"
+#include "roq/gate_futures/protocol/json/trade_parser.hpp"
 
 namespace roq {
 namespace gate_futures {
 namespace gateway {
 
-struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::Handler {
+struct DropCopy final : public web::socket::Client::Handler, protocol::json::TradeParser::Handler {
   struct Handler {
     virtual void operator()(Trace<StreamStatus> const &) = 0;
     virtual void operator()(Trace<ExternalLatency> const &) = 0;
@@ -74,21 +74,21 @@ struct DropCopy final : public web::socket::Client::Handler, json::TradeParser::
   void operator()(web::socket::Client::Text const &) override;
   void operator()(web::socket::Client::Binary const &) override;
 
-  void operator()(Trace<json::TradeLogin> const &) override;
+  void operator()(Trace<protocol::json::TradeLogin> const &) override;
 
-  void operator()(Trace<json::TradeSubscribe> const &) override;
+  void operator()(Trace<protocol::json::TradeSubscribe> const &) override;
 
-  void operator()(Trace<json::TradeBalances> const &) override;
-  void operator()(Trace<json::TradePositions> const &) override;
-  void operator()(Trace<json::TradeOrders> const &) override;
-  void operator()(Trace<json::TradeTrades> const &) override;
+  void operator()(Trace<protocol::json::TradeBalances> const &) override;
+  void operator()(Trace<protocol::json::TradePositions> const &) override;
+  void operator()(Trace<protocol::json::TradeOrders> const &) override;
+  void operator()(Trace<protocol::json::TradeTrades> const &) override;
 
-  void operator()(Trace<json::TradeOrderPlace> const &) override;
-  void operator()(Trace<json::TradeOrderAmend> const &) override;
-  void operator()(Trace<json::TradeOrderCancel> const &) override;
-  void operator()(Trace<json::TradeOrderCancelCP> const &) override;
+  void operator()(Trace<protocol::json::TradeOrderPlace> const &) override;
+  void operator()(Trace<protocol::json::TradeOrderAmend> const &) override;
+  void operator()(Trace<protocol::json::TradeOrderCancel> const &) override;
+  void operator()(Trace<protocol::json::TradeOrderCancelCP> const &) override;
 
-  void operator()(Trace<json::TradeOrderList> const &) override;
+  void operator()(Trace<protocol::json::TradeOrderList> const &) override;
 
  private:
   void operator()(ConnectionStatus, std::string_view const &reason = {});

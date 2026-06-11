@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/message.hpp"
+#include "roq/gate_futures/protocol/json/message.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -26,8 +26,8 @@ TEST_CASE("json_message_subscribe_success", "[json_message]") {
                  R"(})"
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
-  json::Message message_2{message, buffer};
-  CHECK(message_2.channel == json::Channel::TICKERS);
+  protocol::json::Message message_2{message, buffer};
+  CHECK(message_2.channel == protocol::json::Channel::TICKERS);
 }
 
 TEST_CASE("json_message_book_ticker", "[json_message]") {
@@ -48,8 +48,8 @@ TEST_CASE("json_message_book_ticker", "[json_message]") {
                  R"(})"
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
-  json::Message message_2{message, buffer};
-  CHECK(message_2.channel == json::Channel::BOOK_TICKER);
+  protocol::json::Message message_2{message, buffer};
+  CHECK(message_2.channel == protocol::json::Channel::BOOK_TICKER);
 }
 
 TEST_CASE("json_message_tickers", "[json_message]") {
@@ -79,8 +79,8 @@ TEST_CASE("json_message_tickers", "[json_message]") {
                  R"(])"
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
-  json::Message message_2{message, buffer};
-  CHECK(message_2.channel == json::Channel::TICKERS);
+  protocol::json::Message message_2{message, buffer};
+  CHECK(message_2.channel == protocol::json::Channel::TICKERS);
 }
 
 TEST_CASE("json_message_trades", "[json_message]") {
@@ -101,6 +101,6 @@ TEST_CASE("json_message_trades", "[json_message]") {
                  R"(])"
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
-  json::Message message_2{message, buffer};
-  CHECK(message_2.channel == json::Channel::TRADES);
+  protocol::json::Message message_2{message, buffer};
+  CHECK(message_2.channel == protocol::json::Channel::TRADES);
 }

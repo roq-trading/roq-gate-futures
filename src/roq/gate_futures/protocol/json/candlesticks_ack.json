@@ -1,0 +1,11 @@
+{
+  "name": "roq/gate_futures/protocol/json/CandlesticksAck",
+  "type": "array",
+  "values": [
+    {
+      "name": "data",
+      "type": "roq/gate_futures/protocol/json/CandlesticksAckItem",
+      "array": "std/span"
+    }
+  ]
+}

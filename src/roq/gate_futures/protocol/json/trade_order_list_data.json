@@ -1,0 +1,15 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeOrderListData",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "result",
+      "type": "roq/gate_futures/protocol/json/TradeOrderListDataResultItem",
+      "array": "std/span"
+    },
+    {
+      "name": "errs",
+      "type": "roq/gate_futures/protocol/json/TradeOrderListDataError"
+    }
+  ]
+}

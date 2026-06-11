@@ -16,8 +16,8 @@
 
 #include "roq/server/oms/exceptions.hpp"
 
-#include "roq/gate_futures/json/encoder.hpp"
-#include "roq/gate_futures/json/map.hpp"
+#include "roq/gate_futures/protocol/json/encoder.hpp"
+#include "roq/gate_futures/protocol/json/map.hpp"
 
 using namespace std::literals;
 
@@ -86,12 +86,12 @@ std::string_view get_client_order_id(auto &text) {
   return text.substr(2);
 }
 
-OrderStatus get_order_status(json::FinishAs finish_as, json::OrderStatus status) {
+OrderStatus get_order_status(protocol::json::FinishAs finish_as, protocol::json::OrderStatus status) {
   auto result = map(finish_as).template get<OrderStatus>();
   if (result != OrderStatus{}) {
     return result;
   }
-  if (status == json::OrderStatus::OPEN) {
+  if (status == protocol::json::OrderStatus::OPEN) {
     return OrderStatus::WORKING;
   }
   log::fatal("Unexpected: result={}"sv, result);
@@ -145,7 +145,7 @@ void DropCopy::operator()(metrics::Writer &writer) const {
 
 uint16_t DropCopy::operator()(
     Event<CreateOrder> const &event, server::oms::Order const &order, server::oms::RefData const &ref_data, std::string_view const &request_id) {
-  auto message = json::Encoder::order_place(encode_buffer_, event, order, ref_data, request_id, ++request_id_);
+  auto message = protocol::json::Encoder::order_place(encode_buffer_, event, order, ref_data, request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
@@ -157,7 +157,7 @@ uint16_t DropCopy::operator()(
     server::oms::RefData const &ref_data,
     std::string_view const &request_id,
     std::string_view const &previous_request_id) {
-  auto message = json::Encoder::order_amend(encode_buffer_, event, order, ref_data, request_id, previous_request_id, ++request_id_);
+  auto message = protocol::json::Encoder::order_amend(encode_buffer_, event, order, ref_data, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
@@ -169,7 +169,7 @@ uint16_t DropCopy::operator()(
     server::oms::RefData const &ref_data,
     std::string_view const &request_id,
     std::string_view const &previous_request_id) {
-  auto message = json::Encoder::order_cancel(encode_buffer_, event, order, ref_data, request_id, previous_request_id, ++request_id_);
+  auto message = protocol::json::Encoder::order_cancel(encode_buffer_, event, order, ref_data, request_id, previous_request_id, ++request_id_);
   log::debug(R"(message="{}")"sv, message);
   (*connection_).send_text(message);
   return stream_id_;
@@ -177,7 +177,7 @@ uint16_t DropCopy::operator()(
 
 uint16_t DropCopy::operator()(Event<CancelAllOrders> const &event, std::string_view const &request_id) {
   auto helper = [&](auto &symbol) {
-    auto message = json::Encoder::order_cancel_cp(encode_buffer_, event, request_id, ++request_id_, symbol);
+    auto message = protocol::json::Encoder::order_cancel_cp(encode_buffer_, event, request_id, ++request_id_, symbol);
     log::warn(R"(DEBUG message="{}")"sv, message);
     (*connection_).send_text(message);
   };
@@ -399,7 +399,7 @@ void DropCopy::parse(std::string_view const &message) {
     auto log_message = [&]() { log::warn(R"(*** PLEASE REPORT *** message="{}")"sv, message); };
     try {
       TraceInfo trace_info;
-      if (!json::TradeParser::dispatch(*this, message, decode_buffer_, trace_info, shared_.settings.experimental.allow_unknown_event_types)) {
+      if (!protocol::json::TradeParser::dispatch(*this, message, decode_buffer_, trace_info, shared_.settings.experimental.allow_unknown_event_types)) {
         log_message();
       }
     } catch (...) {
@@ -409,7 +409,7 @@ void DropCopy::parse(std::string_view const &message) {
   });
 }
 
-void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeLogin> const &event) {
   auto &[trace_info, login] = event;
   log::info<5>("login={}"sv, login);
   if (login.header.status != 200) {
@@ -423,14 +423,14 @@ void DropCopy::operator()(Trace<json::TradeLogin> const &event) {
   download_.check_relaxed(STATE);
 }
 
-void DropCopy::operator()(Trace<json::TradeSubscribe> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeSubscribe> const &event) {
   auto &subscribe = event.value;
-  if (subscribe.result.status != json::Status::SUCCESS) {
+  if (subscribe.result.status != protocol::json::Status::SUCCESS) {
     log::fatal("subscribe={}"sv, subscribe);
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeBalances> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeBalances> const &event) {
   auto &[trace_info, balances] = event;
   for (auto &item : balances.result) {
     auto funds_update = FundsUpdate{
@@ -451,7 +451,7 @@ void DropCopy::operator()(Trace<json::TradeBalances> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradePositions> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradePositions> const &event) {
   auto &[trace_info, positions] = event;
   for (auto &item : positions.result) {
     if (shared_.discard_symbol(item.contract)) {
@@ -484,7 +484,7 @@ void DropCopy::operator()(Trace<json::TradePositions> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeOrders> const &event) {
   auto &[trace_info, orders] = event;
   auto helper = [&](auto &order_update) {
     Trace event_2{trace_info, order_update};
@@ -496,7 +496,7 @@ void DropCopy::operator()(Trace<json::TradeOrders> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeTrades> const &event) {
   auto &[trace_info, trades] = event;
   for (auto &item : trades.result) {
     log::info<2>("item={}"sv, item);
@@ -552,7 +552,7 @@ void DropCopy::operator()(Trace<json::TradeTrades> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeOrderPlace> const &event) {
   auto &[trace_info, order_place] = event;
   if (order_place.header.status == 200) {
     auto &result = order_place.data.result;
@@ -594,7 +594,7 @@ void DropCopy::operator()(Trace<json::TradeOrderPlace> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderAmend> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeOrderAmend> const &event) {
   auto &[trace_info, order_amend] = event;
   auto &header = order_amend.header;
   if (header.status == 200) {
@@ -633,7 +633,7 @@ void DropCopy::operator()(Trace<json::TradeOrderAmend> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) {
   auto &[trace_info, order_cancel] = event;
   auto &header = order_cancel.header;
   if (header.status == 200) {
@@ -672,7 +672,7 @@ void DropCopy::operator()(Trace<json::TradeOrderCancel> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderCancelCP> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event) {
   auto &[trace_info, order_cancel_cp] = event;
   auto &header = order_cancel_cp.header;
   if (header.status == 200) {
@@ -720,7 +720,7 @@ void DropCopy::operator()(Trace<json::TradeOrderCancelCP> const &event) {
   }
 }
 
-void DropCopy::operator()(Trace<json::TradeOrderList> const &event) {
+void DropCopy::operator()(Trace<protocol::json::TradeOrderList> const &event) {
   auto &[trace_info, order_list] = event;
   auto helper = [&](auto &order_update) {
     Trace event_2{trace_info, order_update};

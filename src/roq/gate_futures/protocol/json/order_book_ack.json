@@ -1,0 +1,28 @@
+{
+  "name": "roq/gate_futures/protocol/json/OrderBookAck",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "current",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "asks",
+      "type": "roq/gate_futures/protocol/json/PriceSize",
+      "array": "std/span"
+    },
+    {
+      "name": "bids",
+      "type": "roq/gate_futures/protocol/json/PriceSize",
+      "array": "std/span"
+    },
+    {
+      "name": "id",
+      "type": "std/uint64"
+    },
+    {
+      "name": "update",
+      "type": "std/milliseconds"
+    }
+  ]
+}

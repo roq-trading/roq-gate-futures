@@ -22,13 +22,13 @@
 
 #include "roq/gate_futures/gateway/shared.hpp"
 
-#include "roq/gate_futures/json/parser.hpp"
+#include "roq/gate_futures/protocol/json/parser.hpp"
 
 namespace roq {
 namespace gate_futures {
 namespace gateway {
 
-struct MarketData final : public web::socket::Client::Handler, public json::Parser::Handler {
+struct MarketData final : public web::socket::Client::Handler, public protocol::json::Parser::Handler {
   struct Handler {
     virtual void operator()(Trace<StreamStatus> const &) = 0;
     virtual void operator()(Trace<ExternalLatency> const &) = 0;
@@ -75,12 +75,12 @@ struct MarketData final : public web::socket::Client::Handler, public json::Pars
 
   void parse(std::string_view const &message);
 
-  void operator()(Trace<json::Subscribe> const &) override;
-  void operator()(Trace<json::Tickers> const &) override;
-  void operator()(Trace<json::Trades> const &) override;
-  void operator()(Trace<json::BookTicker> const &) override;
-  void operator()(Trace<json::OrderBookUpdate> const &) override;
-  void operator()(Trace<json::Candlesticks> const &) override;
+  void operator()(Trace<protocol::json::Subscribe> const &) override;
+  void operator()(Trace<protocol::json::Tickers> const &) override;
+  void operator()(Trace<protocol::json::Trades> const &) override;
+  void operator()(Trace<protocol::json::BookTicker> const &) override;
+  void operator()(Trace<protocol::json::OrderBookUpdate> const &) override;
+  void operator()(Trace<protocol::json::Candlesticks> const &) override;
 
   Handler &handler_;
   // config

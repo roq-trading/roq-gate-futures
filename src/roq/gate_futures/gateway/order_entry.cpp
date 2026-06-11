@@ -16,8 +16,8 @@
 
 #include "roq/server/oms/exceptions.hpp"
 
-#include "roq/gate_futures/json/map.hpp"
-#include "roq/gate_futures/json/utils.hpp"
+#include "roq/gate_futures/protocol/json/map.hpp"
+#include "roq/gate_futures/protocol/json/utils.hpp"
 
 using namespace std::literals;
 
@@ -256,7 +256,7 @@ void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[may
       }
     };
     auto handle_success = [&](auto &body) {
-      json::Accounts accounts{body, decode_buffer_};
+      protocol::json::Accounts accounts{body, decode_buffer_};
       Trace event_2{event, accounts};
       (*this)(event_2);
       download_.check_relaxed(STATE);
@@ -265,7 +265,7 @@ void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[may
   });
 }
 
-void OrderEntry::operator()(Trace<json::Accounts> const &event) {
+void OrderEntry::operator()(Trace<protocol::json::Accounts> const &event) {
   auto &[trace_info, accounts] = event;
   log::info<2>("accounts={}"sv, accounts);
 }
@@ -304,7 +304,7 @@ void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[ma
       }
     };
     auto handle_success = [&](auto &body) {
-      json::Positions positions{body, decode_buffer_};
+      protocol::json::Positions positions{body, decode_buffer_};
       Trace event_2{event, positions};
       (*this)(event_2);
       download_.check_relaxed(STATE);
@@ -313,7 +313,7 @@ void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[ma
   });
 }
 
-void OrderEntry::operator()(Trace<json::Positions> const &event) {
+void OrderEntry::operator()(Trace<protocol::json::Positions> const &event) {
   auto &[trace_info, positions] = event;
   log::info<2>("positions={}"sv, positions);
   for (auto &item : positions.data) {
@@ -387,7 +387,7 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
       }
     };
     auto handle_success = [&](auto &body) {
-      json::UserTrades trades{body, decode_buffer_};
+      protocol::json::UserTrades trades{body, decode_buffer_};
       Trace event_2{event, trades};
       (*this)(event_2);
       download_trades_is_first_ = false;
@@ -397,7 +397,7 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
   });
 }
 
-void OrderEntry::operator()(Trace<json::UserTrades> const &event) {
+void OrderEntry::operator()(Trace<protocol::json::UserTrades> const &event) {
   auto &[trace_info, trades] = event;
   log::info<2>("trades={}"sv, trades);
   for (auto &item : trades.data) {
@@ -484,8 +484,8 @@ void OrderEntry::process_response(web::rest::Response const &response, auto erro
             assert(false);
             [[fallthrough]];
           default: {
-            // json::Error error{body};
-            // error_handler(Origin::EXCHANGE, RequestStatus::REJECTED, json::guess_error(error.code), error.msg);
+            // protocol::json::Error error{body};
+            // error_handler(Origin::EXCHANGE, RequestStatus::REJECTED, protocol::json::guess_error(error.code), error.msg);
           }
         }
         break;

@@ -1,0 +1,11 @@
+{
+  "name": "roq/gate_futures/protocol/json/UserTrades",
+  "type": "array",
+  "values": [
+    {
+      "name": "data",
+      "type": "roq/gate_futures/protocol/json/UserTradesItem",
+      "array": "std/span"
+    }
+  ]
+}

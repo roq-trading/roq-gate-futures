@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::TradeOrderPlace;
+using value_type = protocol::json::TradeOrderPlace;
 
 // {"time":1727318820,"time_ms":1727318820205,"conn_id":"c7799af51014ea53","trace_id":"4d07b2abbe99cc9656b50d9dc980cb60","channel":"","event":"","error":{"code":1,"message":"request
 // message need json scheme"},"result":{"status":"fail"}}

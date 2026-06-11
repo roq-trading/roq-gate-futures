@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::TradeOrderAmend;
+using value_type = protocol::json::TradeOrderAmend;
 
 TEST_CASE("json_order_amend_success_1", "[json_order_amend]") {
   auto message = R"({)"

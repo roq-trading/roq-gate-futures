@@ -1,0 +1,11 @@
+{
+  "name": "roq/gate_futures/protocol/json/Positions",
+  "type": "array",
+  "values": [
+    {
+      "name": "data",
+      "type": "roq/gate_futures/protocol/json/PositionsItem",
+      "array": "std/span"
+    }
+  ]
+}

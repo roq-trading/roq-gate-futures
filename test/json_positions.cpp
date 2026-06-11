@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/positions.hpp"
+#include "roq/gate_futures/protocol/json/positions.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -52,7 +52,7 @@ TEST_CASE("json_positions", "[json_positions]") {
                  R"(})"
                  R"(])"sv;
   core::json::BufferStack buffer{8192, 1};
-  json::Positions positions{message, buffer};
+  protocol::json::Positions positions{message, buffer};
   REQUIRE(std::size(positions.data) == 1);
   auto &result_0 = positions.data[0];
   CHECK(result_0.update_time == 1727084914s);

@@ -1,9 +1,0 @@
-{
-  "name": "roq/gate_futures/json/MarkType",
-  "type": "enum",
-  "values": [
-    {
-      "name": "index"
-    }
-  ]
-}

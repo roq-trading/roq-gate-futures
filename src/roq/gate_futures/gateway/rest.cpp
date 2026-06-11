@@ -241,7 +241,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        json::CurrenciesAck currencies_ack{body, decode_buffer_};
+        protocol::json::CurrenciesAck currencies_ack{body, decode_buffer_};
         Trace event_2{event, currencies_ack};
         (*this)(event_2);
         download_.check(STATE);
@@ -251,7 +251,7 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
   });
 }
 
-void Rest::operator()(Trace<json::CurrenciesAck> const &event) {
+void Rest::operator()(Trace<protocol::json::CurrenciesAck> const &event) {
   auto &[trace_info, currencies_ack] = event;
   log::info<4>("currencies_ack={}"sv, currencies_ack);
 }
@@ -290,7 +290,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
       if (download_.skip(sequence, STATE)) {
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
-        json::ContractsAck contracts_ack{body, decode_buffer_};
+        protocol::json::ContractsAck contracts_ack{body, decode_buffer_};
         Trace event_2{event, contracts_ack};
         (*this)(event_2);
         download_.check(STATE);
@@ -300,7 +300,7 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
   });
 }
 
-void Rest::operator()(Trace<json::ContractsAck> const &event) {
+void Rest::operator()(Trace<protocol::json::ContractsAck> const &event) {
   auto &[trace_info, contracts_ack] = event;
   log::info<4>("contracts_ack={}"sv, contracts_ack);
   std::vector<Symbol> symbols;
@@ -322,7 +322,7 @@ void Rest::operator()(Trace<json::ContractsAck> const &event) {
     }();
     auto settlement_currency = [&]() -> std::string_view {
       switch (item.type) {
-        using enum json::ContractType::type_t;
+        using enum protocol::json::ContractType::type_t;
         case UNDEFINED_INTERNAL:
         case UNKNOWN_INTERNAL:
         case INDEX:
@@ -428,7 +428,7 @@ void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::stri
       // XXX WHAT ???
     };
     auto handle_success = [&](auto &body) {
-      json::OrderBookAck order_book_ack{body, decode_buffer_};
+      protocol::json::OrderBookAck order_book_ack{body, decode_buffer_};
       Trace event_2{event, order_book_ack};
       (*this)(event_2, symbol);
     };
@@ -436,7 +436,7 @@ void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::stri
   });
 }
 
-void Rest::operator()(Trace<json::OrderBookAck> const &event, std::string_view const &symbol) {
+void Rest::operator()(Trace<protocol::json::OrderBookAck> const &event, std::string_view const &symbol) {
   auto &[trace_info, order_book_ack] = event;
   log::info<3>("order_book_ack={}"sv, order_book_ack);
   auto sequence = order_book_ack.id;
@@ -533,7 +533,7 @@ void Rest::get_candlesticks_ack(Trace<web::rest::Response> const &event, std::st
       // XXX WHAT ???
     };
     auto handle_success = [&](auto &body) {
-      json::CandlesticksAck candlesticks_ack{body, decode_buffer_};
+      protocol::json::CandlesticksAck candlesticks_ack{body, decode_buffer_};
       Trace event_2{event, candlesticks_ack};
       (*this)(event_2, symbol);
     };
@@ -541,7 +541,7 @@ void Rest::get_candlesticks_ack(Trace<web::rest::Response> const &event, std::st
   });
 }
 
-void Rest::operator()(Trace<json::CandlesticksAck> const &event, std::string_view const &symbol) {
+void Rest::operator()(Trace<protocol::json::CandlesticksAck> const &event, std::string_view const &symbol) {
   auto &[trace_info, candlesticks_ack] = event;
   log::info<3>("candlesticks_ack={}"sv, candlesticks_ack);
   auto &bars = shared_.bars;

@@ -1,0 +1,17 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeOrderPlaceData",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "result",
+      "type": "roq/gate_futures/protocol/json/TradeOrderPlaceDataResult"
+    },
+    {
+      "name": "req_params"
+    },
+    {
+      "name": "errs",
+      "type": "roq/gate_futures/protocol/json/TradeOrderPlaceDataErrs"
+    }
+  ]
+}

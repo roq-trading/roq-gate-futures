@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::TradeOrderCancelCP;
+using value_type = protocol::json::TradeOrderCancelCP;
 
 TEST_CASE("json_order_cancel_cp_success_1", "[json_order_cancel_cp]") {
   auto message = R"({)"
@@ -135,29 +135,29 @@ TEST_CASE("json_order_cancel_cp_error_1", "[json_order_cancel_cp]") {
                  R"(},)"
                  R"("request_id":"RwICAAAAAAAAAAAAAAAA")"
                  R"(})"sv;
-  struct MyHandler final : public json::TradeParser::Handler {
+  struct MyHandler final : public protocol::json::TradeParser::Handler {
     bool found = false;
 
    protected:
-    void operator()(Trace<json::TradeLogin> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeSubscribe> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeBalances> const &) override { FAIL(); }
-    void operator()(Trace<json::TradePositions> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrders> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeTrades> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderPlace> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderAmend> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancel> const &) override { FAIL(); }
-    void operator()(Trace<json::TradeOrderCancelCP> const &event) override {
+    void operator()(Trace<protocol::json::TradeLogin> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeSubscribe> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeBalances> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradePositions> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeOrders> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeTrades> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeOrderPlace> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeOrderAmend> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeOrderCancel> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeOrderCancelCP> const &event) override {
       found = true;
       auto &order_cancel_cp = event.value;
       CHECK(order_cancel_cp.header.response_time == 1727226815570ms);
     }
-    void operator()(Trace<json::TradeOrderList> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::TradeOrderList> const &) override { FAIL(); }
   } handler;
   core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;
-  auto res = json::TradeParser::dispatch(handler, message, buffer, trace_info);
+  auto res = protocol::json::TradeParser::dispatch(handler, message, buffer, trace_info);
   CHECK(res == true);
   CHECK(handler.found == true);
 }

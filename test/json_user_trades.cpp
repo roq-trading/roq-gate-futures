@@ -4,7 +4,7 @@
 
 #include "roq/core/json/buffer_stack.hpp"
 
-#include "roq/gate_futures/json/user_trades.hpp"
+#include "roq/gate_futures/protocol/json/user_trades.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -103,7 +103,7 @@ TEST_CASE("json_user_trades_update", "[json_user_trades]") {
                  R"(])"
                  R"(})";
   core::json::BufferStack buffer{8192, 1};
-  json::UserTrades user_trades{message, buffer};
+  protocol::json::UserTrades user_trades{message, buffer};
   REQUIRE(std::size(user_trades.data) == 6);
   auto &result_0 = user_trades.data[0];
   CHECK(result_0.create_time == 1727233346949400us);

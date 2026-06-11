@@ -1,0 +1,39 @@
+{
+  "name": "roq/gate_futures/protocol/json/Candlesticks",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "id"
+    },
+    {
+      "name": "time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "channel",
+      "type": "roq/gate_futures/protocol/json/Channel"
+    },
+    {
+      "name": "event",
+      "type": "roq/gate_futures/protocol/json/Event"
+    },
+    {
+      "name": "result",
+      "type": "roq/gate_futures/protocol/json/CandlesticksResultItem",
+      "array": "std/span"
+    },
+    {
+      "name": "error"
+    },
+    {
+      "name": "conn_id"
+    },
+    {
+      "name": "trace_id"
+    }
+  ]
+}

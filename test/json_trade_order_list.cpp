@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::TradeOrderList;
+using value_type = protocol::json::TradeOrderList;
 
 // empty
 TEST_CASE("json_trade_order_list_1", "[json_trade_order_list]") {

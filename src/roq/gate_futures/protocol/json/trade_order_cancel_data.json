@@ -1,0 +1,17 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeOrderCancelData",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "result",
+      "type": "roq/gate_futures/protocol/json/TradeOrderCancelDataResult"
+    },
+    {
+      "name": "req_params"
+    },
+    {
+      "name": "errs",
+      "type": "roq/gate_futures/protocol/json/TradeOrderPlaceDataErrs"
+    }
+  ]
+}

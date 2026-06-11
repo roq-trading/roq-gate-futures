@@ -1,0 +1,38 @@
+{
+  "name": "roq/gate_futures/protocol/json/BalancesItem",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "text",
+      "type": "std/string_view"
+    },
+    {
+      "name": "time",
+      "type": "std/seconds"
+    },
+    {
+      "name": "time_ms",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "type",
+      "type": "std/string_view"
+    },
+    {
+      "name": "user",
+      "type": "std/int64"
+    },
+    {
+      "name": "currency",
+      "type": "std/string_view"
+    },
+    {
+      "name": "balance",
+      "type": "std/double"
+    },
+    {
+      "name": "change",
+      "type": "std/double"
+    }
+  ]
+}

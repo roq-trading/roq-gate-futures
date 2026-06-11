@@ -1,0 +1,14 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeLoginData",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "result",
+      "type": "roq/gate_futures/protocol/json/TradeLoginDataResult"
+    },
+    {
+      "name": "errs",
+      "type": "roq/gate_futures/protocol/json/TradeLoginDataErrs"
+    }
+  ]
+}

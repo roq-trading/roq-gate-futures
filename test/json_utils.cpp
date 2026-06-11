@@ -2,7 +2,7 @@
 
 #include <catch2/catch_all.hpp>
 
-#include "roq/gate_futures/json/utils.hpp"
+#include "roq/gate_futures/protocol/json/utils.hpp"
 
 using namespace roq;
 using namespace roq::gate_futures;
@@ -14,5 +14,5 @@ using namespace Catch::literals;
 
 TEST_CASE("json_utils", "[json_utils]") {
   // std::chrono::milliseconds result={};
-  // json::update(k
+  // protocol::json::update(k
 }

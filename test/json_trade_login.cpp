@@ -12,7 +12,7 @@ using namespace std::chrono_literals;
 
 using namespace Catch::literals;
 
-using value_type = json::TradeLogin;
+using value_type = protocol::json::TradeLogin;
 
 TEST_CASE("json_login_success", "[json_login]") {
   auto message = R"({)"

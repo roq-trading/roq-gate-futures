@@ -1,0 +1,105 @@
+{
+  "name": "roq/gate_futures/protocol/json/TickersItem",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "contract",
+      "type": "std/string_view"
+    },
+    {
+      "name": "last",
+      "type": "std/double"
+    },
+    {
+      "name": "change_percentage",
+      "type": "std/double"
+    },
+    {
+      "name": "funding_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "mark_price",
+      "type": "std/double"
+    },
+    {
+      "name": "index_price",
+      "type": "std/double"
+    },
+    {
+      "name": "total_size",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24h",
+      "type": "std/double"
+    },
+    {
+      "name": "quanto_base_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24h_usd",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24h_btc",
+      "type": "std/double"
+    },
+    {
+      "name": "funding_rate_indicative",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24h_quote",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24h_settle",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24h_base",
+      "type": "std/double"
+    },
+    {
+      "name": "low_24h",
+      "type": "std/double"
+    },
+    {
+      "name": "high_24h",
+      "type": "std/double"
+    },
+    {
+      "name": "volume_24_usd",
+      "type": "std/double",
+      "comment": "exchange typo ??? shouldn't it be 24h?"
+    },
+    {
+      "name": "volume_24_btc",
+      "type": "std/double",
+      "comment": "exchange typo ??? shouldn't it be 24h?"
+    },
+    {
+      "name": "price_type",
+      "type": "std/string_view"
+    },
+    {
+      "name": "change_from",
+      "type": "std/string_view"
+    },
+    {
+      "name": "change_price",
+      "type": "std/double"
+    },
+    {
+      "raw": "t",
+      "name": "timestamp",
+      "type": "std/milliseconds"
+    },
+    {
+      "name": "event_type",
+      "type": "roq/gate_futures/protocol/json/EventType"
+    }
+  ]
+}

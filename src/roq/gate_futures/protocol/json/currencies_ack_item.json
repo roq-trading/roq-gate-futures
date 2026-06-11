@@ -1,0 +1,57 @@
+{
+  "name": "roq/gate_futures/protocol/json/CurrenciesAckItem",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "currency",
+      "type": "std/string_view"
+    },
+    {
+      "name": "delisted",
+      "type": "std/bool"
+    },
+    {
+      "name": "withdraw_disabled",
+      "type": "std/bool"
+    },
+    {
+      "name": "withdraw_delayed",
+      "type": "std/bool"
+    },
+    {
+      "name": "deposit_disabled",
+      "type": "std/bool"
+    },
+    {
+      "name": "trade_disabled",
+      "type": "std/bool"
+    },
+    {
+      "name": "fixed_rate",
+      "type": "std/double"
+    },
+    {
+      "name": "chain",
+      "type": "std/string_view"
+    },
+    {
+      "name": "name",
+      "type": "std/string_view"
+    },
+    {
+      "name": "chains"
+    },
+    {
+      "name": "total_supply",
+      "type": "std/string_view",
+      "comment": "Have seen the infinity unicode symbol..."
+    },
+    {
+      "name": "market_cap",
+      "type": "std/double"
+    },
+    {
+      "name": "category"
+    }
+  ]
+}
