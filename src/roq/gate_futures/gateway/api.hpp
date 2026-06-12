@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "roq/compat.hpp"
-
 #include <string_view>
 
 #include "roq/gate_futures/gateway/settings.hpp"
@@ -31,7 +29,7 @@ struct API final {
     USDT,
   };
 
-  ROQ_PUBLIC static Key parse_api(Settings const &);
+  static Key parse_api(Settings const &);
 };
 
 }  // namespace gateway

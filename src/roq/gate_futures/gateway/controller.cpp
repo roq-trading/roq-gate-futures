@@ -12,6 +12,8 @@
 
 #include "roq/server/oms/exceptions.hpp"
 
+#include "roq/gate_futures/gateway/api.hpp"
+
 #include "roq/gate_futures/protocol/json/utils.hpp"
 
 using namespace std::literals;
@@ -19,6 +21,13 @@ using namespace std::literals;
 namespace roq {
 namespace gate_futures {
 namespace gateway {
+
+// === CONSTANTS ===
+
+namespace {
+uint8_t const API_BTC = 0x0;
+uint8_t const API_USDT = 0x1;
+}  // namespace
 
 // === HELPERS ===
 
@@ -61,6 +70,18 @@ R create_drop_copy(auto &gateway, auto &context, auto &stream_id, auto &accounts
 
 std::unique_ptr<server::Handler> Controller::create(server::Dispatcher &dispatcher, Settings const &settings, Config const &config, io::Context &context) {
   return std::make_unique<Controller>(dispatcher, settings, config, context);
+}
+
+uint8_t Controller::parse_api(Settings const &settings) {
+  auto api = API::parse_api(settings);
+  switch (api) {
+    using enum gateway::API::Key;
+    case BTC:
+      return API_BTC;
+    case USDT:
+      return API_USDT;
+  }
+  log::fatal(R"(Unexpected: api="{}")"sv, settings.app.api);
 }
 
 Controller::Controller(server::Dispatcher &dispatcher, Settings const &settings, Config const &config, io::Context &context)
