@@ -40,6 +40,7 @@ struct TradeParserTester final : public protocol::json::TradeParser::Handler {
   void operator()(Trace<protocol::json::TradeOrderCancel> const &event) override { dispatch(event); }
   void operator()(Trace<protocol::json::TradeOrderCancelCP> const &event) override { dispatch(event); }
   void operator()(Trace<protocol::json::TradeOrderList> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::FuturesSystem> const &event) override { dispatch(event); }
 
   template <typename U>
   void dispatch(Trace<U> const &event) {

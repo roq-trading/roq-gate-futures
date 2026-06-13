@@ -35,6 +35,7 @@ struct ParserTester final : public protocol::json::Parser::Handler {
   void operator()(Trace<protocol::json::BookTicker> const &event) override { dispatch(event); }
   void operator()(Trace<protocol::json::OrderBookUpdate> const &event) override { dispatch(event); }
   void operator()(Trace<protocol::json::Candlesticks> const &event) override { dispatch(event); }
+  void operator()(Trace<protocol::json::FuturesSystem> const &event) override { dispatch(event); }
 
   template <typename U>
   void dispatch(Trace<U> const &event) {

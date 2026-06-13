@@ -565,6 +565,12 @@ void MarketData::operator()(Trace<protocol::json::Candlesticks> const &event) {
   });
 }
 
+void MarketData::operator()(Trace<protocol::json::FuturesSystem> const &event) {
+  auto &[trace_info, futures_system] = event;
+  log::warn("futures_system={}"sv, futures_system);
+  // note! the message says that the exchange will close the connection -- we will just wait
+}
+
 }  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

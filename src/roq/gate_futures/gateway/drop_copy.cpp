@@ -735,6 +735,12 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderList> const &event) {
   download_.check_relaxed(STATE);
 }
 
+void DropCopy::operator()(Trace<protocol::json::FuturesSystem> const &event) {
+  auto &[trace_info, futures_system] = event;
+  log::warn("futures_system={}"sv, futures_system);
+  // note! the message says that the exchange will close the connection -- we will just wait
+}
+
 template <typename Callback, typename T>
 void DropCopy::create_order_update(Callback callback, T const &value, UpdateType update_type) {
   auto client_order_id = get_client_order_id(value.text);

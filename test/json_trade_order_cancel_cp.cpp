@@ -154,6 +154,7 @@ TEST_CASE("json_order_cancel_cp_error_1", "[json_order_cancel_cp]") {
       CHECK(order_cancel_cp.header.response_time == 1727226815570ms);
     }
     void operator()(Trace<protocol::json::TradeOrderList> const &) override { FAIL(); }
+    void operator()(Trace<protocol::json::FuturesSystem> const &) override { FAIL(); }
   } handler;
   core::json::BufferStack buffer{8192, 1};
   TraceInfo trace_info;

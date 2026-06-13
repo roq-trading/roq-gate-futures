@@ -5,76 +5,78 @@ set(SOURCES encoder.cpp map.cpp parser.cpp trade_parser.cpp utils.cpp)
 include(RoqAutogen)
 
 set(AUTOGEN_SCHEMAS
-    accounts_history.json
     accounts.json
+    accounts_history.json
     balances_item.json
     book_ticker.json
     book_ticker_result.json
-    candlesticks_ack_item.json
-    candlesticks_ack.json
     candlesticks.json
+    candlesticks_ack.json
+    candlesticks_ack_item.json
     candlesticks_result_item.json
     channel.json
-    contracts_ack_item.json
-    contracts_ack.json
     contract_type.json
-    currencies_ack_item.json
+    contracts_ack.json
+    contracts_ack_item.json
     currencies_ack.json
+    currencies_ack_item.json
     event.json
     event_type.json
     finish_as.json
+    futures_system.json
+    futures_system_result.json
     mark_type.json
     message.json
     order_book_ack.json
     order_book_update.json
     order_book_update_result.json
-    orders_item.json
     order_status.json
-    positions_item.json
+    orders_item.json
     positions.json
+    positions_item.json
     price_size.json
     role.json
     status.json
     subscribe.json
     subscribe_result.json
-    tickers_item.json
     tickers.json
+    tickers_item.json
     tif.json
     trade_balances.json
     trade_error.json
     trade_header.json
-    trade_login_data_errs.json
-    trade_login_data.json
-    trade_login_data_result.json
     trade_login.json
+    trade_login_data.json
+    trade_login_data_errs.json
+    trade_login_data_result.json
     trade_message.json
+    trade_order_amend.json
     trade_order_amend_data.json
     trade_order_amend_data_result.json
-    trade_order_amend.json
+    trade_order_cancel.json
+    trade_order_cancel_cp.json
     trade_order_cancel_cp_data.json
     trade_order_cancel_cp_data_result.json
-    trade_order_cancel_cp.json
     trade_order_cancel_data.json
     trade_order_cancel_data_result.json
-    trade_order_cancel.json
-    trade_order_list_data_error.json
-    trade_order_list_data.json
-    trade_order_list_data_result_item.json
     trade_order_list.json
-    trade_order_place_data_errs.json
-    trade_order_place_data.json
-    trade_order_place_data_result.json
+    trade_order_list_data.json
+    trade_order_list_data_error.json
+    trade_order_list_data_result_item.json
     trade_order_place.json
+    trade_order_place_data.json
+    trade_order_place_data_errs.json
+    trade_order_place_data_result.json
     trade_orders.json
     trade_positions.json
-    trades_item.json
-    trades.json
     trade_subscribe.json
     trade_subscribe_result.json
     trade_trades.json
     trade_trades_result_item.json
-    user_trades_item.json
-    user_trades.json)
+    trades.json
+    trades_item.json
+    user_trades.json
+    user_trades_item.json)
 
 roq_autogen_hpp(
   OUTPUT

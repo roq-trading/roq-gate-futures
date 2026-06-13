@@ -6,6 +6,7 @@ set(SOURCES
     json_book_ticker.cpp
     json_contracts_ack.cpp
     json_currencies_ack.cpp
+    json_futures_system.cpp
     json_message.cpp
     json_order_book_ack.cpp
     json_order_book_update.cpp
@@ -15,8 +16,8 @@ set(SOURCES
     json_trade_balances.cpp
     json_trade_login.cpp
     json_trade_order_amend.cpp
-    json_trade_order_cancel_cp.cpp
     json_trade_order_cancel.cpp
+    json_trade_order_cancel_cp.cpp
     json_trade_order_list.cpp
     json_trade_order_place.cpp
     json_trade_orders.cpp

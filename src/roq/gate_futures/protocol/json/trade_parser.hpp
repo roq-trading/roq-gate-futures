@@ -24,6 +24,8 @@
 
 #include "roq/gate_futures/protocol/json/trade_order_list.hpp"
 
+#include "roq/gate_futures/protocol/json/futures_system.hpp"
+
 namespace roq {
 namespace gate_futures {
 namespace protocol {
@@ -31,21 +33,23 @@ namespace json {
 
 struct TradeParser final {
   struct Handler {
-    virtual void operator()(Trace<protocol::json::TradeLogin> const &) = 0;
+    virtual void operator()(Trace<TradeLogin> const &) = 0;
     //
-    virtual void operator()(Trace<protocol::json::TradeSubscribe> const &) = 0;
+    virtual void operator()(Trace<TradeSubscribe> const &) = 0;
     //
-    virtual void operator()(Trace<protocol::json::TradeBalances> const &) = 0;
-    virtual void operator()(Trace<protocol::json::TradePositions> const &) = 0;
-    virtual void operator()(Trace<protocol::json::TradeOrders> const &) = 0;
-    virtual void operator()(Trace<protocol::json::TradeTrades> const &) = 0;
+    virtual void operator()(Trace<TradeBalances> const &) = 0;
+    virtual void operator()(Trace<TradePositions> const &) = 0;
+    virtual void operator()(Trace<TradeOrders> const &) = 0;
+    virtual void operator()(Trace<TradeTrades> const &) = 0;
     //
-    virtual void operator()(Trace<protocol::json::TradeOrderPlace> const &) = 0;
-    virtual void operator()(Trace<protocol::json::TradeOrderAmend> const &) = 0;
-    virtual void operator()(Trace<protocol::json::TradeOrderCancel> const &) = 0;
-    virtual void operator()(Trace<protocol::json::TradeOrderCancelCP> const &) = 0;
+    virtual void operator()(Trace<TradeOrderPlace> const &) = 0;
+    virtual void operator()(Trace<TradeOrderAmend> const &) = 0;
+    virtual void operator()(Trace<TradeOrderCancel> const &) = 0;
+    virtual void operator()(Trace<TradeOrderCancelCP> const &) = 0;
     //
-    virtual void operator()(Trace<protocol::json::TradeOrderList> const &) = 0;
+    virtual void operator()(Trace<TradeOrderList> const &) = 0;
+    //
+    virtual void operator()(Trace<FuturesSystem> const &) = 0;
   };
 
   static bool dispatch(Handler &, std::string_view const &message, core::json::BufferStack &, TraceInfo const &, bool allow_unknown_event_types = false);

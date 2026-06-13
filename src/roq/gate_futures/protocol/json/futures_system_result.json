@@ -1,0 +1,14 @@
+{
+  "name": "roq/gate_futures/protocol/json/FuturesSystemResult",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "type",
+      "type": "std/string_view"
+    },
+    {
+      "name": "msg",
+      "type": "std/string_view"
+    }
+  ]
+}

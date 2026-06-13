@@ -76,6 +76,9 @@ bool Parser::dispatch(
         case ORDER_CANCEL_CP:
         case ORDER_LIST:
           log::fatal("Unexpected"sv);
+        case FUTURES_SYSTEM:
+          dispatch_helper<FuturesSystem>(handler, message, buffer_stack, trace_info);
+          return true;
       }
       break;
     case API:

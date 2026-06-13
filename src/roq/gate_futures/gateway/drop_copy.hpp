@@ -90,6 +90,8 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
 
   void operator()(Trace<protocol::json::TradeOrderList> const &) override;
 
+  void operator()(Trace<protocol::json::FuturesSystem> const &) override;
+
  private:
   void operator()(ConnectionStatus, std::string_view const &reason = {});
 
