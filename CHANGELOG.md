@@ -6,6 +6,7 @@ All notable changes will be documented in this file.
 
 ### Changed
 
+* BREAKING CHANGE: ClOrdID now using 3 bits for API and 3 bits for instance number (#607)
 * Support `futures.system` messages (#606)
 
 ## 1.1.5 &ndash; 2026-06-06
