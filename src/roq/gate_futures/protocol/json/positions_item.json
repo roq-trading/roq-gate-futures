@@ -184,6 +184,10 @@
     {
       "name": "liq_lock",
       "type": "std/bool"
+    },
+    {
+      "name": "protected_size",
+      "type": "std/double"
     }
   ]
 }
