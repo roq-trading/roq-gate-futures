@@ -123,10 +123,6 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
   template <typename Callback, typename T>
   void create_order_update(Callback, T const &value, UpdateType);
 
-  template <typename... Args>
-  void operator()(Trace<server::oms::Response> const &, Args &&...);
-  void operator()(Trace<server::oms::OrderUpdate> const &);
-
   Handler &handler_;
   // config
   uint16_t const stream_id_;

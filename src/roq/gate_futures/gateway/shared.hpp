@@ -31,26 +31,21 @@ struct Shared final {
 
   Shared(Shared const &) = delete;
 
-  auto discard_symbol(std::string_view const &name) const { return dispatcher_.discard_symbol(name); }
-
-  template <typename... Args>
-  auto update_order(Args &&...args) {
-    return dispatcher_.update_order(std::forward<Args>(args)...);
-  }
+  auto discard_symbol(std::string_view const &name) const { return dispatcher.discard_symbol(name); }
 
   template <typename... Args>
   auto operator()(Args &&...args) {
-    return dispatcher_(std::forward<Args>(args)...);
+    return dispatcher(std::forward<Args>(args)...);
   }
 
   template <typename Callback>
   bool get_all_order_symbols(Callback callback, std::string_view const &account) const {
-    return dispatcher_.get_all_order_symbols(callback, account);
+    return dispatcher.get_all_order_symbols(callback, account);
   }
 
   template <typename... Args>
   auto get_ref_data(Args &&...args) {
-    return dispatcher_.get_ref_data(std::forward<Args>(args)...);
+    return dispatcher.get_ref_data(std::forward<Args>(args)...);
   }
 
  public:
@@ -78,8 +73,7 @@ struct Shared final {
 
   utils::unordered_map<std::string, market::mbp::Sequencer> mbp_sequencer;
 
- private:
-  server::Dispatcher &dispatcher_;
+  server::Dispatcher &dispatcher;
 
  public:
   Settings const &settings;

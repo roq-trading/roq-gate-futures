@@ -486,10 +486,7 @@ void DropCopy::operator()(Trace<protocol::json::TradePositions> const &event) {
 
 void DropCopy::operator()(Trace<protocol::json::TradeOrders> const &event) {
   auto &[trace_info, orders] = event;
-  auto helper = [&](auto &order_update) {
-    Trace event_2{trace_info, order_update};
-    (*this)(event_2);
-  };
+  auto helper = [&](auto &order_update) { create_trace_and_dispatch(shared_.dispatcher, trace_info, order_update, stream_id_); };
   for (auto &item : orders.result) {
     log::info<2>("item={}"sv, item);
     create_order_update(helper, item, UpdateType::INCREMENTAL);
@@ -572,8 +569,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderPlace> const &event) {
             .quantity = NaN,
             .price = NaN,
         };
-        Trace event_2{trace_info, response};
-        (*this)(event_2, order_update);
+        create_trace_and_dispatch(shared_.dispatcher, trace_info, response, order_update, stream_id_);
       };
       create_order_update(helper, result, UpdateType::INCREMENTAL);
     }
@@ -591,8 +587,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderPlace> const &event) {
         .quantity = NaN,
         .price = NaN,
     };
-    Trace event_2{trace_info, response};
-    (*this)(event_2);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
   }
 }
 
@@ -614,8 +609,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderAmend> const &event) {
           .quantity = NaN,
           .price = NaN,
       };
-      Trace event_2{trace_info, response};
-      (*this)(event_2, order_update);
+      create_trace_and_dispatch(shared_.dispatcher, trace_info, response, order_update, stream_id_);
     };
     create_order_update(helper, order_amend.data.result, UpdateType::INCREMENTAL);
   } else {
@@ -632,8 +626,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderAmend> const &event) {
         .quantity = NaN,
         .price = NaN,
     };
-    Trace event_2{trace_info, response};
-    (*this)(event_2);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
   }
 }
 
@@ -655,8 +648,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) 
           .quantity = NaN,
           .price = NaN,
       };
-      Trace event_2{trace_info, response};
-      (*this)(event_2, order_update);
+      create_trace_and_dispatch(shared_.dispatcher, trace_info, response, order_update, stream_id_);
     };
     create_order_update(helper, order_cancel.data.result, UpdateType::INCREMENTAL);
   } else {
@@ -673,8 +665,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) 
         .quantity = NaN,
         .price = NaN,
     };
-    Trace event_2{trace_info, response};
-    (*this)(event_2);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
   }
 }
 
@@ -728,10 +719,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event
 
 void DropCopy::operator()(Trace<protocol::json::TradeOrderList> const &event) {
   auto &[trace_info, order_list] = event;
-  auto helper = [&](auto &order_update) {
-    Trace event_2{trace_info, order_update};
-    (*this)(event_2);
-  };
+  auto helper = [&](auto &order_update) { create_trace_and_dispatch(shared_.dispatcher, trace_info, order_update, stream_id_); };
   log::info<2>("order_list={}"sv, order_list);
   for (auto &item : order_list.data.result) {
     log::info<2>("item={}"sv, item);
@@ -827,23 +815,6 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .sending_time_utc = value.update_time,
   };
   callback(order_update);
-}
-
-template <typename... Args>
-void DropCopy::operator()(Trace<server::oms::Response> const &event, Args &&...args) {
-  auto &[trace_info, response] = event;
-  if (shared_.update_order(stream_id_, trace_info, response, std::forward<Args>(args)..., []([[maybe_unused]] auto &order) {})) {
-  } else {
-    log::warn(R"(Did not find order: response={})"sv, response);
-  }
-}
-
-void DropCopy::operator()(Trace<server::oms::OrderUpdate> const &event) {
-  auto &[trace_info, order_update] = event;
-  if (shared_.update_order(stream_id_, trace_info, order_update, [&]([[maybe_unused]] auto &order) {})) {
-  } else {
-    log::warn("*** EXTERNAL ORDER ***"sv);
-  }
 }
 
 }  // namespace gateway
