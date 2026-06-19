@@ -153,7 +153,7 @@ void Rest::operator()(ConnectionStatus connection_status, std::string_view const
       .proxy = (*connection_).get_proxy(),
   };
   log::info("stream_status={}"sv, stream_status);
-  create_trace_and_dispatch(handler_, trace_info, stream_status);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, stream_status);
 }
 
 void Rest::operator()(Trace<web::rest::Client::Connected> const &) {
@@ -180,7 +180,7 @@ void Rest::operator()(Trace<web::rest::Client::Latency> const &event) {
       .account = {},
       .latency = latency.sample,
   };
-  create_trace_and_dispatch(handler_, trace_info, external_latency);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, external_latency);
   latency_.ping.update(latency.sample);
 }
 
@@ -309,7 +309,7 @@ void Rest::operator()(Trace<protocol::json::ContractsAck> const &event) {
   for (auto &item : contracts_ack.data) {
     log::info<2>("item={}"sv, item);
     auto symbol = item.name;
-    auto discard = shared_.discard_symbol(symbol);
+    auto discard = shared_.dispatcher.discard_symbol(symbol);
     auto [base_currency, quote_currency] = [&]() -> std::pair<std::string_view, std::string_view> {
       auto sep = symbol.find('_');
       if (sep == std::string_view::npos) [[unlikely]] {
@@ -376,7 +376,7 @@ void Rest::operator()(Trace<protocol::json::ContractsAck> const &event) {
         .sending_time_utc = {},
         .discard = discard,
     };
-    create_trace_and_dispatch(handler_, trace_info, reference_data, true);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, reference_data, true);
     if (discard) {
       log::info<1>(R"(Drop symbol="{}")"sv, symbol);
       continue;
@@ -482,8 +482,7 @@ void Rest::operator()(Trace<protocol::json::OrderBookAck> const &event, std::str
           .checksum = {},
       };
       auto apply_updates = [&](auto &market_by_price) { sequencer.apply(market_by_price, sequence, true); };
-      Trace event{trace_info, market_by_price_update};
-      shared_(event, true, apply_updates);
+      create_trace_and_dispatch(shared_.dispatcher, trace_info, market_by_price_update, true, apply_updates);
     };
     auto request_snapshot = [&](auto retries) {
       log::info(R"(DEBUG REQUEST symbol="{}" (retries={}))"sv, symbol, retries);
@@ -573,7 +572,7 @@ void Rest::operator()(Trace<protocol::json::CandlesticksAck> const &event, std::
       .update_type = UpdateType::SNAPSHOT,
       .exchange_time_utc = {},  // XXX FIXME
   };
-  create_trace_and_dispatch(handler_, trace_info, time_series_update, true);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, time_series_update, true);
   bars.clear();
 }
 

@@ -181,7 +181,7 @@ uint16_t DropCopy::operator()(Event<CancelAllOrders> const &event, std::string_v
     log::warn(R"(DEBUG message="{}")"sv, message);
     (*connection_).send_text(message);
   };
-  if (shared_.get_all_order_symbols(helper, account_.name)) {
+  if (shared_.dispatcher.get_all_order_symbols(helper, account_.name)) {
   } else {
     log::warn("DEBUG *** NO ORDERS ***"sv);
   }
@@ -214,7 +214,7 @@ void DropCopy::operator()(web::socket::Client::Latency const &latency) {
       .account = account_.name,
       .latency = latency.sample,
   };
-  create_trace_and_dispatch(handler_, trace_info, external_latency);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, external_latency);
   latency_.ping.update(latency.sample);
 }
 
@@ -245,7 +245,7 @@ void DropCopy::operator()(ConnectionStatus connection_status, std::string_view c
       .proxy = (*connection_).get_proxy(),
   };
   log::info("stream_status={}"sv, stream_status);
-  create_trace_and_dispatch(handler_, trace_info, stream_status);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, stream_status);
 }
 
 uint32_t DropCopy::download(State state) {
@@ -447,14 +447,14 @@ void DropCopy::operator()(Trace<protocol::json::TradeBalances> const &event) {
         .exchange_time_utc = item.time_ms,
         .sending_time_utc = balances.time_ms,
     };
-    create_trace_and_dispatch(handler_, trace_info, funds_update, true);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, funds_update, true);
   }
 }
 
 void DropCopy::operator()(Trace<protocol::json::TradePositions> const &event) {
   auto &[trace_info, positions] = event;
   for (auto &item : positions.result) {
-    if (shared_.discard_symbol(item.contract)) {
+    if (shared_.dispatcher.discard_symbol(item.contract)) {
       continue;
     }
     auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
@@ -480,7 +480,7 @@ void DropCopy::operator()(Trace<protocol::json::TradePositions> const &event) {
         .sending_time_utc = positions.time_ms,
     };
     log::debug("position_update={}"sv, position_update);
-    create_trace_and_dispatch(handler_, trace_info, position_update, true);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, position_update, true);
   }
 }
 
@@ -509,7 +509,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeTrades> const &event) {
     auto external_order_id = fmt::format("{}"sv, item.order_id);
     auto side = item.size < 0 ? Side::SELL : Side::BUY;
     auto quantity = static_cast<double>(std::abs(item.size));
-    auto ref_data = shared_.get_ref_data(shared_.settings.exchange, item.contract);
+    auto ref_data = shared_.dispatcher.get_ref_data(shared_.settings.exchange, item.contract);
     auto profit_loss_amount = utils::compute_profit_loss_amount(side, quantity, item.price, ref_data.multiplier);
     auto fill = Fill{
         .exchange_time_utc = exchange_time_utc,
@@ -545,7 +545,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeTrades> const &event) {
         .user = {},
         .strategy_id = {},
     };
-    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, trade_update, true, SOURCE_NONE);
   }
 }
 
@@ -691,8 +691,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event
         .user = {},
         .strategy_id = {},
     };
-    Trace event_2{trace_info, cancel_all_orders_ack};
-    shared_(event_2);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, cancel_all_orders_ack);
   } else {
     auto cancel_all_orders_ack = CancelAllOrdersAck{
         .stream_id = stream_id_,
@@ -712,8 +711,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event
         .user = {},
         .strategy_id = {},
     };
-    Trace event_2{trace_info, cancel_all_orders_ack};
-    shared_(event_2);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, cancel_all_orders_ack);
   }
 }
 

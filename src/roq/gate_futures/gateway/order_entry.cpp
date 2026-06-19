@@ -170,7 +170,7 @@ void OrderEntry::operator()(Trace<web::rest::Client::Latency> const &event) {
       .account = account_.name,
       .latency = latency.sample,
   };
-  create_trace_and_dispatch(handler_, trace_info, external_latency);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, external_latency);
   latency_.ping.update(latency.sample);
 }
 
@@ -193,7 +193,7 @@ void OrderEntry::operator()(ConnectionStatus connection_status, std::string_view
       .proxy = (*connection_).get_proxy(),
   };
   log::info("stream_status={}"sv, stream_status);
-  create_trace_and_dispatch(handler_, trace_info, stream_status);
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, stream_status);
 }
 
 uint32_t OrderEntry::download(State state) {
@@ -318,7 +318,7 @@ void OrderEntry::operator()(Trace<protocol::json::Positions> const &event) {
   log::info<2>("positions={}"sv, positions);
   for (auto &item : positions.data) {
     log::info<2>("item={}"sv, item);
-    if (shared_.discard_symbol(item.contract)) {
+    if (shared_.dispatcher.discard_symbol(item.contract)) {
       continue;
     }
     auto exchange_time_utc = [&]() -> std::chrono::nanoseconds {
@@ -344,7 +344,7 @@ void OrderEntry::operator()(Trace<protocol::json::Positions> const &event) {
         .sending_time_utc = {},
     };
     log::debug("position_update={}"sv, position_update);
-    create_trace_and_dispatch(handler_, trace_info, position_update, true);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, position_update, true);
   }
 }
 
@@ -411,7 +411,7 @@ void OrderEntry::operator()(Trace<protocol::json::UserTrades> const &event) {
     auto external_order_id = fmt::format("{}"sv, item.order_id);
     auto side = item.size < 0 ? Side::SELL : Side::BUY;
     auto quantity = static_cast<double>(std::abs(item.size));
-    auto ref_data = shared_.get_ref_data(shared_.settings.exchange, item.contract);
+    auto ref_data = shared_.dispatcher.get_ref_data(shared_.settings.exchange, item.contract);
     auto profit_loss_amount = utils::compute_profit_loss_amount(side, quantity, item.price, ref_data.multiplier);
     auto fill = Fill{
         .exchange_time_utc = exchange_time_utc,
@@ -447,7 +447,7 @@ void OrderEntry::operator()(Trace<protocol::json::UserTrades> const &event) {
         .user = {},
         .strategy_id = {},
     };
-    create_trace_and_dispatch(handler_, trace_info, trade_update, true, SOURCE_NONE);
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, trade_update, true, SOURCE_NONE);
   }
 }
 

@@ -31,25 +31,18 @@ struct Shared final {
 
   Shared(Shared const &) = delete;
 
-  auto discard_symbol(std::string_view const &name) const { return dispatcher.discard_symbol(name); }
+  server::Dispatcher &dispatcher;
 
-  template <typename... Args>
-  auto operator()(Args &&...args) {
-    return dispatcher(std::forward<Args>(args)...);
-  }
-
-  template <typename Callback>
-  bool get_all_order_symbols(Callback callback, std::string_view const &account) const {
-    return dispatcher.get_all_order_symbols(callback, account);
-  }
-
-  template <typename... Args>
-  auto get_ref_data(Args &&...args) {
-    return dispatcher.get_ref_data(std::forward<Args>(args)...);
-  }
-
- public:
+  Settings const &settings;
   API const api;
+
+  core::limit::RateLimiter rate_limiter;
+
+  core::Symbols symbols;
+  utils::unordered_set<std::string> all_symbols;
+
+  core::TimerQueue<std::string> depth_request_queue;
+  core::TimerQueue<std::string> time_series_request_queue;
 
  private:
   struct {
@@ -73,17 +66,8 @@ struct Shared final {
 
   utils::unordered_map<std::string, market::mbp::Sequencer> mbp_sequencer;
 
-  server::Dispatcher &dispatcher;
-
- public:
-  Settings const &settings;
-  core::limit::RateLimiter rate_limiter;
-  core::Symbols symbols;
-  utils::unordered_set<std::string> all_symbols;
-  core::TimerQueue<std::string> depth_request_queue;
-  core::TimerQueue<std::string> time_series_request_queue;
-
   std::vector<Bar> bars;
+  std::vector<MBPUpdate> final_bids, final_asks;
 };
 
 }  // namespace gateway
