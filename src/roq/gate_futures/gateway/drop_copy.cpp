@@ -6,7 +6,6 @@
 
 #include "roq/utils/common.hpp"
 #include "roq/utils/safe_cast.hpp"
-#include "roq/utils/update.hpp"
 
 #include "roq/utils/exceptions/unhandled.hpp"
 

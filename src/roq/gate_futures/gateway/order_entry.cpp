@@ -2,17 +2,12 @@
 
 #include "roq/gate_futures/gateway/order_entry.hpp"
 
-#include <utility>
-
 #include "roq/mask.hpp"
 
 #include "roq/utils/common.hpp"
 #include "roq/utils/safe_cast.hpp"
-#include "roq/utils/update.hpp"
 
 #include "roq/utils/metrics/factory.hpp"
-
-#include "roq/web/rest/client.hpp"
 
 #include "roq/server/oms/exceptions.hpp"
 

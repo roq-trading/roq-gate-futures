@@ -2,8 +2,6 @@
 
 #include "roq/gate_futures/gateway/market_data.hpp"
 
-#include <algorithm>
-
 #include "roq/logging.hpp"
 
 #include "roq/mask.hpp"
@@ -16,8 +14,6 @@
 #include "roq/utils/exceptions/unhandled.hpp"
 
 #include "roq/utils/metrics/factory.hpp"
-
-#include "roq/web/socket/client.hpp"
 
 #include "roq/gate_futures/protocol/json/utils.hpp"
 

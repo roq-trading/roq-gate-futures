@@ -3,7 +3,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
 #include "roq/utils/metrics/counter.hpp"
 #include "roq/utils/metrics/latency.hpp"
@@ -35,8 +34,6 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
 
   DropCopy(DropCopy const &) = delete;
 
-  bool ready() const;
-
   void operator()(Event<Start> const &);
   void operator()(Event<Stop> const &);
   void operator()(Event<Timer> const &);
@@ -60,6 +57,8 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
   uint16_t operator()(Event<CancelAllOrders> const &, std::string_view const &request_id);
 
  protected:
+  // web::socket::Client::Handler
+
   void operator()(web::socket::Client::Connected const &) override;
   void operator()(web::socket::Client::Disconnected const &) override;
   void operator()(web::socket::Client::Ready const &) override;
@@ -67,6 +66,8 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
   void operator()(web::socket::Client::Latency const &) override;
   void operator()(web::socket::Client::Text const &) override;
   void operator()(web::socket::Client::Binary const &) override;
+
+  // protocol::json::TradeParser::Handler
 
   void operator()(Trace<protocol::json::TradeLogin> const &) override;
 
@@ -86,7 +87,10 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
 
   void operator()(Trace<protocol::json::FuturesSystem> const &) override;
 
- private:
+  // helpers
+
+  bool ready() const;
+
   void operator()(ConnectionStatus, std::string_view const &reason = {});
 
   enum class State {
@@ -117,6 +121,7 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
   template <typename Callback, typename T>
   void create_order_update(Callback, T const &value, UpdateType);
 
+ private:
   Handler &handler_;
   // config
   uint16_t const stream_id_;
