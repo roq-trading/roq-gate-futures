@@ -122,7 +122,7 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
   void create_order_update(Callback, T const &value, UpdateType);
 
  private:
-  Handler &handler_;
+  [[maybe_unused]] Handler &handler_;
   // config
   uint16_t const stream_id_;
   std::string const name_;
