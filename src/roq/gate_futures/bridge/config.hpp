@@ -6,10 +6,10 @@
 
 namespace roq {
 namespace gate_futures {
-namespace proto_bridge {
+namespace bridge {
 
 using Config = gateway::Config;
 
-}  // namespace proto_bridge
+}  // namespace bridge
 }  // namespace gate_futures
 }  // namespace roq
