@@ -409,17 +409,24 @@ void DropCopy::parse(std::string_view const &message) {
 }
 
 void DropCopy::operator()(Trace<protocol::json::TradeLogin> const &event) {
-  auto &[trace_info, login] = event;
-  log::info<5>("login={}"sv, login);
-  if (login.header.status != 200) {
-    log::fatal("Unexpected: login={}"sv, login);
+  auto &[trace_info, trade_login] = event;
+  log::info<5>("trade_login={}"sv, trade_login);
+  if (trade_login.header.status == 200) {
+    if (trade_login.data.result.uid <= 0) {
+      log::fatal("Unexpected: user_id must be positive (trade_login={})"sv, trade_login);
+    }
+    user_id_ = trade_login.data.result.uid;
+    auto const STATE = State::LOGIN;
+    download_.check_relaxed(STATE);
+  } else {
+    if (shared_.settings.experimental.retry_logon) {
+      log::error("trade_login={}"sv, trade_login);
+      log::warn("Disconnecting..."sv);
+      (*connection_).close();
+    } else {
+      log::fatal("trade_login={}"sv, trade_login);
+    }
   }
-  if (login.data.result.uid <= 0) {
-    log::fatal("Unexpected: user_id must be positive (login={})"sv, login);
-  }
-  user_id_ = login.data.result.uid;
-  auto const STATE = State::LOGIN;
-  download_.check_relaxed(STATE);
 }
 
 void DropCopy::operator()(Trace<protocol::json::TradeSubscribe> const &event) {
