@@ -420,11 +420,11 @@ void DropCopy::operator()(Trace<protocol::json::TradeLogin> const &event) {
     download_.check_relaxed(STATE);
   } else {
     if (shared_.settings.experimental.retry_logon) {
-      log::error("trade_login={}"sv, trade_login);
+      log::error("[{}] trade_login={}"sv, account_.name, trade_login);
       log::warn("Disconnecting..."sv);
       (*connection_).close();
     } else {
-      log::fatal("trade_login={}"sv, trade_login);
+      log::fatal("[{}] trade_login={}"sv, account_.name, trade_login);
     }
   }
 }
