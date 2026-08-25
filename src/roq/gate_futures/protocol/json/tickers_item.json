@@ -100,6 +100,18 @@
     {
       "name": "event_type",
       "type": "roq/gate_futures/protocol/json/EventType"
+    },
+    {
+      "name": "funding_interval",
+      "type": "std/int32"
+    },
+    {
+      "name": "funding_offset",
+      "type": "std/int32"
+    },
+    {
+      "name": "funding_next_apply",
+      "type": "std/milliseconds"
     }
   ]
 }
