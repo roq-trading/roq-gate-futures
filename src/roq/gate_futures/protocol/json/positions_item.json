@@ -188,6 +188,10 @@
     {
       "name": "protected_size",
       "type": "std/double"
+    },
+    {
+      "name": "pnl_dividend",
+      "type": "std/double"
     }
   ]
 }

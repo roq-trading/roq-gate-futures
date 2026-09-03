@@ -137,6 +137,10 @@
     {
       "name": "cross_imr",
       "type": "std/double"
+    },
+    {
+      "name": "pnl_dividend",
+      "type": "std/double"
     }
   ]
 }
