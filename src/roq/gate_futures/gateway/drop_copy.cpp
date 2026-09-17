@@ -793,6 +793,7 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
       .order_type = order_type,
       .time_in_force = map(value.tif),
       .execution_instructions = {},
+      .execution_destination = {},
       .create_time_utc = create_time_utc,
       .update_time_utc = update_time_utc,
       .external_account = {},
