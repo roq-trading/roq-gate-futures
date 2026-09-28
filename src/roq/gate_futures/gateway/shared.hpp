@@ -22,7 +22,7 @@
 #include "roq/gate_futures/gateway/api.hpp"
 #include "roq/gate_futures/gateway/settings.hpp"
 
-#include "roq/gate_futures/tools/rate_limit.hpp"
+#include "roq/gate_futures/tools/throttle.hpp"
 
 namespace roq {
 namespace gate_futures {
@@ -38,7 +38,7 @@ struct Shared final {
   Settings const &settings;
   API const api;
 
-  tools::RateLimit rate_limit;
+  tools::Throttle throttle;
 
   core::limit::RateLimiter rate_limiter;
 

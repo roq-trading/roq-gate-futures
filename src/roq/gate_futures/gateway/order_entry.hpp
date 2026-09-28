@@ -85,7 +85,7 @@ struct OrderEntry final : public web::rest::Client::Handler {
 
   // helpers
 
-  void process_response(web::rest::Response const &, auto error_handler, auto success_handler);
+  void process_response(Trace<web::rest::Response> const &, auto error_handler, auto success_handler);
 
   void waf_limit_violation();
 
