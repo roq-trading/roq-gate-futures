@@ -359,6 +359,8 @@ void MarketData::operator()(Trace<protocol::json::Trades> const &event) {
     auto emplace_back = [](auto &result, auto &value) {
       auto side = utils::compare(value.size, 0.0) == std::strong_ordering::less ? Side::SELL : Side::BUY;
       auto trade = Trade{
+          .trade_conditions = {},
+          .trade_type = {},
           .side = side,
           .price = value.price,
           .quantity = std::fabs(value.size),
