@@ -111,8 +111,10 @@ OrderEntry::OrderEntry(Handler &handler, io::Context &context, uint16_t stream_i
       latency_{
           .ping = create_metrics(shared.settings, name_, "ping"sv),
       },
-      account_{account}, shared_{shared}, download_{shared.settings.rest.request_timeout, [this](auto state) { return download(state); }} {
+      account_{account}, shared_{shared}, download_{shared.settings.rest.request_timeout, [this](auto &event) { return download(event); }} {
 }
+
+// server::Stream
 
 void OrderEntry::operator()(Event<Start> const &) {
   (*connection_).start();
@@ -142,36 +144,9 @@ void OrderEntry::operator()(metrics::Writer &writer) const {
       .write(latency_.ping, metrics::Type::LATENCY);
 }
 
-void OrderEntry::operator()(Trace<web::rest::Connected> const &) {
-  if (download_.downloading()) {
-    download_.bump();
-  } else {
-    download_.begin();
-  }
-}
-
-void OrderEntry::operator()(Trace<web::rest::Disconnected> const &) {
-  ++counter_.disconnect;
-  (*this)(ConnectionStatus::DISCONNECTED);
-  if (!download_.downloading()) {
-    download_.reset();
-  }
-}
-
-void OrderEntry::operator()(Trace<web::rest::Latency> const &event) {
-  auto &[trace_info, latency] = event;
-  auto external_latency = ExternalLatency{
-      .stream_id = stream_id_,
-      .account = account_.name,
-      .latency = latency.sample,
-  };
-  create_trace_and_dispatch(shared_.dispatcher, trace_info, external_latency);
-  latency_.ping.update(latency.sample);
-}
-
-void OrderEntry::operator()(ConnectionStatus connection_status, std::string_view const &reason) {
+void OrderEntry::operator()(Trace<ConnectionStatus> const &event, std::string_view const &reason) {
+  auto &[trace_info, connection_status] = event;
   connection_status_ = connection_status;
-  TraceInfo trace_info;
   auto stream_status = StreamStatus{
       .stream_id = stream_id_,
       .account = account_.name,
@@ -191,31 +166,65 @@ void OrderEntry::operator()(ConnectionStatus connection_status, std::string_view
   create_trace_and_dispatch(shared_.dispatcher, trace_info, stream_status);
 }
 
-uint32_t OrderEntry::download(State state) {
+// web::rest::Client::Handler
+
+void OrderEntry::operator()(Trace<web::rest::Connected> const &event) {
+  auto &[trace_info, connected] = event;
+  if (download_.downloading()) {
+    download_.bump(trace_info);
+  } else {
+    download_.begin(trace_info);
+  }
+}
+
+void OrderEntry::operator()(Trace<web::rest::Disconnected> const &event) {
+  auto &[trace_info, disconnected] = event;
+  ++counter_.disconnect;
+  create_trace_and_dispatch_2(trace_info, ConnectionStatus::DISCONNECTED);
+  if (!download_.downloading()) {
+    download_.reset();
+  }
+}
+
+void OrderEntry::operator()(Trace<web::rest::Latency> const &event) {
+  auto &[trace_info, latency] = event;
+  auto external_latency = ExternalLatency{
+      .stream_id = stream_id_,
+      .account = account_.name,
+      .latency = latency.sample,
+  };
+  create_trace_and_dispatch(shared_.dispatcher, trace_info, external_latency);
+  latency_.ping.update(latency.sample);
+}
+
+int32_t OrderEntry::download(Trace<State> const &event) {
+  auto &[trace_info, state] = event;
   switch (state) {
     using enum State;
     case UNDEFINED:
       assert(false);
       break;
     case ACCOUNTS:
-      (*this)(ConnectionStatus::DOWNLOADING, "accounts"sv);
+      create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "accounts"sv);
       get_accounts();
       return 1;
     case POSITIONS:
-      (*this)(ConnectionStatus::DOWNLOADING, "positions"sv);
+      create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "positions"sv);
       get_positions();
       return 1;
     case TRADES:
-      (*this)(ConnectionStatus::DOWNLOADING, "trades"sv);
+      create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "trades"sv);
       get_trades();
       return 1;
     case DONE:
-      (*this)(ConnectionStatus::READY);
+      create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
       return 0;
   }
   assert(false);
   return 0;
 }
+
+// accounts
 
 void OrderEntry::get_accounts() {
   profile_.accounts([&]() {
@@ -244,6 +253,7 @@ void OrderEntry::get_accounts() {
 void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
   auto const STATE = State::ACCOUNTS;
   profile_.accounts_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       if (download_.downloading()) {
@@ -252,9 +262,8 @@ void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[may
     };
     auto handle_success = [&](auto &body) {
       protocol::json::Accounts accounts{body, decode_buffer_};
-      Trace event_2{event, accounts};
-      (*this)(event_2);
-      download_.check_relaxed(STATE);
+      create_trace_and_dispatch_2(trace_info, accounts);
+      download_.check_relaxed(trace_info, STATE);
     };
     process_response(event, handle_error, handle_success);
   });
@@ -264,6 +273,8 @@ void OrderEntry::operator()(Trace<protocol::json::Accounts> const &event) {
   auto &[trace_info, accounts] = event;
   log::info<2>("accounts={}"sv, accounts);
 }
+
+// positions
 
 void OrderEntry::get_positions() {
   profile_.positions([&]() {
@@ -292,6 +303,7 @@ void OrderEntry::get_positions() {
 void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
   auto const STATE = State::POSITIONS;
   profile_.positions_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       if (download_.downloading()) {
@@ -300,9 +312,8 @@ void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[ma
     };
     auto handle_success = [&](auto &body) {
       protocol::json::Positions positions{body, decode_buffer_};
-      Trace event_2{event, positions};
-      (*this)(event_2);
-      download_.check_relaxed(STATE);
+      create_trace_and_dispatch_2(trace_info, positions);
+      download_.check_relaxed(trace_info, STATE);
     };
     process_response(event, handle_error, handle_success);
   });
@@ -343,6 +354,8 @@ void OrderEntry::operator()(Trace<protocol::json::Positions> const &event) {
   }
 }
 
+// trades
+
 void OrderEntry::get_trades() {
   profile_.trades([&]() {
     auto now = clock::get_realtime<std::chrono::milliseconds>();
@@ -375,6 +388,7 @@ void OrderEntry::get_trades() {
 void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
   auto const STATE = State::TRADES;
   profile_.trades_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       if (download_.downloading()) {
@@ -383,10 +397,9 @@ void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe
     };
     auto handle_success = [&](auto &body) {
       protocol::json::UserTrades trades{body, decode_buffer_};
-      Trace event_2{event, trades};
-      (*this)(event_2);
+      create_trace_and_dispatch_2(trace_info, trades);
       download_trades_is_first_ = false;
-      download_.check_relaxed(STATE);
+      download_.check_relaxed(trace_info, STATE);
     };
     process_response(event, handle_error, handle_success);
   });

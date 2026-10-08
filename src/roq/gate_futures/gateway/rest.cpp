@@ -92,8 +92,10 @@ Rest::Rest(Handler &handler, io::Context &context, uint16_t stream_id, Shared &s
       latency_{
           .ping = create_metrics(shared.settings, name_, "ping"sv),
       },
-      shared_{shared}, download_{shared.settings.rest.request_timeout, [this](auto state) { return download(state); }} {
+      shared_{shared}, download_{shared.settings.rest.request_timeout, [this](auto &event) { return download(event); }} {
 }
+
+// server::Stream
 
 void Rest::operator()(Event<Start> const &) {
   (*connection_).start();
@@ -128,9 +130,9 @@ void Rest::operator()(metrics::Writer &writer) const {
       .write(latency_.ping, metrics::Type::LATENCY);
 }
 
-void Rest::operator()(ConnectionStatus connection_status, std::string_view const &reason) {
+void Rest::operator()(Trace<ConnectionStatus> const &event, std::string_view const &reason) {
+  auto &[trace_info, connection_status] = event;
   connection_status_ = connection_status;
-  TraceInfo trace_info;
   auto stream_status = StreamStatus{
       .stream_id = stream_id_,
       .account = {},
@@ -150,18 +152,20 @@ void Rest::operator()(ConnectionStatus connection_status, std::string_view const
   create_trace_and_dispatch(shared_.dispatcher, trace_info, stream_status);
 }
 
-void Rest::operator()(Trace<web::rest::Connected> const &) {
+void Rest::operator()(Trace<web::rest::Connected> const &event) {
+  auto &[trace_info, connected] = event;
   if (download_.downloading()) {
-    download_.bump();
+    download_.bump(trace_info);
   } else {
-    (*this)(ConnectionStatus::DOWNLOADING);
-    download_.begin();
+    create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING);
+    download_.begin(trace_info);
   }
 }
 
-void Rest::operator()(Trace<web::rest::Disconnected> const &) {
+void Rest::operator()(Trace<web::rest::Disconnected> const &event) {
+  auto &[trace_info, disconnected] = event;
   ++counter_.disconnect;
-  (*this)(ConnectionStatus::DISCONNECTED);
+  create_trace_and_dispatch_2(trace_info, ConnectionStatus::DISCONNECTED);
   if (!download_.downloading()) {
     download_.reset();
   }
@@ -178,7 +182,8 @@ void Rest::operator()(Trace<web::rest::Latency> const &event) {
   latency_.ping.update(latency.sample);
 }
 
-uint32_t Rest::download(State state) {
+int32_t Rest::download(Trace<State> const &event) {
+  auto &[trace_info, state] = event;
   switch (state) {
     using enum State;
     case UNDEFINED:
@@ -194,7 +199,7 @@ uint32_t Rest::download(State state) {
       get_contracts();
       return 1;
     case DONE:
-      (*this)(ConnectionStatus::READY);
+      create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
       return 0;
   }
   assert(false);
@@ -227,6 +232,7 @@ void Rest::get_currencies() {
 void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
   auto const STATE = State::CURRENCIES;
   profile_.currencies_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       download_.retry(STATE);
@@ -236,9 +242,8 @@ void Rest::get_currencies_ack(Trace<web::rest::Response> const &event, uint32_t 
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
         protocol::json::CurrenciesAck currencies_ack{body, decode_buffer_};
-        Trace event_2{event, currencies_ack};
-        (*this)(event_2);
-        download_.check(STATE);
+        create_trace_and_dispatch_2(trace_info, currencies_ack);
+        download_.check(trace_info, STATE);
       }
     };
     process_response(event, handle_error, handle_success);
@@ -276,6 +281,7 @@ void Rest::get_contracts() {
 void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t sequence) {
   auto const STATE = State::CONTRACTS;
   profile_.contracts_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       download_.retry(STATE);
@@ -285,9 +291,8 @@ void Rest::get_contracts_ack(Trace<web::rest::Response> const &event, uint32_t s
         log::info("Download state={} has already been processed"sv, STATE);
       } else {
         protocol::json::ContractsAck contracts_ack{body, decode_buffer_};
-        Trace event_2{event, contracts_ack};
-        (*this)(event_2);
-        download_.check(STATE);
+        create_trace_and_dispatch_2(trace_info, contracts_ack);
+        download_.check(trace_info, STATE);
       }
     };
     process_response(event, handle_error, handle_success);
@@ -418,14 +423,14 @@ void Rest::get_order_book(std::string_view const &symbol) {
 
 void Rest::get_order_book_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.order_book_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       // XXX WHAT ???
     };
     auto handle_success = [&](auto &body) {
       protocol::json::OrderBookAck order_book_ack{body, decode_buffer_};
-      Trace event_2{event, order_book_ack};
-      (*this)(event_2, symbol);
+      create_trace_and_dispatch_2(trace_info, order_book_ack, symbol);
     };
     process_response(event, handle_error, handle_success);
   });
@@ -522,14 +527,14 @@ void Rest::get_candlesticks(std::string_view const &symbol) {
 
 void Rest::get_candlesticks_ack(Trace<web::rest::Response> const &event, std::string_view const &symbol) {
   profile_.candlesticks_ack([&]() {
+    auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
       // XXX WHAT ???
     };
     auto handle_success = [&](auto &body) {
       protocol::json::CandlesticksAck candlesticks_ack{body, decode_buffer_};
-      Trace event_2{event, candlesticks_ack};
-      (*this)(event_2, symbol);
+      create_trace_and_dispatch_2(trace_info, candlesticks_ack, symbol);
     };
     process_response(event, handle_error, handle_success);
   });
@@ -571,7 +576,7 @@ void Rest::operator()(Trace<protocol::json::CandlesticksAck> const &event, std::
   bars.clear();
 }
 
-// queue
+// helpers
 
 void Rest::check_request_queue(std::chrono::nanoseconds now) {
   auto depth_helper = [&](auto &symbol) { get_order_book(symbol); };
@@ -579,8 +584,6 @@ void Rest::check_request_queue(std::chrono::nanoseconds now) {
   auto time_series_helper = [&](auto &symbol) { get_candlesticks(symbol); };
   shared_.time_series_request_queue.dispatch([&](auto now) { return shared_.rate_limiter.can_request(now); }, time_series_helper, now);
 }
-
-// helpers
 
 void Rest::process_response(Trace<web::rest::Response> const &event, auto error_handler, auto success_handler) {
   auto &[trace_info, response] = event;

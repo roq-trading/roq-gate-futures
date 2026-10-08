@@ -12,11 +12,13 @@
 
 #include "roq/web/socket/client.hpp"
 
-#include "roq/core/download.hpp"
+#include "roq/core/download_2.hpp"
 
 #include "roq/core/json/buffer_stack.hpp"
 
 #include "roq/server.hpp"
+
+#include "roq/server/stream.hpp"
 
 #include "roq/gate_futures/gateway/account.hpp"
 #include "roq/gate_futures/gateway/shared.hpp"
@@ -27,34 +29,45 @@ namespace roq {
 namespace gate_futures {
 namespace gateway {
 
-struct DropCopy final : public web::socket::Client::Handler, protocol::json::TradeParser::Handler {
+struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream, public web::socket::Client::Handler, protocol::json::TradeParser::Handler {
   struct Handler {};
 
   DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &);
 
-  DropCopy(DropCopy const &) = delete;
+  // protected:
+  friend base_type;
 
-  void operator()(Event<Start> const &);
-  void operator()(Event<Stop> const &);
-  void operator()(Event<Timer> const &);
+  // server::Stream
 
-  void operator()(metrics::Writer &) const;
+  uint16_t stream_id() const override { return stream_id_; }
 
-  uint16_t operator()(Event<CreateOrder> const &, server::oms::Order const &, server::oms::RefData const &, std::string_view const &request_id);
+  bool ready() const override;
+
+  void operator()(Event<Start> const &) override;
+  void operator()(Event<Stop> const &) override;
+  void operator()(Event<Timer> const &) override;
+
+  void operator()(metrics::Writer &) const override;
+
+  void operator()(Trace<ConnectionStatus> const &, std::string_view const &reason = {}) override;
+
+  // server::OrderActionStream
+
+  uint16_t operator()(Event<CreateOrder> const &, server::oms::Order const &, server::oms::RefData const &, std::string_view const &request_id) override;
   uint16_t operator()(
       Event<ModifyOrder> const &,
       server::oms::Order const &,
       server::oms::RefData const &,
       std::string_view const &request_id,
-      std::string_view const &previous_request_id);
+      std::string_view const &previous_request_id) override;
   uint16_t operator()(
       Event<CancelOrder> const &,
       server::oms::Order const &,
       server::oms::RefData const &,
       std::string_view const &request_id,
-      std::string_view const &previous_request_id);
+      std::string_view const &previous_request_id) override;
 
-  uint16_t operator()(Event<CancelAllOrders> const &, std::string_view const &request_id);
+  uint16_t operator()(Event<CancelAllOrders> const &, std::string_view const &request_id) override;
 
  protected:
   // web::socket::Client::Handler
@@ -87,11 +100,7 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
 
   void operator()(Trace<protocol::json::FuturesSystem> const &) override;
 
-  // helpers
-
-  bool ready() const;
-
-  void operator()(ConnectionStatus, std::string_view const &reason = {});
+  // core::Download
 
   enum class State {
     UNDEFINED = 0,
@@ -101,7 +110,9 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
     DONE,
   };
 
-  uint32_t download(State);
+  int32_t download(Trace<State> const &);
+
+  // helpers
 
   void login();
 
@@ -147,7 +158,7 @@ struct DropCopy final : public web::socket::Client::Handler, protocol::json::Tra
   uint32_t request_id_ = {};
   bool ready_ = false;
   ConnectionStatus connection_status_ = {};
-  core::Download<State> download_;
+  core::Download2<State> download_;
   std::chrono::nanoseconds logon_timeout_ = {};
   std::chrono::nanoseconds next_ping_ = {};
   // ...
