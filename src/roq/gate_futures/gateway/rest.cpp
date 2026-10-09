@@ -220,12 +220,8 @@ void Rest::get_currencies() {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_currencies_ack(event, sequence);
-    };
-    (*connection_)("spot-currencies"sv, request, callback);
+    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_currencies_ack(event, sequence); };
+    (*connection_)(request, callback, "spot-currencies"sv);
   });
 }
 
@@ -269,12 +265,8 @@ void Rest::get_contracts() {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_contracts_ack(event, sequence);
-    };
-    (*connection_)("futures-contracts"sv, request, callback);
+    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_contracts_ack(event, sequence); };
+    (*connection_)(request, callback, "futures-contracts"sv);
   });
 }
 
@@ -412,12 +404,8 @@ void Rest::get_order_book(std::string_view const &symbol) {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, symbol = std::string{symbol}]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_order_book_ack(event, symbol);
-    };
-    (*connection_)("futures-order-book"sv, request, callback);
+    auto callback = [this, symbol = std::string{symbol}](auto &event, [[maybe_unused]] auto &request_id) { get_order_book_ack(event, symbol); };
+    (*connection_)(request, callback, "futures-order-book"sv);
   });
 }
 
@@ -515,13 +503,9 @@ void Rest::get_candlesticks(std::string_view const &symbol) {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, symbol = std::string{symbol}]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_candlesticks_ack(event, symbol);
-    };
+    auto callback = [this, symbol = std::string{symbol}](auto &event, [[maybe_unused]] auto &request_id) { get_candlesticks_ack(event, symbol); };
     log::info("{}"sv, request);
-    (*connection_)("futures-order-book"sv, request, callback);
+    (*connection_)(request, callback, "futures-order-book"sv);
   });
 }
 

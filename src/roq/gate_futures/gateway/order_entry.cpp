@@ -241,12 +241,8 @@ void OrderEntry::get_accounts() {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_accounts_ack(event, sequence);
-    };
-    (*connection_)("accounts"sv, request, callback);
+    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_accounts_ack(event, sequence); };
+    (*connection_)(request, callback, "accounts"sv);
   });
 }
 
@@ -291,12 +287,8 @@ void OrderEntry::get_positions() {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_positions_ack(event, sequence);
-    };
-    (*connection_)("positions"sv, request, callback);
+    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_positions_ack(event, sequence); };
+    (*connection_)(request, callback, "positions"sv);
   });
 }
 
@@ -376,12 +368,8 @@ void OrderEntry::get_trades() {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()]([[maybe_unused]] auto &request_id, auto &response) {
-      TraceInfo trace_info;
-      Trace event{trace_info, response};
-      get_trades_ack(event, sequence);
-    };
-    (*connection_)("trades"sv, request, callback);
+    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_trades_ack(event, sequence); };
+    (*connection_)(request, callback, "trades"sv);
   });
 }
 
