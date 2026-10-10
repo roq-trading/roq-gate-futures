@@ -105,17 +105,17 @@ MarketData::MarketData(Handler &handler, io::Context &context, uint16_t stream_i
 
 // server::Stream
 
-void MarketData::operator()(Event<Start> const &) {
+void MarketData::operator()(Trace<Start> const &) {
   (*connection_).start();
 }
 
-void MarketData::operator()(Event<Stop> const &) {
+void MarketData::operator()(Trace<Stop> const &) {
   (*connection_).stop();
 }
 
-void MarketData::operator()(Event<Timer> const &event) {
-  auto now = event.value.now;
-  (*connection_).refresh(now);
+void MarketData::operator()(Trace<Timer> const &event) {
+  auto &[trace_info, timer] = event;
+  (*connection_).refresh(timer.now);
 }
 
 void MarketData::operator()(metrics::Writer &writer) const {
