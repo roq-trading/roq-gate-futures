@@ -127,7 +127,7 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
 
   void get_orders();
 
-  void parse(std::string_view const &message);
+  void parse(TraceInfo const &, std::string_view const &message);
 
   template <typename Callback, typename T>
   void create_order_update(Callback, T const &value, UpdateType);

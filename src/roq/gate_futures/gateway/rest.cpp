@@ -382,7 +382,7 @@ void Rest::operator()(Trace<protocol::json::ContractsAck> const &event) {
     auto contracts_update = SymbolsUpdate{
         .symbols = symbols,
     };
-    handler_(contracts_update);
+    create_trace_and_dispatch(handler_, trace_info, contracts_update);
   }
   if (counter > 0) [[unlikely]] {
     log::info("Symbols {} / {}"sv, counter, std::size(contracts_ack.data));

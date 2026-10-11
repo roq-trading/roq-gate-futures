@@ -150,7 +150,7 @@ TEST_CASE("json_order_cancel_cp_error_1", "[json_order_cancel_cp]") {
     void operator()(Trace<protocol::json::TradeOrderCancel> const &) override { FAIL(); }
     void operator()(Trace<protocol::json::TradeOrderCancelCP> const &event) override {
       found = true;
-      auto &order_cancel_cp = event.value;
+      auto &[trace_info, order_cancel_cp] = event;
       CHECK(order_cancel_cp.header.response_time == 1727226815570ms);
     }
     void operator()(Trace<protocol::json::TradeOrderList> const &) override { FAIL(); }
