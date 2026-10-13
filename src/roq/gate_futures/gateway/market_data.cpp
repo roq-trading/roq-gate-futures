@@ -160,7 +160,8 @@ void MarketData::operator()(Trace<ConnectionStatus> const &event, std::string_vi
 
 void MarketData::subscribe(size_t start_from) {
   if (ready()) {
-    subscribe(shared_.symbols.get_slice(index_, start_from));
+    TraceInfo trace_info;  // XXX FIXME TODO
+    subscribe(trace_info, shared_.symbols.get_slice(index_, start_from));
   }
 }
 
@@ -497,22 +498,23 @@ void MarketData::operator()(Trace<protocol::json::FuturesSystem> const &event) {
 
 // helpers
 
-void MarketData::subscribe(std::span<Symbol const> const &symbols) {
+void MarketData::subscribe(TraceInfo const &trace_info, std::span<Symbol const> const &symbols) {
   if (std::empty(symbols)) {
     return;
   }
-  subscribe("futures.tickers"sv, symbols);
-  subscribe("futures.trades"sv, symbols);
-  subscribe("futures.book_ticker"sv, symbols);
-  subscribe("futures.order_book_update"sv, symbols, utils::safe_cast(shared_.settings.misc.order_book_freq), shared_.settings.misc.order_book_depth);
+  subscribe(trace_info, "futures.tickers"sv, symbols);
+  subscribe(trace_info, "futures.trades"sv, symbols);
+  subscribe(trace_info, "futures.book_ticker"sv, symbols);
+  subscribe(
+      trace_info, "futures.order_book_update"sv, symbols, utils::safe_cast(shared_.settings.misc.order_book_freq), shared_.settings.misc.order_book_depth);
   if (shared_.settings.download.time_series_lookback.count()) {
-    subscribe("futures.candlesticks"sv, symbols, "1m"sv);
+    subscribe(trace_info, "futures.candlesticks"sv, symbols, "1m"sv);
   }
 }
 
-void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols) {
+void MarketData::subscribe(TraceInfo const &trace_info, std::string_view const &channel, std::span<Symbol const> const &symbols) {
   assert(!std::empty(symbols));
-  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto now = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc);
   auto message = fmt::format(
       R"({{)"
       R"("time":{},)"
@@ -527,10 +529,11 @@ void MarketData::subscribe(std::string_view const &channel, std::span<Symbol con
 }
 
 // order book
-void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth) {
+void MarketData::subscribe(
+    TraceInfo const &trace_info, std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth) {
   assert(!std::empty(symbols));
   for (auto &symbol : symbols) {
-    auto now = clock::get_realtime<std::chrono::seconds>();
+    auto now = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc);
     auto message = fmt::format(
         R"({{)"
         R"("time":{},)"
@@ -548,10 +551,11 @@ void MarketData::subscribe(std::string_view const &channel, std::span<Symbol con
 }
 
 // candlesticks
-void MarketData::subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::string_view const &interval) {
+void MarketData::subscribe(
+    TraceInfo const &trace_info, std::string_view const &channel, std::span<Symbol const> const &symbols, std::string_view const &interval) {
   assert(!std::empty(symbols));
   for (auto &symbol : symbols) {
-    auto now = clock::get_realtime<std::chrono::seconds>();
+    auto now = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc);
     auto message = fmt::format(
         R"({{)"
         R"("time":{},)"

@@ -270,15 +270,15 @@ int32_t DropCopy::download(Trace<State> const &event) {
       break;
     case LOGIN:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::LOGIN_SENT);
-      login();
+      login(trace_info);
       return 1;
     case SUBSCRIBE:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "subscribe"sv);
-      subscribe();
+      subscribe(trace_info);
       return 0;
     case ORDERS:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "orders"sv);
-      get_orders();
+      get_orders(trace_info);
       return 1;
     case DONE:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
@@ -708,9 +708,9 @@ void DropCopy::create_order_update(Callback callback, T const &value, UpdateType
 
 // helpers
 
-void DropCopy::login() {
+void DropCopy::login(TraceInfo const &trace_info) {
   auto request_id = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto now = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc);
   auto event = "api"sv;
   auto channel = "futures.login"sv;
   auto signature = account_.create_signature_login(event, channel, {}, now);
@@ -739,40 +739,40 @@ void DropCopy::login() {
   (*connection_).send_text(message);
 }
 
-void DropCopy::subscribe() {
-  subscribe_balances();
-  subscribe_positions();
-  subscribe_orders();
-  subscribe_trades();
+void DropCopy::subscribe(TraceInfo const &trace_info) {
+  subscribe_balances(trace_info);
+  subscribe_positions(trace_info);
+  subscribe_orders(trace_info);
+  subscribe_trades(trace_info);
 }
 
-void DropCopy::subscribe_balances() {
+void DropCopy::subscribe_balances(TraceInfo const &trace_info) {
   assert(user_id_);
   auto payload = fmt::format(R"(["{}"])"sv, user_id_);
-  subscribe("futures.balances"sv, "subscribe"sv, payload);
+  subscribe(trace_info, "futures.balances"sv, "subscribe"sv, payload);
 }
 
-void DropCopy::subscribe_positions() {
+void DropCopy::subscribe_positions(TraceInfo const &trace_info) {
   assert(user_id_);
   auto payload = fmt::format(R"(["{}","!all"])"sv, user_id_);
-  subscribe("futures.positions"sv, "subscribe"sv, payload);
+  subscribe(trace_info, "futures.positions"sv, "subscribe"sv, payload);
 }
 
-void DropCopy::subscribe_orders() {
+void DropCopy::subscribe_orders(TraceInfo const &trace_info) {
   assert(user_id_);
   auto payload = fmt::format(R"(["{}","!all"])"sv, user_id_);
-  subscribe("futures.orders"sv, "subscribe"sv, payload);
+  subscribe(trace_info, "futures.orders"sv, "subscribe"sv, payload);
 }
 
-void DropCopy::subscribe_trades() {
+void DropCopy::subscribe_trades(TraceInfo const &trace_info) {
   assert(user_id_);
   auto payload = fmt::format(R"(["{}","!all"])"sv, user_id_);
-  subscribe("futures.usertrades"sv, "subscribe"sv, payload);
+  subscribe(trace_info, "futures.usertrades"sv, "subscribe"sv, payload);
 }
 
-void DropCopy::subscribe(std::string_view const &channel, std::string_view const &event, std::string_view const &payload) {
+void DropCopy::subscribe(TraceInfo const &trace_info, std::string_view const &channel, std::string_view const &event, std::string_view const &payload) {
   auto request_id = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto now = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc);
   std::string signature = account_.create_signature(channel, event, now);
   auto message = fmt::format(
       R"({{)"
@@ -798,9 +798,9 @@ void DropCopy::subscribe(std::string_view const &channel, std::string_view const
   (*connection_).send_text(message);
 }
 
-void DropCopy::get_orders() {
+void DropCopy::get_orders(TraceInfo const &trace_info) {
   auto request_id = ++request_id_;
-  auto now = clock::get_realtime<std::chrono::seconds>();
+  auto now = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc);
   auto const channel = "futures.order_list"sv;
   auto const event = "api"sv;
   auto message = fmt::format(

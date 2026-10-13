@@ -114,18 +114,18 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
 
   // helpers
 
-  void login();
+  void login(TraceInfo const &);
 
-  void subscribe();
+  void subscribe(TraceInfo const &);
 
-  void subscribe_balances();
-  void subscribe_positions();
-  void subscribe_orders();
-  void subscribe_trades();
+  void subscribe_balances(TraceInfo const &);
+  void subscribe_positions(TraceInfo const &);
+  void subscribe_orders(TraceInfo const &);
+  void subscribe_trades(TraceInfo const &);
 
-  void subscribe(std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
+  void subscribe(TraceInfo const &, std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
 
-  void get_orders();
+  void get_orders(TraceInfo const &);
 
   void parse(TraceInfo const &, std::string_view const &message);
 

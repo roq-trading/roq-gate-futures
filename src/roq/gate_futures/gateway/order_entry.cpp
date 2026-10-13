@@ -206,15 +206,15 @@ int32_t OrderEntry::download(Trace<State> const &event) {
       break;
     case ACCOUNTS:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "accounts"sv);
-      get_accounts();
+      get_accounts(trace_info);
       return 1;
     case POSITIONS:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "positions"sv);
-      get_positions();
+      get_positions(trace_info);
       return 1;
     case TRADES:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "trades"sv);
-      get_trades();
+      get_trades(trace_info);
       return 1;
     case DONE:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
@@ -226,11 +226,11 @@ int32_t OrderEntry::download(Trace<State> const &event) {
 
 // accounts
 
-void OrderEntry::get_accounts() {
+void OrderEntry::get_accounts(TraceInfo const &trace_info) {
   profile_.accounts([&]() {
     auto method = web::http::Method::GET;
     auto path = shared_.api.accounts;
-    auto headers = account_.create_headers(method, path, {}, {});
+    auto headers = account_.create_headers(trace_info, method, path, {}, {});
     auto request = web::rest::Request{
         .method = method,
         .path = path,
@@ -272,11 +272,11 @@ void OrderEntry::operator()(Trace<protocol::json::Accounts> const &event) {
 
 // positions
 
-void OrderEntry::get_positions() {
+void OrderEntry::get_positions(TraceInfo const &trace_info) {
   profile_.positions([&]() {
     auto method = web::http::Method::GET;
     auto path = shared_.api.positions;
-    auto headers = account_.create_headers(method, path, {}, {});
+    auto headers = account_.create_headers(trace_info, method, path, {}, {});
     auto request = web::rest::Request{
         .method = method,
         .path = path,
@@ -348,16 +348,15 @@ void OrderEntry::operator()(Trace<protocol::json::Positions> const &event) {
 
 // trades
 
-void OrderEntry::get_trades() {
+void OrderEntry::get_trades(TraceInfo const &trace_info) {
   profile_.trades([&]() {
-    auto now = clock::get_realtime<std::chrono::milliseconds>();
     auto lookback = get_download_trades_lookback(shared_.settings, download_trades_is_first_);
     log::info<1>("Download trades: lookback={}"sv, lookback);
-    auto from = std::chrono::duration_cast<std::chrono::seconds>(now - lookback);
+    auto from = std::chrono::duration_cast<std::chrono::seconds>(trace_info.origin_create_time_utc - lookback);
     auto method = web::http::Method::GET;
     auto path = shared_.api.trades;
     auto query = fmt::format("?from={}"sv, from.count());
-    auto headers = account_.create_headers(method, path, query, {});
+    auto headers = account_.create_headers(trace_info, method, path, query, {});
     auto request = web::rest::Request{
         .method = method,
         .path = path,

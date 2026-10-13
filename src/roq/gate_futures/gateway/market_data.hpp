@@ -79,10 +79,12 @@ struct MarketData final : public Base<MarketData>,
 
   // helpers
 
-  void subscribe(std::span<Symbol const> const &symbols);
-  void subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols);
-  void subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth);
-  void subscribe(std::string_view const &channel, std::span<Symbol const> const &symbols, std::string_view const &interval);
+  void subscribe(TraceInfo const &, std::span<Symbol const> const &symbols);
+
+  void subscribe(TraceInfo const &, std::string_view const &channel, std::span<Symbol const> const &symbols);
+  void subscribe(
+      TraceInfo const &, std::string_view const &channel, std::span<Symbol const> const &symbols, std::chrono::milliseconds frequency, uint32_t depth);
+  void subscribe(TraceInfo const &, std::string_view const &channel, std::span<Symbol const> const &symbols, std::string_view const &interval);
 
   void parse(TraceInfo const &, std::string_view const &message);
 

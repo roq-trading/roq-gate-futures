@@ -22,7 +22,7 @@ struct Account final {
 
   auto &get_key() const { return crypto_.get_key(); }
 
-  std::string create_headers(web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body);
+  std::string create_headers(TraceInfo const &, web::http::Method, std::string_view const &path, std::string_view const &query, std::string_view const &body);
 
   std::string create_signature_login(
       std::string_view const &event, std::string_view const &channel, std::string_view const &req_param, std::chrono::seconds timestamp);

@@ -74,19 +74,19 @@ struct OrderEntry final : public Base<OrderEntry>, public server::Stream, public
 
   // accounts
 
-  void get_accounts();
+  void get_accounts(TraceInfo const &);
   void get_accounts_ack(Trace<web::rest::Response> const &, uint32_t sequence);
   void operator()(Trace<protocol::json::Accounts> const &);
 
   // positions
 
-  void get_positions();
+  void get_positions(TraceInfo const &);
   void get_positions_ack(Trace<web::rest::Response> const &, uint32_t sequence);
   void operator()(Trace<protocol::json::Positions> const &);
 
   // trades
 
-  void get_trades();
+  void get_trades(TraceInfo const &);
   void get_trades_ack(Trace<web::rest::Response> const &, uint32_t sequence);
   void operator()(Trace<protocol::json::UserTrades> const &);
 
