@@ -12,20 +12,19 @@
 
 #include "roq/web/rest/client.hpp"
 
-#include "roq/core/download_2.hpp"
-
 #include "roq/core/json/buffer_stack.hpp"
 
 #include "roq/server.hpp"
 
 #include "roq/server/stream.hpp"
 
+#include "roq/gate_futures/gateway/account.hpp"
+#include "roq/gate_futures/gateway/request.hpp"
+#include "roq/gate_futures/gateway/shared.hpp"
+
 #include "roq/gate_futures/protocol/json/accounts.hpp"
 #include "roq/gate_futures/protocol/json/positions.hpp"
 #include "roq/gate_futures/protocol/json/user_trades.hpp"
-
-#include "roq/gate_futures/gateway/account.hpp"
-#include "roq/gate_futures/gateway/shared.hpp"
 
 namespace roq {
 namespace gate_futures {
@@ -34,7 +33,7 @@ namespace gateway {
 struct OrderEntry final : public Base<OrderEntry>, public server::Stream, public web::rest::Client::Handler {
   struct Handler {};
 
-  OrderEntry(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &);
+  OrderEntry(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &, Request &);
 
   // protected:
   friend base_type;
@@ -60,37 +59,27 @@ struct OrderEntry final : public Base<OrderEntry>, public server::Stream, public
   void operator()(Trace<web::rest::Disconnected> const &) override;
   void operator()(Trace<web::rest::Latency> const &) override;
 
-  // core::Download
-
-  enum class State {
-    UNDEFINED = 0,
-    ACCOUNTS,
-    POSITIONS,
-    TRADES,
-    DONE,
-  };
-
-  int32_t download(Trace<State> const &);
-
   // accounts
 
   void get_accounts(TraceInfo const &);
-  void get_accounts_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void get_accounts_ack(Trace<web::rest::Response> const &);
   void operator()(Trace<protocol::json::Accounts> const &);
 
   // positions
 
   void get_positions(TraceInfo const &);
-  void get_positions_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void get_positions_ack(Trace<web::rest::Response> const &);
   void operator()(Trace<protocol::json::Positions> const &);
 
   // trades
 
   void get_trades(TraceInfo const &);
-  void get_trades_ack(Trace<web::rest::Response> const &, uint32_t sequence);
+  void get_trades_ack(Trace<web::rest::Response> const &);
   void operator()(Trace<protocol::json::UserTrades> const &);
 
   // helpers
+
+  void check_request_queue(TraceInfo const &);
 
   void process_response(Trace<web::rest::Response> const &, auto error_handler, auto success_handler);
 
@@ -123,9 +112,9 @@ struct OrderEntry final : public Base<OrderEntry>, public server::Stream, public
   Account &account_;
   // shared
   Shared &shared_;
+  Request &request_;
   // state
   ConnectionStatus connection_status_ = {};
-  core::Download2<State> download_;
   bool download_trades_is_first_ = true;
 };
 

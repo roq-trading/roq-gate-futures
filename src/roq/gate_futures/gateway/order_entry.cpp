@@ -94,7 +94,7 @@ std::string_view get_client_order_id(auto &text) {
 
 // === IMPLEMENTATION ===
 
-OrderEntry::OrderEntry(Handler &handler, io::Context &context, uint16_t stream_id, Account &account, Shared &shared)
+OrderEntry::OrderEntry(Handler &handler, io::Context &context, uint16_t stream_id, Account &account, Shared &shared, Request &request)
     : handler_{handler}, stream_id_{stream_id}, name_{create_name(stream_id_, account.name)},
       connection_{create_connection(*this, shared.settings, context, shared)}, decode_buffer_{shared.settings.misc.decode_buffer_size, MAX_DECODE_BUFFER_DEPTH},
       counter_{
@@ -111,7 +111,7 @@ OrderEntry::OrderEntry(Handler &handler, io::Context &context, uint16_t stream_i
       latency_{
           .ping = create_metrics(shared.settings, name_, "ping"sv),
       },
-      account_{account}, shared_{shared}, download_{shared.settings.rest.request_timeout, [this](auto &event) { return download(event); }} {
+      account_{account}, shared_{shared}, request_{request} {
 }
 
 // server::Stream
@@ -126,7 +126,15 @@ void OrderEntry::operator()(Trace<Stop> const &) {
 
 void OrderEntry::operator()(Trace<Timer> const &event) {
   auto &[trace_info, timer] = event;
-  (*connection_).refresh(timer.now);
+  if ((*connection_).refresh(timer.now)) {
+    if (ready()) {
+      try {
+        check_request_queue(trace_info);
+      } catch (NotConnected &) {
+        // note! ok
+      }
+    }
+  }
 }
 
 void OrderEntry::operator()(metrics::Writer &writer) const {
@@ -170,20 +178,13 @@ void OrderEntry::operator()(Trace<ConnectionStatus> const &event, std::string_vi
 
 void OrderEntry::operator()(Trace<web::rest::Connected> const &event) {
   auto &[trace_info, connected] = event;
-  if (download_.downloading()) {
-    download_.bump(trace_info);
-  } else {
-    download_.begin(trace_info);
-  }
+  create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
 }
 
 void OrderEntry::operator()(Trace<web::rest::Disconnected> const &event) {
   auto &[trace_info, disconnected] = event;
   ++counter_.disconnect;
   create_trace_and_dispatch_2(trace_info, ConnectionStatus::DISCONNECTED);
-  if (!download_.downloading()) {
-    download_.reset();
-  }
 }
 
 void OrderEntry::operator()(Trace<web::rest::Latency> const &event) {
@@ -195,33 +196,6 @@ void OrderEntry::operator()(Trace<web::rest::Latency> const &event) {
   };
   create_trace_and_dispatch(shared_.dispatcher, trace_info, external_latency);
   latency_.ping.update(latency.sample);
-}
-
-int32_t OrderEntry::download(Trace<State> const &event) {
-  auto &[trace_info, state] = event;
-  switch (state) {
-    using enum State;
-    case UNDEFINED:
-      assert(false);
-      break;
-    case ACCOUNTS:
-      create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "accounts"sv);
-      get_accounts(trace_info);
-      return 1;
-    case POSITIONS:
-      create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "positions"sv);
-      get_positions(trace_info);
-      return 1;
-    case TRADES:
-      create_trace_and_dispatch_2(trace_info, ConnectionStatus::DOWNLOADING, "trades"sv);
-      get_trades(trace_info);
-      return 1;
-    case DONE:
-      create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
-      return 0;
-  }
-  assert(false);
-  return 0;
 }
 
 // accounts
@@ -241,27 +215,23 @@ void OrderEntry::get_accounts(TraceInfo const &trace_info) {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_accounts_ack(event, sequence); };
+    auto callback = [this](auto &event, [[maybe_unused]] auto &request_id) { get_accounts_ack(event); };
     (*connection_)(request, callback, "accounts"sv);
   });
 }
 
-void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto const STATE = State::ACCOUNTS;
+void OrderEntry::get_accounts_ack(Trace<web::rest::Response> const &event) {
   profile_.accounts_ack([&]() {
     auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
-      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
-      if (download_.downloading()) {
-        download_.retry(STATE);
-      }
+      log::error(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
     };
     auto handle_success = [&](auto &body) {
       protocol::json::Accounts accounts{body, decode_buffer_};
       create_trace_and_dispatch_2(trace_info, accounts);
-      download_.check_relaxed(trace_info, STATE);
     };
     process_response(event, handle_error, handle_success);
+    request_.balances.commit(trace_info);
   });
 }
 
@@ -287,27 +257,23 @@ void OrderEntry::get_positions(TraceInfo const &trace_info) {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_positions_ack(event, sequence); };
+    auto callback = [this](auto &event, [[maybe_unused]] auto &request_id) { get_positions_ack(event); };
     (*connection_)(request, callback, "positions"sv);
   });
 }
 
-void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto const STATE = State::POSITIONS;
+void OrderEntry::get_positions_ack(Trace<web::rest::Response> const &event) {
   profile_.positions_ack([&]() {
     auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
       log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
-      if (download_.downloading()) {
-        download_.retry(STATE);
-      }
     };
     auto handle_success = [&](auto &body) {
       protocol::json::Positions positions{body, decode_buffer_};
       create_trace_and_dispatch_2(trace_info, positions);
-      download_.check_relaxed(trace_info, STATE);
     };
     process_response(event, handle_error, handle_success);
+    request_.positions.commit(trace_info);
   });
 }
 
@@ -367,28 +333,24 @@ void OrderEntry::get_trades(TraceInfo const &trace_info) {
         .body = {},
         .quality_of_service = {},
     };
-    auto callback = [this, sequence = download_.sequence()](auto &event, [[maybe_unused]] auto &request_id) { get_trades_ack(event, sequence); };
+    auto callback = [this](auto &event, [[maybe_unused]] auto &request_id) { get_trades_ack(event); };
     (*connection_)(request, callback, "trades"sv);
   });
 }
 
-void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event, [[maybe_unused]] uint32_t sequence) {
-  auto const STATE = State::TRADES;
+void OrderEntry::get_trades_ack(Trace<web::rest::Response> const &event) {
   profile_.trades_ack([&]() {
     auto &[trace_info, response] = event;
     auto handle_error = [&](auto origin, auto status, auto error, auto const &text) {
-      log::warn(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
-      if (download_.downloading()) {
-        download_.retry(STATE);
-      }
+      log::error(R"(origin={}, error={}, status={}, text="{}")"sv, origin, error, status, text);
     };
     auto handle_success = [&](auto &body) {
       protocol::json::UserTrades trades{body, decode_buffer_};
       create_trace_and_dispatch_2(trace_info, trades);
       download_trades_is_first_ = false;
-      download_.check_relaxed(trace_info, STATE);
     };
     process_response(event, handle_error, handle_success);
+    request_.trades.commit(trace_info);
   });
 }
 
@@ -447,6 +409,12 @@ void OrderEntry::operator()(Trace<protocol::json::UserTrades> const &event) {
 }
 
 // helpers
+
+void OrderEntry::check_request_queue(TraceInfo const &trace_info) {
+  request_.balances.check_pending(trace_info, [this](auto &trace_info) { get_accounts(trace_info); });
+  request_.positions.check_pending(trace_info, [this](auto &trace_info) { get_positions(trace_info); });
+  request_.trades.check_pending(trace_info, [this](auto &trace_info) { get_trades(trace_info); });
+}
 
 void OrderEntry::process_response(Trace<web::rest::Response> const &event, auto error_handler, auto success_handler) {
   auto &[trace_info, response] = event;

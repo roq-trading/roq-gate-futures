@@ -21,6 +21,7 @@
 #include "roq/server/stream.hpp"
 
 #include "roq/gate_futures/gateway/account.hpp"
+#include "roq/gate_futures/gateway/request.hpp"
 #include "roq/gate_futures/gateway/shared.hpp"
 
 #include "roq/gate_futures/protocol/json/trade_parser.hpp"
@@ -32,7 +33,7 @@ namespace gateway {
 struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream, public web::socket::Client::Handler, protocol::json::TradeParser::Handler {
   struct Handler {};
 
-  DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &);
+  DropCopy(Handler &, io::Context &, uint16_t stream_id, Account &, Shared &, Request &);
 
   // protected:
   friend base_type;
@@ -80,6 +81,23 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
   void operator()(Trace<web::socket::Text> const &) override;
   void operator()(Trace<web::socket::Binary> const &) override;
 
+  // core::Download
+
+  enum class State {
+    UNDEFINED = 0,
+    SUBSCRIBE_BALANCES,
+    GET_BALANCES,
+    SUBSCRIBE_POSITIONS,
+    GET_POSITIONS,
+    SUBSCRIBE_ORDERS,
+    GET_ORDERS,
+    SUBSCRIBE_TRADES,
+    GET_TRADES,
+    DONE,
+  };
+
+  int32_t download(Trace<State> const &);
+
   // protocol::json::TradeParser::Handler
 
   void operator()(Trace<protocol::json::TradeLogin> const &) override;
@@ -100,23 +118,9 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
 
   void operator()(Trace<protocol::json::FuturesSystem> const &) override;
 
-  // core::Download
-
-  enum class State {
-    UNDEFINED = 0,
-    LOGIN,
-    SUBSCRIBE,
-    ORDERS,
-    DONE,
-  };
-
-  int32_t download(Trace<State> const &);
-
   // helpers
 
-  void login(TraceInfo const &);
-
-  void subscribe(TraceInfo const &);
+  void send_login(TraceInfo const &);
 
   void subscribe_balances(TraceInfo const &);
   void subscribe_positions(TraceInfo const &);
@@ -126,6 +130,8 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
   void subscribe(TraceInfo const &, std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
 
   void get_orders(TraceInfo const &);
+
+  void check_request_queue(TraceInfo const &);
 
   void parse(TraceInfo const &, std::string_view const &message);
 
@@ -154,6 +160,7 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
   // account
   Account &account_;
   Shared &shared_;
+  Request &request_;
   // state
   uint32_t request_id_ = {};
   bool ready_ = false;
