@@ -62,6 +62,10 @@ trade_order_place.hpp
 trade_order_place_data.hpp
 trade_order_place_data_errs.hpp
 trade_order_place_data_result.hpp
+trade_order_status.hpp
+trade_order_status_data.hpp
+trade_order_status_data_error.hpp
+trade_order_status_data_result.hpp
 trade_orders.hpp
 trade_positions.hpp
 trade_subscribe.hpp
@@ -134,6 +138,10 @@ trade_order_place.cpp
 trade_order_place_data.cpp
 trade_order_place_data_errs.cpp
 trade_order_place_data_result.cpp
+trade_order_status.cpp
+trade_order_status_data.cpp
+trade_order_status_data_error.cpp
+trade_order_status_data_result.cpp
 trade_orders.cpp
 trade_positions.cpp
 trade_subscribe.cpp

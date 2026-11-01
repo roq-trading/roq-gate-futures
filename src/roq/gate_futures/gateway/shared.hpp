@@ -72,6 +72,10 @@ struct Shared final {
 
   std::vector<Bar> bars;
   std::vector<MBPUpdate> final_bids, final_asks;
+
+  utils::unordered_map<std::string, std::string> symbol_2_settle_coin;
+
+  std::string_view get_settle_coin(std::string_view const &symbol);
 };
 
 }  // namespace gateway

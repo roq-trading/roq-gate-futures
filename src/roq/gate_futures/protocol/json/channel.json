@@ -78,6 +78,11 @@
       "comment": "order management"
     },
     {
+      "raw": "futures.order_status",
+      "name": "order_status",
+      "comment": "order management"
+    },
+    {
       "raw": "futures.system",
       "name": "futures_system",
       "comment": "system"

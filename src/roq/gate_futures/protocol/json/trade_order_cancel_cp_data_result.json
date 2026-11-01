@@ -69,6 +69,18 @@
     {
       "name": "user",
       "type": "std/int64"
+    },
+    {
+      "name": "tkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "mkfr",
+      "type": "std/double"
+    },
+    {
+      "name": "bbo",
+      "type": "std/string_view"
     }
   ]
 }

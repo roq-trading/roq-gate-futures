@@ -42,7 +42,7 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
 
   uint16_t stream_id() const override { return stream_id_; }
 
-  bool ready() const override;
+  bool ready() const override { return connection_status_ == ConnectionStatus::READY; }
 
   void operator()(Trace<Start> const &) override;
   void operator()(Trace<Stop> const &) override;
@@ -90,7 +90,8 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
     SUBSCRIBE_POSITIONS,
     GET_POSITIONS,
     SUBSCRIBE_ORDERS,
-    GET_ORDERS,
+    GET_OPEN_ORDERS,
+    GET_LOST_ORDERS,
     SUBSCRIBE_TRADES,
     GET_TRADES,
     DONE,
@@ -115,6 +116,7 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
   void operator()(Trace<protocol::json::TradeOrderCancelCP> const &) override;
 
   void operator()(Trace<protocol::json::TradeOrderList> const &) override;
+  void operator()(Trace<protocol::json::TradeOrderStatus> const &) override;
 
   void operator()(Trace<protocol::json::FuturesSystem> const &) override;
 
@@ -129,9 +131,15 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
 
   void subscribe(TraceInfo const &, std::string_view const &channel, std::string_view const &event, std::string_view const &payload);
 
-  void get_orders(TraceInfo const &);
+  void get_open_orders(TraceInfo const &);
+
+  void get_single_order_status(
+      TraceInfo const &, std::string_view const &client_order_id, std::string_view const &external_order_id, std::string_view const &settlement_coin);
 
   void check_request_queue(TraceInfo const &);
+
+  bool check_stale_orders(TraceInfo const &);
+  void check_stale_orders_2(TraceInfo const &);
 
   void parse(TraceInfo const &, std::string_view const &message);
 
@@ -171,6 +179,10 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
   // ...
   int64_t user_id_ = {};
   std::string encode_buffer_;
+  //
+  std::chrono::nanoseconds next_check_stale_orders_ = {};
+  //
+  size_t download_lost_orders_counter_ = {};
 };
 
 }  // namespace gateway

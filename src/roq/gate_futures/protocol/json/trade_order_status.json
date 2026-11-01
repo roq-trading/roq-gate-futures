@@ -1,0 +1,18 @@
+{
+  "name": "roq/gate_futures/protocol/json/TradeOrderStatus",
+  "type": "dictionary",
+  "values": [
+    {
+      "name": "header",
+      "type": "roq/gate_futures/protocol/json/TradeHeader"
+    },
+    {
+      "name": "data",
+      "type": "roq/gate_futures/protocol/json/TradeOrderStatusData"
+    },
+    {
+      "name": "request_id",
+      "type": "std/string_view"
+    }
+  ]
+}

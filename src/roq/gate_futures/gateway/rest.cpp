@@ -369,6 +369,8 @@ void Rest::operator()(Trace<protocol::json::ContractsAck> const &event) {
         .discard = discard,
     };
     create_trace_and_dispatch(shared_.dispatcher, trace_info, reference_data, true);
+    // cache settle-coin
+    shared_.symbol_2_settle_coin[symbol] = settlement_currency;
     if (discard) {
       log::info<1>(R"(Drop symbol="{}")"sv, symbol);
       continue;

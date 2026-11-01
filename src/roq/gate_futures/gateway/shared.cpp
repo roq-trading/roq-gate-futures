@@ -14,6 +14,14 @@ Shared::Shared(server::Dispatcher &dispatcher, Settings const &settings)
       time_series_request_queue{rate_limiter}, symbols{settings.ws.max_subscriptions_per_stream} {
 }
 
+std::string_view Shared::get_settle_coin(std::string_view const &symbol) {
+  auto iter = symbol_2_settle_coin.find(symbol);
+  if (iter == std::end(symbol_2_settle_coin)) {
+    return {};
+  }
+  return (*iter).second;
+}
+
 }  // namespace gateway
 }  // namespace gate_futures
 }  // namespace roq

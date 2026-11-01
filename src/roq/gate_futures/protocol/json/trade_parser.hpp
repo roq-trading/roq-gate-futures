@@ -23,6 +23,7 @@
 #include "roq/gate_futures/protocol/json/trade_order_place.hpp"
 
 #include "roq/gate_futures/protocol/json/trade_order_list.hpp"
+#include "roq/gate_futures/protocol/json/trade_order_status.hpp"
 
 #include "roq/gate_futures/protocol/json/futures_system.hpp"
 
@@ -48,6 +49,7 @@ struct TradeParser final {
     virtual void operator()(Trace<TradeOrderCancelCP> const &) = 0;
     //
     virtual void operator()(Trace<TradeOrderList> const &) = 0;
+    virtual void operator()(Trace<TradeOrderStatus> const &) = 0;
     //
     virtual void operator()(Trace<FuturesSystem> const &) = 0;
   };

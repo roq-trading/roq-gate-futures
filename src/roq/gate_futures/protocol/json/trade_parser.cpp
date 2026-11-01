@@ -92,6 +92,9 @@ bool TradeParser::dispatch(
       case ORDER_LIST:
         dispatch_helper<TradeOrderList>(handler, message, buffer_stack, trace_info);
         return true;
+      case ORDER_STATUS:
+        dispatch_helper<TradeOrderStatus>(handler, message, buffer_stack, trace_info);
+        return true;
       case FUTURES_SYSTEM:
         break;
     }
@@ -133,6 +136,7 @@ bool TradeParser::dispatch(
           case ORDER_CANCEL:
           case ORDER_CANCEL_CP:
           case ORDER_LIST:
+          case ORDER_STATUS:
           case FUTURES_SYSTEM:
             break;
         }
@@ -169,6 +173,7 @@ bool TradeParser::dispatch(
           case ORDER_CANCEL:
           case ORDER_CANCEL_CP:
           case ORDER_LIST:
+          case ORDER_STATUS:
             break;
           case FUTURES_SYSTEM:
             dispatch_helper<FuturesSystem>(handler, message, buffer_stack, trace_info);

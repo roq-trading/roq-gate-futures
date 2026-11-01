@@ -67,6 +67,10 @@ set(AUTOGEN_SCHEMAS
     trade_order_place_data.json
     trade_order_place_data_errs.json
     trade_order_place_data_result.json
+    trade_order_status.json
+    trade_order_status_data.json
+    trade_order_status_data_error.json
+    trade_order_status_data_result.json
     trade_orders.json
     trade_positions.json
     trade_subscribe.json
