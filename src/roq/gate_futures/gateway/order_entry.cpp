@@ -447,10 +447,8 @@ void OrderEntry::process_response(Trace<web::rest::Response> const &event, auto 
           case CONFLICT:  // 409
             assert(false);
             [[fallthrough]];
-          default: {
-            // protocol::json::Error error{body};
-            // error_handler(Origin::EXCHANGE, RequestStatus::REJECTED, protocol::json::guess_error(error.code), error.msg);
-          }
+          default:
+            error_handler(Origin::EXCHANGE, RequestStatus::REJECTED, Error::UNKNOWN, ""sv);
         }
         break;
       case SERVER_ERROR: {
