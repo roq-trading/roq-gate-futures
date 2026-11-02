@@ -91,7 +91,7 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
     GET_POSITIONS,
     SUBSCRIBE_ORDERS,
     GET_OPEN_ORDERS,
-    GET_LOST_ORDERS,
+    GET_STALE_ORDERS,
     SUBSCRIBE_TRADES,
     GET_TRADES,
     DONE,
@@ -182,7 +182,7 @@ struct DropCopy final : public Base<DropCopy>, public server::OrderActionStream,
   //
   std::chrono::nanoseconds next_check_stale_orders_ = {};
   //
-  size_t download_lost_orders_counter_ = {};
+  size_t download_stale_orders_counter_ = {};
 };
 
 }  // namespace gateway

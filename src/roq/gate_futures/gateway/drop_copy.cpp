@@ -230,7 +230,7 @@ void DropCopy::operator()(Trace<web::socket::Disconnected> const &event) {
   download_.reset();
   logon_timeout_ = {};
   next_ping_ = {};
-  download_lost_orders_counter_ = {};
+  download_stale_orders_counter_ = {};
 }
 
 void DropCopy::operator()(Trace<web::socket::Ready> const &event) {
@@ -298,8 +298,8 @@ int32_t DropCopy::download(Trace<State> const &event) {
       publish_downloading();
       get_open_orders(trace_info);
       return 1;
-    case GET_LOST_ORDERS:
-      if (download_lost_orders_counter_) {
+    case GET_STALE_ORDERS:
+      if (download_stale_orders_counter_) {
         publish_downloading();
         return 1;
       } else {
@@ -735,14 +735,14 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderStatus> const &event) 
     create_order_update(helper, order_status.data.result, UpdateType::SNAPSHOT);
   }
   //
-  if (download_lost_orders_counter_) {
-    --download_lost_orders_counter_;
+  if (download_stale_orders_counter_) {
+    --download_stale_orders_counter_;
   } else {
     log::fatal("Unexpected"sv);
   }
-  log::warn("DEBUG remaining orders: {}"sv, download_lost_orders_counter_);
-  if (download_lost_orders_counter_ == 0) {
-    auto const STATE = State::GET_LOST_ORDERS;
+  log::warn("DEBUG remaining orders: {}"sv, download_stale_orders_counter_);
+  if (download_stale_orders_counter_ == 0) {
+    auto const STATE = State::GET_STALE_ORDERS;
     download_.check_relaxed(trace_info, STATE);
   }
 }
@@ -1014,7 +1014,7 @@ void DropCopy::check_request_queue(TraceInfo const &trace_info) {
       break;
     case GET_OPEN_ORDERS:
       break;
-    case GET_LOST_ORDERS:
+    case GET_STALE_ORDERS:
       break;
     case SUBSCRIBE_TRADES:
       break;
@@ -1030,7 +1030,7 @@ void DropCopy::check_request_queue(TraceInfo const &trace_info) {
 
 bool DropCopy::check_stale_orders(TraceInfo const &trace_info) {
   auto helper = [&](auto &order) {
-    ++download_lost_orders_counter_;
+    ++download_stale_orders_counter_;
     // XXX FIXME TODO throttle
     auto settlement_coin = shared_.get_settle_coin(order.symbol);
     get_single_order_status(trace_info, order.client_order_id, order.external_order_id, settlement_coin);
@@ -1038,8 +1038,8 @@ bool DropCopy::check_stale_orders(TraceInfo const &trace_info) {
   if (shared_.dispatcher.get_all_stale_orders(helper, account_.name)) {
   } else {
   }
-  if (download_lost_orders_counter_) {
-    log::info("Found {} new lost order(s)"sv, download_lost_orders_counter_);
+  if (download_stale_orders_counter_) {
+    log::info("Found {} new lost order(s)"sv, download_stale_orders_counter_);
     return true;
   } else {
     return false;
