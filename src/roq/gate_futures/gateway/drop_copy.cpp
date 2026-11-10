@@ -1046,7 +1046,7 @@ bool DropCopy::check_stale_orders(TraceInfo const &trace_info) {
 
 void DropCopy::check_stale_orders_2(TraceInfo const &trace_info) {
   if (next_check_stale_orders_ < trace_info.origin_create_time) {
-    next_check_stale_orders_ = trace_info.origin_create_time + shared_.settings.experimental.check_stale_order_freq;
+    next_check_stale_orders_ = trace_info.origin_create_time + shared_.settings.oms.stale_order_check_freq;
     check_stale_orders(trace_info);
   }
 }
