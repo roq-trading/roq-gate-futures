@@ -2,9 +2,15 @@
 
 #include "roq/gate_futures/protocol/json/map.hpp"
 
+#include "roq/server/tools/log_once.hpp"
+
 using namespace std::literals;
 
 namespace roq {
+
+namespace {
+server::tools::LogOnce LOG_ONCE{"Map"sv};
+}
 
 namespace {
 template <typename... Args>
