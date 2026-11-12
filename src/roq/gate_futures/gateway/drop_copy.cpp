@@ -507,7 +507,22 @@ void DropCopy::operator()(Trace<protocol::json::TradeTrades> const &event) {
 
 void DropCopy::operator()(Trace<protocol::json::TradeOrderPlace> const &event) {
   auto &[trace_info, order_place] = event;
-  if (order_place.header.status == 200) {
+  if (order_place.header.status != 200) {
+    auto response = server::oms::Response{
+        .request_type = RequestType::CREATE_ORDER,
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::REJECTED,
+        .error = map(order_place.header.status),
+        .text = order_place.data.errs.message,
+        .version = 1,
+        .request_id = order_place.request_id,
+        .external_order_id = {},
+        .client_order_id = {},
+        .quantity = NaN,
+        .price = NaN,
+    };
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
+  } else if (shared_.settings.oms.unsafe_order_ack) {
     auto &result = order_place.data.result;
     // note! first ack doesn't contain the actual order (probably just validation)
     if (!std::empty(result.text)) {
@@ -529,28 +544,28 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderPlace> const &event) {
       };
       create_order_update(helper, result, UpdateType::INCREMENTAL);
     }
-  } else {
-    auto response = server::oms::Response{
-        .request_type = RequestType::CREATE_ORDER,
-        .origin = Origin::EXCHANGE,
-        .request_status = RequestStatus::REJECTED,
-        .error = Error::UNKNOWN,  // XXX TODO parse error code
-        .text = order_place.data.errs.message,
-        .version = 1,
-        .request_id = order_place.request_id,
-        .external_order_id = {},
-        .client_order_id = {},
-        .quantity = NaN,
-        .price = NaN,
-    };
-    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
   }
 }
 
 void DropCopy::operator()(Trace<protocol::json::TradeOrderAmend> const &event) {
   auto &[trace_info, order_amend] = event;
   auto &header = order_amend.header;
-  if (header.status == 200) {
+  if (header.status != 200) {
+    auto response = server::oms::Response{
+        .request_type = RequestType::MODIFY_ORDER,
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::REJECTED,
+        .error = map(header.status),
+        .text = order_amend.data.errs.message,
+        .version = {},
+        .request_id = order_amend.request_id,
+        .external_order_id = {},
+        .client_order_id = {},
+        .quantity = NaN,
+        .price = NaN,
+    };
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
+  } else if (shared_.settings.oms.unsafe_order_ack) {
     auto helper = [&](auto &order_update) {
       auto response = server::oms::Response{
           .request_type = RequestType::MODIFY_ORDER,
@@ -568,28 +583,29 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderAmend> const &event) {
       create_trace_and_dispatch(shared_.dispatcher, trace_info, response, order_update, stream_id_);
     };
     create_order_update(helper, order_amend.data.result, UpdateType::INCREMENTAL);
-  } else {
+  }
+}
+
+void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) {
+  auto &[trace_info, order_cancel] = event;
+  log::warn("DEBUG order_cancel={}"sv, order_cancel);
+  auto &header = order_cancel.header;
+  if (header.status != 200) {
     auto response = server::oms::Response{
         .request_type = RequestType::CANCEL_ORDER,
         .origin = Origin::EXCHANGE,
         .request_status = RequestStatus::REJECTED,
-        .error = Error::UNKNOWN,  // XXX TODO parse error code
-        .text = order_amend.data.errs.message,
+        .error = map(header.status),
+        .text = order_cancel.data.errs.message,
         .version = {},
-        .request_id = order_amend.request_id,
+        .request_id = order_cancel.request_id,
         .external_order_id = {},
         .client_order_id = {},
         .quantity = NaN,
         .price = NaN,
     };
     create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
-  }
-}
-
-void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) {
-  auto &[trace_info, order_cancel] = event;
-  auto &header = order_cancel.header;
-  if (header.status == 200) {
+  } else if (shared_.settings.oms.unsafe_order_ack) {
     auto helper = [&](auto &order_update) {
       auto response = server::oms::Response{
           .request_type = RequestType::CANCEL_ORDER,
@@ -607,48 +623,13 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) 
       create_trace_and_dispatch(shared_.dispatcher, trace_info, response, order_update, stream_id_);
     };
     create_order_update(helper, order_cancel.data.result, UpdateType::INCREMENTAL);
-  } else {
-    auto response = server::oms::Response{
-        .request_type = RequestType::CANCEL_ORDER,
-        .origin = Origin::EXCHANGE,
-        .request_status = RequestStatus::REJECTED,
-        .error = Error::UNKNOWN,  // XXX TODO parse error code
-        .text = order_cancel.data.errs.message,
-        .version = {},
-        .request_id = order_cancel.request_id,
-        .external_order_id = {},
-        .client_order_id = {},
-        .quantity = NaN,
-        .price = NaN,
-    };
-    create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
   }
 }
 
 void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event) {
   auto &[trace_info, order_cancel_cp] = event;
   auto &header = order_cancel_cp.header;
-  if (header.status == 200) {
-    auto cancel_all_orders_ack = CancelAllOrdersAck{
-        .stream_id = stream_id_,
-        .account = account_.name,
-        .order_id = {},
-        .exchange = {},
-        .symbol = {},
-        .side = {},
-        .origin = Origin::EXCHANGE,
-        .request_status = RequestStatus::ACCEPTED,
-        .error = {},
-        .text = {},
-        .request_id = order_cancel_cp.request_id,
-        .external_account = {},
-        .number_of_affected_orders = {},
-        .round_trip_latency = {},
-        .user = {},
-        .strategy_id = {},
-    };
-    create_trace_and_dispatch(shared_.dispatcher, trace_info, cancel_all_orders_ack);
-  } else {
+  if (header.status != 200) {
     auto cancel_all_orders_ack = CancelAllOrdersAck{
         .stream_id = stream_id_,
         .account = account_.name,
@@ -660,6 +641,26 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event
         .request_status = RequestStatus::REJECTED,
         .error = Error::UNKNOWN,  // XXX TODO parse error code
         .text = order_cancel_cp.data.errs.message,
+        .request_id = order_cancel_cp.request_id,
+        .external_account = {},
+        .number_of_affected_orders = {},
+        .round_trip_latency = {},
+        .user = {},
+        .strategy_id = {},
+    };
+    create_trace_and_dispatch(shared_.dispatcher, trace_info, cancel_all_orders_ack);
+  } else if (shared_.settings.oms.unsafe_order_ack) {
+    auto cancel_all_orders_ack = CancelAllOrdersAck{
+        .stream_id = stream_id_,
+        .account = account_.name,
+        .order_id = {},
+        .exchange = {},
+        .symbol = {},
+        .side = {},
+        .origin = Origin::EXCHANGE,
+        .request_status = RequestStatus::ACCEPTED,
+        .error = {},
+        .text = {},
         .request_id = order_cancel_cp.request_id,
         .external_account = {},
         .number_of_affected_orders = {},

@@ -19,6 +19,35 @@ using Helper = detail::MapHelper<Args...>;
 
 // gate_futures => roq
 
+// int32_t => roq::Error
+
+template <>
+template <>
+constexpr Helper<int32_t>::operator std::optional<roq::Error>() const {
+  auto value = std::get<0>(args_);
+  switch (value) {
+    case 0:
+      return roq::Error::UNDEFINED;
+    case 200:
+      return roq::Error::UNDEFINED;
+    case 400:
+      return Error::TOO_LATE_TO_MODIFY_OR_CANCEL;
+    case 404:
+      return Error::TOO_LATE_TO_MODIFY_OR_CANCEL;
+  }
+  LOG_ONCE("error_code"sv, value);
+  return Error::UNKNOWN;
+}
+
+static_assert(Helper{int32_t{0}} == roq::Error::UNDEFINED);
+static_assert(Helper{int32_t{200}} == roq::Error::UNDEFINED);
+
+template <>
+template <>
+std::optional<roq::Error> Map<int32_t>::helper() const {
+  return Helper{args_};
+}
+
 // gate_futures::protocol::json::FinishAs ==> roq::OrderStatus
 
 template <>
