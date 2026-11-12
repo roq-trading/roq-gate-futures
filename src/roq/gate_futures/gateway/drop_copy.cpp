@@ -522,7 +522,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderPlace> const &event) {
         .price = NaN,
     };
     create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
-  } else if (shared_.settings.oms.unsafe_order_ack) {
+  } else if (shared_.settings.oms.allow_unsafe_order_ack) {
     auto &result = order_place.data.result;
     // note! first ack doesn't contain the actual order (probably just validation)
     if (!std::empty(result.text)) {
@@ -565,7 +565,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderAmend> const &event) {
         .price = NaN,
     };
     create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
-  } else if (shared_.settings.oms.unsafe_order_ack) {
+  } else if (shared_.settings.oms.allow_unsafe_order_ack) {
     auto helper = [&](auto &order_update) {
       auto response = server::oms::Response{
           .request_type = RequestType::MODIFY_ORDER,
@@ -605,7 +605,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancel> const &event) 
         .price = NaN,
     };
     create_trace_and_dispatch(shared_.dispatcher, trace_info, response, stream_id_);
-  } else if (shared_.settings.oms.unsafe_order_ack) {
+  } else if (shared_.settings.oms.allow_unsafe_order_ack) {
     auto helper = [&](auto &order_update) {
       auto response = server::oms::Response{
           .request_type = RequestType::CANCEL_ORDER,
@@ -649,7 +649,7 @@ void DropCopy::operator()(Trace<protocol::json::TradeOrderCancelCP> const &event
         .strategy_id = {},
     };
     create_trace_and_dispatch(shared_.dispatcher, trace_info, cancel_all_orders_ack);
-  } else if (shared_.settings.oms.unsafe_order_ack) {
+  } else if (shared_.settings.oms.allow_unsafe_order_ack) {
     auto cancel_all_orders_ack = CancelAllOrdersAck{
         .stream_id = stream_id_,
         .account = account_.name,
