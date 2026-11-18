@@ -19,14 +19,14 @@ namespace json {
 
 std::string_view Encoder::order_place(
     std::string &buffer,
-    roq::Event<CreateOrder> const &event,
+    roq::Trace<CreateOrder> const &event,
     server::oms::Order const &order,
     server::oms::RefData const &ref_data,
     std::string_view const &request_id,
     uint32_t request_id_2) {
   buffer.clear();
   auto &[message_info, create_order] = event;
-  assert(message_info.receive_time_utc.count() > 0);
+  assert(message_info.origin_create_time_utc.count() > 0);
   auto channel = "futures.order_place"sv;
   auto event_2 = "api"sv;
   auto sign = utils::sign(create_order.side);
@@ -104,7 +104,7 @@ std::string_view Encoder::order_place(
       R"(}})"
       R"(}})"sv,
       request_id_2,
-      message_info.receive_time_utc.count(),
+      message_info.origin_create_time_utc.count(),
       channel,
       event_2,
       request_id,
@@ -119,7 +119,7 @@ std::string_view Encoder::order_place(
 
 std::string_view Encoder::order_amend(
     std::string &buffer,
-    roq::Event<ModifyOrder> const &event,
+    roq::Trace<ModifyOrder> const &event,
     server::oms::Order const &order,
     server::oms::RefData const &ref_data,
     std::string_view const &request_id,
@@ -127,7 +127,7 @@ std::string_view Encoder::order_amend(
     uint32_t request_id_2) {
   buffer.clear();
   auto &[message_info, modify_order] = event;
-  assert(message_info.receive_time_utc.count() > 0);
+  assert(message_info.origin_create_time_utc.count() > 0);
   auto const channel = "futures.order_amend"sv;
   auto const event_2 = "api"sv;
   fmt::format_to(
@@ -142,7 +142,7 @@ std::string_view Encoder::order_amend(
       R"("req_param":{{)"
       R"("order_id":"t-{}",)"sv,
       request_id_2,
-      message_info.receive_time_utc.count(),
+      message_info.origin_create_time_utc.count(),
       channel,
       event_2,
       request_id,
@@ -167,7 +167,7 @@ std::string_view Encoder::order_amend(
 
 std::string_view Encoder::order_cancel(
     std::string &buffer,
-    roq::Event<CancelOrder> const &event,
+    roq::Trace<CancelOrder> const &event,
     server::oms::Order const &order,
     server::oms::RefData const &,
     std::string_view const &request_id,
@@ -175,7 +175,7 @@ std::string_view Encoder::order_cancel(
     uint32_t request_id_2) {
   buffer.clear();
   auto &[message_info, cancel_order] = event;
-  assert(message_info.receive_time_utc.count() > 0);
+  assert(message_info.origin_create_time_utc.count() > 0);
   auto const channel = "futures.order_cancel"sv;
   auto const event_2 = "api"sv;
   fmt::format_to(
@@ -193,7 +193,7 @@ std::string_view Encoder::order_cancel(
       R"(}})"
       R"(}})"sv,
       request_id_2,
-      message_info.receive_time_utc.count(),
+      message_info.origin_create_time_utc.count(),
       channel,
       event_2,
       request_id,
@@ -202,10 +202,10 @@ std::string_view Encoder::order_cancel(
 }
 
 std::string_view Encoder::order_cancel_cp(
-    std::string &buffer, roq::Event<CancelAllOrders> const &event, std::string_view const &request_id, uint32_t request_id_2, std::string_view const &symbol) {
+    std::string &buffer, roq::Trace<CancelAllOrders> const &event, std::string_view const &request_id, uint32_t request_id_2, std::string_view const &symbol) {
   buffer.clear();
   auto &[message_info, cancel_all_orders] = event;
-  assert(message_info.receive_time_utc.count() > 0);
+  assert(message_info.origin_create_time_utc.count() > 0);
   auto const channel = "futures.order_cancel_cp"sv;
   auto const event_2 = "api"sv;
   fmt::format_to(
@@ -223,7 +223,7 @@ std::string_view Encoder::order_cancel_cp(
       R"(}})"
       R"(}})"sv,
       request_id_2,
-      message_info.receive_time_utc.count(),
+      message_info.origin_create_time_utc.count(),
       channel,
       event_2,
       request_id,

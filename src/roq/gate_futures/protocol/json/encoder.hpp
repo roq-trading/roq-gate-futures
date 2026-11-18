@@ -21,7 +21,7 @@ namespace json {
 struct Encoder final {
   static std::string_view order_place(
       std::string &buffer,
-      roq::Event<CreateOrder> const &,
+      roq::Trace<CreateOrder> const &,
       server::oms::Order const &,
       server::oms::RefData const &,
       std::string_view const &request_id,
@@ -29,7 +29,7 @@ struct Encoder final {
 
   static std::string_view order_amend(
       std::string &buffer,
-      roq::Event<ModifyOrder> const &,
+      roq::Trace<ModifyOrder> const &,
       server::oms::Order const &,
       server::oms::RefData const &,
       std::string_view const &request_id,
@@ -38,7 +38,7 @@ struct Encoder final {
 
   static std::string_view order_cancel(
       std::string &buffer,
-      roq::Event<CancelOrder> const &,
+      roq::Trace<CancelOrder> const &,
       server::oms::Order const &,
       server::oms::RefData const &,
       std::string_view const &request_id,
@@ -46,7 +46,7 @@ struct Encoder final {
       uint32_t request_id_2);
 
   static std::string_view order_cancel_cp(
-      std::string &buffer, roq::Event<CancelAllOrders> const &, std::string_view const &request_id, uint32_t request_id_2, std::string_view const &symbol);
+      std::string &buffer, roq::Trace<CancelAllOrders> const &, std::string_view const &request_id, uint32_t request_id_2, std::string_view const &symbol);
 };
 
 }  // namespace json
