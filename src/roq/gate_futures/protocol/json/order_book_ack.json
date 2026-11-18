@@ -23,6 +23,14 @@
     {
       "name": "update",
       "type": "std/milliseconds"
+    },
+    {
+      "name": "current_us",
+      "type": "std/microseconds"
+    },
+    {
+      "name": "update_us",
+      "type": "std/microseconds"
     }
   ]
 }

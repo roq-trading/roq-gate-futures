@@ -44,7 +44,7 @@ void dispatch_helper(auto &handler, auto &message, auto &buffer_stack, auto &tra
 // === IMPLEMENTATION ===
 
 bool TradeParser::dispatch(
-    Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info, bool allow_unknown_event_types) {
+    Handler &handler, std::string_view const &message, core::json::BufferStack &buffer_stack, TraceInfo const &trace_info, bool disable_strict_parsing) {
   TradeMessage message_2{message, buffer_stack};
   log::debug("{}"sv, message_2);
   auto &error = message_2.error;
@@ -59,7 +59,7 @@ bool TradeParser::dispatch(
       case UNDEFINED_INTERNAL:
         break;
       case UNKNOWN_INTERNAL:
-        if (allow_unknown_event_types) {
+        if (disable_strict_parsing) {
           return false;
         }
         break;
@@ -104,7 +104,7 @@ bool TradeParser::dispatch(
       case UNDEFINED_INTERNAL:
         break;
       case UNKNOWN_INTERNAL:
-        if (allow_unknown_event_types) {
+        if (disable_strict_parsing) {
           return false;
         }
         break;
@@ -114,7 +114,7 @@ bool TradeParser::dispatch(
           case UNDEFINED_INTERNAL:
             break;
           case UNKNOWN_INTERNAL:
-            if (allow_unknown_event_types) {
+            if (disable_strict_parsing) {
               return false;
             }
             break;
@@ -181,7 +181,7 @@ bool TradeParser::dispatch(
         }
         break;
       case API:
-        if (allow_unknown_event_types) {
+        if (disable_strict_parsing) {
           return false;
         }
         break;
