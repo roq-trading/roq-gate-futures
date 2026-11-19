@@ -52,6 +52,9 @@
     },
     {
       "name": "category"
+    },
+    {
+      "name": "tokenized_security_info"
     }
   ]
 }
