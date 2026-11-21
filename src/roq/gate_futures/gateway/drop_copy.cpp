@@ -236,7 +236,6 @@ void DropCopy::operator()(Trace<web::socket::Connected> const &) {
 void DropCopy::operator()(Trace<web::socket::Disconnected> const &event) {
   auto &[trace_info, disconnected] = event;
   ++counter_.disconnect;
-  ready_ = false;
   create_trace_and_dispatch_2(trace_info, ConnectionStatus::DISCONNECTED);
   download_.reset();
   logon_timeout_ = {};
@@ -330,8 +329,6 @@ int32_t DropCopy::download(Trace<State> const &event) {
       }
     case DONE:
       create_trace_and_dispatch_2(trace_info, ConnectionStatus::READY);
-      assert(!ready_);
-      ready_ = true;
       return 0;
   }
   assert(false);
